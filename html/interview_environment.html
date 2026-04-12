@@ -1,0 +1,952 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Интервью — Environment | chilBase</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --ocean-deep: #0A2E4D;
+  --ocean-mid: #1B6B93;
+  --ocean-light: #5DB9C9;
+  --ocean-pale: #E8F6F9;
+  --success: #2ECC71;
+  --warning: #F39C12;
+  --danger: #E74C3C;
+  --text-dark: #1a2a3a;
+  --text-mid: #4a6070;
+  --white: #ffffff;
+  --bg: #f4f8fb;
+  --border: #d0e4ef;
+  --wave-colors: #1B6B93, #2980B9, #16A085, #8E44AD, #E67E22;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text-dark); min-height: 100vh; }
+
+/* ── LAYOUT ── */
+.layout { display: grid; grid-template-columns: 260px 1fr; min-height: 100vh; }
+
+/* ── SIDEBAR ── */
+.sidebar {
+  background: var(--ocean-deep);
+  color: var(--white);
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow-y: auto;
+  padding: 1.5rem 0;
+  display: flex;
+  flex-direction: column;
+}
+.sidebar-logo {
+  padding: 0 1.5rem 1.5rem;
+  border-bottom: 1px solid rgba(255,255,255,.1);
+  margin-bottom: 1rem;
+}
+.sidebar-logo .brand { font-family: 'Space Grotesk', sans-serif; font-size: .75rem; font-weight: 600; letter-spacing: .15em; text-transform: uppercase; opacity: .5; margin-bottom: .3rem; }
+.sidebar-logo .dept { font-family: 'Space Grotesk', sans-serif; font-size: 1.1rem; font-weight: 700; }
+.sidebar-logo .meta { font-size: .75rem; opacity: .55; margin-top: .2rem; }
+
+.nav-section { padding: 0 .75rem; margin-bottom: .5rem; }
+.nav-label { font-size: .65rem; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; opacity: .4; padding: .5rem .75rem .3rem; }
+.nav-item {
+  display: flex; align-items: center; gap: .7rem;
+  padding: .55rem .75rem;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: .85rem;
+  opacity: .7;
+  transition: all .2s;
+  text-decoration: none;
+  color: var(--white);
+}
+.nav-item:hover { background: rgba(255,255,255,.08); opacity: 1; }
+.nav-item.active { background: rgba(93,185,201,.18); opacity: 1; color: var(--ocean-light); }
+.nav-item .wave-num {
+  width: 22px; height: 22px; border-radius: 50%;
+  background: rgba(255,255,255,.12);
+  display: flex; align-items: center; justify-content: center;
+  font-size: .7rem; font-weight: 700; flex-shrink: 0;
+}
+.nav-item.active .wave-num { background: var(--ocean-light); color: var(--ocean-deep); }
+.nav-item .check { margin-left: auto; opacity: 0; color: var(--success); font-size: .85rem; }
+.nav-item.done .check { opacity: 1; }
+.nav-item.done { opacity: .5; }
+
+.sidebar-timer {
+  margin-top: auto;
+  padding: 1rem 1.5rem;
+  border-top: 1px solid rgba(255,255,255,.1);
+}
+.timer-label { font-size: .65rem; opacity: .4; text-transform: uppercase; letter-spacing: .1em; margin-bottom: .4rem; }
+.timer-display { font-family: 'Space Grotesk', sans-serif; font-size: 1.8rem; font-weight: 700; letter-spacing: .05em; }
+.timer-btn {
+  margin-top: .5rem; width: 100%;
+  background: rgba(255,255,255,.1); border: none; color: var(--white);
+  padding: .5rem; border-radius: 8px; cursor: pointer;
+  font-size: .8rem; font-family: 'Inter', sans-serif;
+  transition: background .2s;
+}
+.timer-btn:hover { background: rgba(255,255,255,.18); }
+
+/* ── MAIN CONTENT ── */
+.main { padding: 2rem 2.5rem; max-width: 820px; }
+
+/* ── HEADER ── */
+.page-header {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 1.5rem 2rem;
+  margin-bottom: 2rem;
+  display: flex; align-items: flex-start; justify-content: space-between;
+}
+.page-header h1 { font-family: 'Space Grotesk', sans-serif; font-size: 1.5rem; font-weight: 700; color: var(--ocean-deep); margin-bottom: .3rem; }
+.page-header .subtitle { font-size: .85rem; color: var(--text-mid); }
+.meta-grid { display: flex; gap: 1.5rem; margin-top: 1rem; flex-wrap: wrap; }
+.meta-item { font-size: .8rem; }
+.meta-item .label { opacity: .5; text-transform: uppercase; font-size: .65rem; letter-spacing: .08em; }
+.meta-item .value { font-weight: 600; color: var(--ocean-deep); margin-top: .1rem; }
+.consent-badge {
+  background: #FFF3CD; border: 1px solid #FFC107;
+  border-radius: 8px; padding: .6rem 1rem;
+  font-size: .8rem; color: #856404;
+  white-space: nowrap; flex-shrink: 0;
+}
+
+/* ── SECTIONS ── */
+.section { margin-bottom: 2rem; scroll-margin-top: 1rem; }
+.section-card {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  overflow: hidden;
+}
+.section-header {
+  padding: 1.2rem 1.5rem;
+  display: flex; align-items: center; gap: 1rem;
+  cursor: pointer;
+  user-select: none;
+}
+.section-header:hover { background: var(--ocean-pale); }
+.section-icon {
+  width: 36px; height: 36px; border-radius: 10px;
+  background: var(--ocean-pale);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1rem; flex-shrink: 0;
+}
+.section-title { font-family: 'Space Grotesk', sans-serif; font-size: 1rem; font-weight: 600; }
+.section-sub { font-size: .78rem; color: var(--text-mid); margin-top: .1rem; }
+.section-toggle { margin-left: auto; color: var(--text-mid); font-size: .9rem; transition: transform .2s; }
+.section-toggle.open { transform: rotate(180deg); }
+.section-body { padding: 1.5rem; border-top: 1px solid var(--border); }
+.section-body.hidden { display: none; }
+
+/* ── CONTEXT BOX ── */
+.context-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+.context-block { background: var(--ocean-pale); border-radius: 10px; padding: 1rem; }
+.context-block.full { grid-column: 1 / -1; }
+.context-block h4 { font-family: 'Space Grotesk', sans-serif; font-size: .75rem; font-weight: 600; text-transform: uppercase; letter-spacing: .1em; color: var(--ocean-mid); margin-bottom: .6rem; }
+.context-block ul { list-style: none; }
+.context-block ul li { font-size: .83rem; padding: .2rem 0; padding-left: 1rem; position: relative; color: var(--text-dark); }
+.context-block ul li::before { content: '→'; position: absolute; left: 0; color: var(--ocean-mid); opacity: .5; font-size: .75rem; }
+.tag-list { display: flex; flex-wrap: wrap; gap: .4rem; }
+.tag { background: rgba(27,107,147,.12); color: var(--ocean-mid); padding: .2rem .6rem; border-radius: 20px; font-size: .75rem; font-weight: 500; }
+
+/* ── PSYCHOTYPE TABLE ── */
+.psycho-table { width: 100%; border-collapse: collapse; font-size: .83rem; }
+.psycho-table th { background: var(--ocean-pale); padding: .6rem .8rem; text-align: left; font-weight: 600; font-size: .75rem; text-transform: uppercase; letter-spacing: .06em; color: var(--ocean-mid); }
+.psycho-table td { padding: .7rem .8rem; border-bottom: 1px solid var(--border); vertical-align: top; }
+.psycho-table tr:last-child td { border-bottom: none; }
+.type-badge { font-weight: 700; font-family: 'Space Grotesk', sans-serif; }
+.type-badge.analyst { color: #2980B9; }
+.type-badge.skeptic { color: #E74C3C; }
+.type-badge.enthusiast { color: #27AE60; }
+.type-badge.executor { color: #8E44AD; }
+.redflag { background: #FFF3CD; border-left: 3px solid var(--warning); padding: .8rem 1rem; border-radius: 0 8px 8px 0; margin-top: 1rem; font-size: .83rem; }
+.respondent-note { background: #E8F5E9; border-left: 3px solid var(--success); padding: .8rem 1rem; border-radius: 0 8px 8px 0; margin-top: .8rem; font-size: .83rem; }
+
+/* ── HYPOTHESES ── */
+.hypo-grid { display: flex; flex-direction: column; gap: .7rem; }
+.hypo-card { display: grid; grid-template-columns: 32px 1fr 1fr; gap: .8rem; align-items: start; padding: .8rem 1rem; background: var(--ocean-pale); border-radius: 10px; }
+.hypo-num { width: 28px; height: 28px; border-radius: 50%; background: var(--ocean-mid); color: var(--white); display: flex; align-items: center; justify-content: center; font-size: .75rem; font-weight: 700; flex-shrink: 0; }
+.hypo-text { font-size: .83rem; font-weight: 500; }
+.hypo-goal { font-size: .78rem; color: var(--text-mid); }
+
+/* ── WAVE ── */
+.wave-header {
+  display: flex; align-items: center; gap: 1rem;
+  padding: 1.2rem 1.5rem;
+  cursor: pointer;
+  user-select: none;
+}
+.wave-header:hover { background: var(--ocean-pale); }
+.wave-badge {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: .7rem; font-weight: 700;
+  padding: .25rem .7rem;
+  border-radius: 20px;
+  background: var(--ocean-mid);
+  color: var(--white);
+  white-space: nowrap;
+}
+.wave-0 { background: #6C757D; }
+.wave-1 { background: #1B6B93; }
+.wave-2 { background: #E74C3C; }
+.wave-3 { background: #F39C12; }
+.wave-4 { background: #8E44AD; }
+.wave-5 { background: #27AE60; }
+.wave-title { font-family: 'Space Grotesk', sans-serif; font-size: 1rem; font-weight: 600; }
+.wave-time { margin-left: auto; font-size: .78rem; color: var(--text-mid); background: var(--ocean-pale); padding: .2rem .6rem; border-radius: 20px; white-space: nowrap; }
+
+.wave-body { padding: 1.5rem; border-top: 1px solid var(--border); }
+.wave-body.hidden { display: none; }
+
+.question-block { margin-bottom: 1.5rem; }
+.q-num { font-size: .7rem; font-weight: 700; text-transform: uppercase; letter-spacing: .1em; color: var(--ocean-mid); margin-bottom: .4rem; }
+.q-text {
+  background: var(--ocean-pale);
+  border-left: 3px solid var(--ocean-mid);
+  padding: .8rem 1rem;
+  border-radius: 0 8px 8px 0;
+  font-size: .88rem;
+  font-style: italic;
+  line-height: 1.55;
+  color: var(--text-dark);
+}
+.q-note { font-size: .78rem; color: var(--text-mid); margin-top: .4rem; font-style: italic; padding-left: .5rem; border-left: 2px solid var(--border); }
+.q-note::before { content: '💡 '; }
+
+.divider { height: 1px; background: var(--border); margin: 1.5rem 0; }
+.interim-note { background: #FFF8E7; border: 1px solid #FDEAA7; border-radius: 10px; padding: .8rem 1rem; font-size: .82rem; color: #856404; margin: 1rem 0; }
+
+/* ── ARTIFACT ── */
+.artifact-section { background: #F8F9FA; border-radius: 12px; padding: 1.5rem; }
+.artifact-table { width: 100%; border-collapse: collapse; font-size: .8rem; margin-bottom: 1.5rem; }
+.artifact-table th { background: var(--ocean-deep); color: var(--white); padding: .5rem .7rem; text-align: left; font-size: .72rem; font-weight: 600; }
+.artifact-table td { padding: .5rem .7rem; border-bottom: 1px solid var(--border); background: var(--white); }
+.artifact-table td:first-child { font-weight: 500; }
+.fill-field { width: 100%; min-height: 24px; border: none; border-bottom: 1px dashed var(--border); background: transparent; font-size: .8rem; font-family: 'Inter', sans-serif; }
+.artifact-sub { font-family: 'Space Grotesk', sans-serif; font-size: .78rem; font-weight: 600; text-transform: uppercase; letter-spacing: .08em; color: var(--ocean-mid); margin-bottom: .6rem; margin-top: 1rem; }
+.opp-table { width: 100%; border-collapse: collapse; font-size: .8rem; }
+.opp-table th { background: var(--ocean-mid); color: var(--white); padding: .4rem .7rem; font-size: .72rem; }
+.opp-table td { padding: .4rem .7rem; border-bottom: 1px solid var(--border); background: var(--white); }
+
+/* ── TIMING ── */
+.timing-list { display: flex; flex-direction: column; gap: .5rem; }
+.timing-item { display: flex; align-items: center; gap: 1rem; padding: .6rem 1rem; background: var(--ocean-pale); border-radius: 8px; }
+.timing-time { font-family: 'Space Grotesk', sans-serif; font-size: .8rem; font-weight: 700; color: var(--ocean-mid); white-space: nowrap; min-width: 100px; }
+.timing-label { font-size: .83rem; }
+.timing-mark { margin-left: auto; }
+.timing-mark input[type=checkbox] { width: 16px; height: 16px; cursor: pointer; }
+
+/* ── PRINT ── */
+.print-btn {
+  position: fixed; bottom: 2rem; right: 2rem;
+  background: var(--ocean-mid); color: var(--white);
+  border: none; border-radius: 50px; padding: .7rem 1.4rem;
+  cursor: pointer; font-family: 'Inter', sans-serif; font-size: .85rem;
+  box-shadow: 0 4px 20px rgba(27,107,147,.3);
+  display: flex; align-items: center; gap: .5rem;
+  transition: all .2s;
+  z-index: 100;
+}
+.print-btn:hover { background: var(--ocean-deep); transform: translateY(-2px); }
+
+@media print {
+  .sidebar, .print-btn, .timer-btn { display: none !important; }
+  .layout { display: block; }
+  .main { padding: 0; max-width: 100%; }
+  .section-body, .wave-body { display: block !important; }
+  .section-card, .page-header { break-inside: avoid; }
+}
+</style>
+</head>
+<body>
+<div class="layout">
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <div class="brand">chilBase · AI Диагностика</div>
+    <div class="dept">Environment</div>
+    <div class="meta">Прокопцов Артем · 38 чел.</div>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-label">Подготовка</div>
+    <a href="#context" class="nav-item active" onclick="setActive(this)">
+      <span class="wave-num">📋</span> Контекст отдела
+      <span class="check">✓</span>
+    </a>
+    <a href="#psychotype" class="nav-item" onclick="setActive(this)">
+      <span class="wave-num">🧠</span> Психотип
+      <span class="check">✓</span>
+    </a>
+    <a href="#hypotheses" class="nav-item" onclick="setActive(this)">
+      <span class="wave-num">💡</span> Гипотезы
+      <span class="check">✓</span>
+    </a>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-label">Интервью</div>
+    <a href="#wave0" class="nav-item" onclick="setActive(this)">
+      <span class="wave-num">0</span> Rapport
+      <span class="check">✓</span>
+    </a>
+    <a href="#wave1" class="nav-item" onclick="setActive(this)">
+      <span class="wave-num">1</span> Карта процессов
+      <span class="check">✓</span>
+    </a>
+    <a href="#wave2" class="nav-item" onclick="setActive(this)">
+      <span class="wave-num">2</span> Боли и фрикции
+      <span class="check">✓</span>
+    </a>
+    <a href="#ai-scan" class="nav-item" onclick="setActive(this)">
+      <span class="wave-num">🎯</span> AI Scan
+      <span class="check">✓</span>
+    </a>
+    <a href="#wave3" class="nav-item" onclick="setActive(this)">
+      <span class="wave-num">3</span> Scaling Stress Test
+      <span class="check">✓</span>
+    </a>
+    <a href="#wave4" class="nav-item" onclick="setActive(this)">
+      <span class="wave-num">4</span> Data & Tools X-Ray
+      <span class="check">✓</span>
+    </a>
+    <a href="#wave5" class="nav-item" onclick="setActive(this)">
+      <span class="wave-num">5</span> AI Signals
+      <span class="check">✓</span>
+    </a>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-label">После</div>
+    <a href="#artifact" class="nav-item" onclick="setActive(this)">
+      <span class="wave-num">📝</span> Артефакт
+      <span class="check">✓</span>
+    </a>
+    <a href="#timing" class="nav-item" onclick="setActive(this)">
+      <span class="wave-num">⏱</span> Тайминг
+      <span class="check">✓</span>
+    </a>
+  </div>
+
+  <div class="sidebar-timer">
+    <div class="timer-label">Время интервью</div>
+    <div class="timer-display" id="timerDisplay">0:00</div>
+    <button class="timer-btn" id="timerBtn" onclick="toggleTimer()">▶ Старт</button>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<main class="main">
+
+  <!-- HEADER -->
+  <div class="page-header">
+    <div>
+      <h1>Интервью — Environment</h1>
+      <div class="subtitle">Глубинное интервью с руководителем / лидом · ~2 часа</div>
+      <div class="meta-grid">
+        <div class="meta-item">
+          <div class="label">Респондент</div>
+          <div class="value">Прокопцов Артем</div>
+        </div>
+        <div class="meta-item">
+          <div class="label">Роль</div>
+          <div class="value">3D Environment Lead</div>
+        </div>
+        <div class="meta-item">
+          <div class="label">Отдел</div>
+          <div class="value">38 человек</div>
+        </div>
+        <div class="meta-item">
+          <div class="label">Дата</div>
+          <div class="value" id="interviewDate">___________</div>
+        </div>
+      </div>
+    </div>
+    <div class="consent-badge">⚠️ Зачитать скрипт<br>согласия перед стартом</div>
+  </div>
+
+  <!-- CONTEXT -->
+  <div class="section" id="context">
+    <div class="section-card">
+      <div class="section-header" onclick="toggleSection(this)">
+        <div class="section-icon">📋</div>
+        <div>
+          <div class="section-title">Контекст отдела</div>
+          <div class="section-sub">Что мы знаем до интервью</div>
+        </div>
+        <span class="section-toggle open">▼</span>
+      </div>
+      <div class="section-body">
+        <div class="context-grid">
+          <div class="context-block full">
+            <h4>Что делают</h4>
+            <p style="font-size:.85rem; line-height:1.6">Полный цикл создания игрового окружения — экстерьеры, интерьеры, terrain/ландшафт. От приёмки LD-документации до интеграции в движок.</p>
+          </div>
+          <div class="context-block">
+            <h4>Инструменты</h4>
+            <div class="tag-list">
+              <span class="tag">Unity</span><span class="tag">Blender</span><span class="tag">3dsMax</span>
+              <span class="tag">Maya</span><span class="tag">Substance Painter</span><span class="tag">Substance Designer</span>
+              <span class="tag">SpeedTree</span><span class="tag">Marvelous Designer</span>
+              <span class="tag">Git</span><span class="tag">Flowfast</span><span class="tag">Confluence</span>
+            </div>
+          </div>
+          <div class="context-block">
+            <h4>Известные боли</h4>
+            <ul>
+              <li>Ручная синхронизация материалов с Git</li>
+              <li>Нет тестовой среды для сборки ассетов</li>
+              <li>Нарратив как боттлнек</li>
+              <li>Нет зависимостей между задачами LD/terrain</li>
+              <li>Сложно прогнозировать сроки</li>
+              <li>Flowfast плохо работает для планирования</li>
+              <li>Нет долгосрочной роадмапы</li>
+            </ul>
+          </div>
+          <div class="context-block">
+            <h4>Текущий AI</h4>
+            <ul>
+              <li>ChatGPT/Gemini — для исследований</li>
+              <li>Freepik/Gemini — референсы и блокауты</li>
+              <li>Вайбкодинг локальных тулз</li>
+              <li>Нет production AI pipeline</li>
+            </ul>
+          </div>
+          <div class="context-block full">
+            <h4>Обсуждаемые AI-сценарии</h4>
+            <div class="tag-list">
+              <span class="tag">Генерация texture maps (roughness, metallic)</span>
+              <span class="tag">Миникарты</span>
+              <span class="tag">Апскейлинг текстур</span>
+              <span class="tag">Оптимизация сборки/интеграции</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PSYCHOTYPE -->
+  <div class="section" id="psychotype">
+    <div class="section-card">
+      <div class="section-header" onclick="toggleSection(this)">
+        <div class="section-icon">🧠</div>
+        <div>
+          <div class="section-title">Психотип респондента — тактика</div>
+          <div class="section-sub">Определи в первые 2–3 минуты</div>
+        </div>
+        <span class="section-toggle open">▼</span>
+      </div>
+      <div class="section-body">
+        <table class="psycho-table">
+          <thead>
+            <tr>
+              <th>Тип</th>
+              <th>Сигналы</th>
+              <th>Тактика</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><span class="type-badge analyst">Аналитик</span></td>
+              <td>Отвечает цифрами и процессами, уточняет детали, говорит медленно</td>
+              <td>Давай структуру заранее, задавай метрические вопросы, не торопи</td>
+            </tr>
+            <tr>
+              <td><span class="type-badge skeptic">Скептик</span></td>
+              <td>«У нас всё нормально», защищает отдел, короткие ответы</td>
+              <td>Гипотетические сценарии («а если бы...»), не оценивай, копай через конкретные примеры</td>
+            </tr>
+            <tr>
+              <td><span class="type-badge enthusiast">Энтузиаст</span></td>
+              <td>Много говорит, перепрыгивает темы, генерирует идеи</td>
+              <td>Возвращай к конкретике («хорошо, а сколько это занимает времени?»), разделяй факты и желания</td>
+            </tr>
+            <tr>
+              <td><span class="type-badge executor">Исполнитель</span></td>
+              <td>Короткие ответы, ждёт следующего вопроса, не инициирует</td>
+              <td>Закрытые вопросы с вариантами, медленнее темп, больше уточнений</td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="redflag">
+          ⚠️ <strong>Красный флаг:</strong> Если респондент начинает говорить «AI — это угроза» или «мы уже всё пробовали» — это скептик с тревогой. Не спорь. Переходи к болям («что конкретно тормозит прямо сейчас?») и оставь AI-тему на Волну 5.
+        </div>
+        <div class="respondent-note">
+          ✦ <strong>Про Артема конкретно:</strong> Технический лид на 38 человек. Скорее всего Аналитик или Исполнитель — ценит точность. Если уходит в детали пайплайна — это нормально, там живут реальные боли. Не вытаскивай к стратегическим обобщениям, оставайся в конкретике процессов.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- HYPOTHESES -->
+  <div class="section" id="hypotheses">
+    <div class="section-card">
+      <div class="section-header" onclick="toggleSection(this)">
+        <div class="section-icon">💡</div>
+        <div>
+          <div class="section-title">Гипотезы для проверки</div>
+          <div class="section-sub">5 предположений — хотим подтвердить или опровергнуть</div>
+        </div>
+        <span class="section-toggle open">▼</span>
+      </div>
+      <div class="section-body">
+        <div class="hypo-grid">
+          <div class="hypo-card">
+            <div class="hypo-num">H1</div>
+            <div class="hypo-text">Текстурный пайплайн содержит много ручной конвертации</div>
+            <div class="hypo-goal">Можно ли автоматизировать через AI-скрипты?</div>
+          </div>
+          <div class="hypo-card">
+            <div class="hypo-num">H2</div>
+            <div class="hypo-text">Flowfast не даёт прозрачности — задачи теряются</div>
+            <div class="hypo-goal">Как принимают решения о приоритетах?</div>
+          </div>
+          <div class="hypo-card">
+            <div class="hypo-num">H3</div>
+            <div class="hypo-text">Знание о пайплайне сосредоточено у ключевых людей</div>
+            <div class="hypo-goal">Что случится если уйдёт lead?</div>
+          </div>
+          <div class="hypo-card">
+            <div class="hypo-num">H4</div>
+            <div class="hypo-text">Ревью занимает непропорционально много времени</div>
+            <div class="hypo-goal">Можно ли AI-assisted pre-review?</div>
+          </div>
+          <div class="hypo-card">
+            <div class="hypo-num">H5</div>
+            <div class="hypo-text">Референс-поиск — ежедневная рутина без системы</div>
+            <div class="hypo-goal">Можно ли автоматизировать или структурировать?</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- WAVE 0 -->
+  <div class="section" id="wave0">
+    <div class="section-card">
+      <div class="wave-header" onclick="toggleWave(this)">
+        <span class="wave-badge wave-0">Волна 0</span>
+        <div>
+          <div class="wave-title">Rapport</div>
+        </div>
+        <span class="wave-time">⏱ 0:00 – 0:10</span>
+        <span class="section-toggle open" style="margin-left:1rem">▼</span>
+      </div>
+      <div class="wave-body">
+        <div class="question-block">
+          <div class="q-num">Открывающий вопрос</div>
+          <div class="q-text">«Расскажите — что делает Environment как отдел для игрока, который запускает chilBase? Что они видят благодаря вам?»</div>
+          <div class="q-note">Слушай: как говорит о своей работе — сервисно или с ownership.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- WAVE 1 -->
+  <div class="section" id="wave1">
+    <div class="section-card">
+      <div class="wave-header" onclick="toggleWave(this)">
+        <span class="wave-badge wave-1">Волна 1</span>
+        <div>
+          <div class="wave-title">Карта процессов</div>
+        </div>
+        <span class="wave-time">⏱ 0:10 – 0:30</span>
+        <span class="section-toggle open" style="margin-left:1rem">▼</span>
+      </div>
+      <div class="wave-body">
+        <div class="question-block">
+          <div class="q-num">1.1 Рабочий цикл</div>
+          <div class="q-text">«Опишите типичную неделю художника вашего отдела — с понедельника. Что происходит первым делом?»</div>
+        </div>
+        <div class="question-block">
+          <div class="q-num">1.2 Полный цикл ассета</div>
+          <div class="q-text">«Возьмём конкретный пример: новый интерьер локации. Расскажите шаг за шагом — от получения задачи до финальной интеграции в движок. Кто что делает на каждом этапе?»</div>
+          <div class="q-note">Рисуй схему прямо во время ответа: Input → steps → Output</div>
+        </div>
+        <div class="question-block">
+          <div class="q-num">1.3 Параллельные треки</div>
+          <div class="q-text">«У вас три направления — экстерьеры, интерьеры, terrain. Как они координируются между собой? Кто принимает решение, что делать в параллель?»</div>
+        </div>
+        <div class="question-block">
+          <div class="q-num">1.4 Точки передачи</div>
+          <div class="q-text">«Где в этом процессе ассет переходит от одного человека к другому? Что нужно передать вместе с ним?»</div>
+        </div>
+        <div class="question-block">
+          <div class="q-num">1.5 Проверка и ревью</div>
+          <div class="q-text">«Как устроено ревью? Кто смотрит, на каком этапе, по каким критериям?»</div>
+        </div>
+        <div class="interim-note">📝 <strong>Промежуточный вывод:</strong> Записать 3–5 ключевых процессов с исполнителем, частотой, объёмом.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- WAVE 2 -->
+  <div class="section" id="wave2">
+    <div class="section-card">
+      <div class="wave-header" onclick="toggleWave(this)">
+        <span class="wave-badge wave-2">Волна 2</span>
+        <div>
+          <div class="wave-title">Боли и фрикции</div>
+        </div>
+        <span class="wave-time">⏱ 0:30 – 0:50</span>
+        <span class="section-toggle open" style="margin-left:1rem">▼</span>
+      </div>
+      <div class="wave-body">
+        <div class="question-block">
+          <div class="q-num">2.1 Синхронизация материалов</div>
+          <div class="q-text">«Вы упоминали, что в пайплайне интерьеров много ручной работы с синхронизацией материалов в Git. Расскажите подробнее — что конкретно делается вручную? Сколько это занимает?»</div>
+        </div>
+        <div class="question-block">
+          <div class="q-num">2.2 Входящее качество</div>
+          <div class="q-text">«Вы получаете LD-блокауты на входе. Часто ли приходится возвращать их на доработку? Что в них обычно не так?»</div>
+        </div>
+        <div class="question-block">
+          <div class="q-num">2.3 Нарратив как боттлнек</div>
+          <div class="q-text">«Что значит "нарратив — боттлнек"? Что конкретно от нарратива зависит и почему это тормозит?»</div>
+        </div>
+        <div class="question-block">
+          <div class="q-num">2.4 Прогнозирование сроков</div>
+          <div class="q-text">«Как вы сейчас оцениваете сроки на задачу? Где чаще всего ошибаетесь в оценке?»</div>
+        </div>
+        <div class="question-block">
+          <div class="q-num">2.5 Потери на ревью</div>
+          <div class="q-text">«Бывает ли, что ассет проходит несколько итераций ревью? Почему — что обычно не так с первого раза?»</div>
+        </div>
+        <div class="question-block">
+          <div class="q-num">2.6 Ручная работа-невидимка</div>
+          <div class="q-text">«Есть ли задачи, которые делаются регулярно, но никак не отслеживаются в Flowfast?»</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- AI OPPORTUNITY SCAN -->
+  <div class="section" id="ai-scan">
+    <div class="section-card">
+      <div class="wave-header" onclick="toggleWave(this)">
+        <span class="wave-badge" style="background:#2C3E50">AI Scan</span>
+        <div>
+          <div class="wave-title">AI Opportunity Scan</div>
+          <div style="font-size:.78rem; color:var(--text-mid); margin-top:.1rem">Три ключевых вопроса для выявления AI-возможностей</div>
+        </div>
+        <span class="wave-time">⏱ ~15 мин</span>
+        <span class="section-toggle open" style="margin-left:1rem">▼</span>
+      </div>
+      <div class="wave-body">
+        <div style="background:#F0F4F8; border-left:3px solid #2C3E50; padding:.7rem 1rem; border-radius:0 8px 8px 0; margin-bottom:1.2rem; font-size:.8rem; color:#2C3E50;">
+          Эти вопросы задаются в связке — они выявляют конкретные процессы, которые можно автоматизировать или аугментировать. Цель: получить не «хотелки», а операциональные кейсы с метриками.
+        </div>
+
+        <div class="question-block">
+          <div class="q-num">AIS-1 · Боттлнек при росте</div>
+          <div class="q-text">«Если в следующем отчётном периоде ваш результат нужно ускорить в 2–3 раза — объём, скорость, частота, выручка — выберите релевантную метрику сами. Какой конкретный шаг вашего бизнес-процесса перестанет справляться первым?»</div>
+          <div class="q-note">Уточни три параметра: <strong>какой именно этап</strong> → <strong>какой артефакт он должен выдавать</strong> → <strong>чего именно станет не хватать</strong> (скорости / качества / согласований / решений / данных)</div>
+        </div>
+
+        <div class="question-block">
+          <div class="q-num">AIS-2 · Повторяющиеся решения без уникальной ценности</div>
+          <div class="q-text">«Какие регулярные действия в вашей команде: повторяются каждый день или каждую неделю, требуют квалифицированных специалистов, но не создают уникальной бизнес-ценности?»</div>
+          <div class="q-note">Примеры-подсказки если молчит: согласование, приёмка, выбор из вариантов, решение «стоп / продолжать / масштабировать». Дальше уточни: <strong>что именно решается</strong> → <strong>на основе каких данных</strong> → <strong>что произойдёт если это решение задержится на 1–2 недели</strong></div>
+        </div>
+
+        <div class="question-block">
+          <div class="q-num">AIS-3 · Решения с недостаточными данными</div>
+          <div class="q-text">«В каких местах процесса вы принимаете решения с недостаточным объёмом данных — потому что сбор данных слишком дорог, анализ слишком трудоёмок, или данные есть, но не связаны между собой?»</div>
+          <div class="q-note">Зафиксируй: <strong>какое решение принимается</strong> → <strong>какие данные должны были бы на него влиять</strong> → <strong>но сейчас фактически не учитываются</strong></div>
+        </div>
+
+        <div class="interim-note">📝 <strong>Итог блока:</strong> Записать 2–3 конкретных процесса с исполнителем, частотой и метрикой — это готовые кандидаты для AI Opportunity Map.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- WAVE 3 -->
+  <div class="section" id="wave3">
+    <div class="section-card">
+      <div class="wave-header" onclick="toggleWave(this)">
+        <span class="wave-badge wave-3">Волна 3</span>
+        <div>
+          <div class="wave-title">Scaling Stress Test</div>
+        </div>
+        <span class="wave-time">⏱ 0:55 – 1:10</span>
+        <span class="section-toggle open" style="margin-left:1rem">▼</span>
+      </div>
+      <div class="wave-body">
+        <div class="question-block">
+          <div class="q-num">Сценарий ×2</div>
+          <div class="q-text">«Представьте: через полгода у вас в два раза больше задач — новый регион игры, новые локации. Справится команда без удвоения людей?»</div>
+          <div class="q-note">Что первым сломается?</div>
+        </div>
+        <div class="question-block">
+          <div class="q-num">Сценарий ×5</div>
+          <div class="q-text">«А если нужно ×5 контента — например, выход на новые платформы? Что ломается первым — люди, пайплайн, инструменты?»</div>
+        </div>
+        <div class="question-block">
+          <div class="q-num">Сценарий Crisis</div>
+          <div class="q-text">«Ключевой человек — тот, кто лучше всех знает пайплайн материалов — уходит завтра. Что встаёт? Сколько времени на восстановление?»</div>
+        </div>
+        <div class="question-block">
+          <div class="q-num">Документация знаний</div>
+          <div class="q-text">«Где хранится знание о том, как правильно собирать ассет для прода? В Confluence? В голове? В обоих?»</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- WAVE 4 -->
+  <div class="section" id="wave4">
+    <div class="section-card">
+      <div class="wave-header" onclick="toggleWave(this)">
+        <span class="wave-badge wave-4">Волна 4</span>
+        <div>
+          <div class="wave-title">Data & Tools X-Ray</div>
+        </div>
+        <span class="wave-time">⏱ 1:10 – 1:25</span>
+        <span class="section-toggle open" style="margin-left:1rem">▼</span>
+      </div>
+      <div class="wave-body">
+        <div class="question-block">
+          <div class="q-num">4.1 Инструментальная карта</div>
+          <div class="q-text">«Перечислите все инструменты, которые ваша команда открывает каждый день — от рабочего места художника до коммуникации.»</div>
+        </div>
+        <div class="question-block">
+          <div class="q-num">4.2 Данные и метрики</div>
+          <div class="q-text">«Как вы измеряете производительность отдела? Есть ли метрики — сколько ассетов в неделю, время цикла, процент возвратов на ревью?»</div>
+        </div>
+        <div class="question-block">
+          <div class="q-num">4.3 Flowfast vs реальность</div>
+          <div class="q-text">«Насколько Flowfast отражает реальное состояние работ? Что там есть, чего нет?»</div>
+        </div>
+        <div class="question-block">
+          <div class="q-num">4.4 Substance pipeline</div>
+          <div class="q-text">«Как устроена работа в Substance — у каждого художника своя среда или есть общие библиотеки материалов? Как синхронизируются обновления?»</div>
+        </div>
+        <div class="question-block">
+          <div class="q-num">4.5 Данные для AI</div>
+          <div class="q-text">«Если бы кто-то хотел обучить AI на ваших ассетах — какие данные есть и в каком состоянии? Структурированы ли они?»</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- WAVE 5 -->
+  <div class="section" id="wave5">
+    <div class="section-card">
+      <div class="wave-header" onclick="toggleWave(this)">
+        <span class="wave-badge wave-5">Волна 5</span>
+        <div>
+          <div class="wave-title">AI Signals</div>
+        </div>
+        <span class="wave-time">⏱ 1:25 – 1:40</span>
+        <span class="section-toggle open" style="margin-left:1rem">▼</span>
+      </div>
+      <div class="wave-body">
+        <div class="question-block">
+          <div class="q-num">5.1 Текущий опыт</div>
+          <div class="q-text">«Расскажите — как именно вы сейчас используете ChatGPT и Gemini в работе? Приведите пример из прошлой недели.»</div>
+        </div>
+        <div class="question-block">
+          <div class="q-num">5.2 Эксперименты с текстурами</div>
+          <div class="q-text">«Вы обсуждали генерацию вспомогательных карт для текстур через AI — roughness, metallic из color map. На каком это сейчас этапе? Что пробовали?»</div>
+        </div>
+        <div class="question-block">
+          <div class="q-num">5.3 Воображаемый AI-коллега</div>
+          <div class="q-text">«Если бы у вас был AI, специально обученный на пайплайне Environment в chilBase — что бы вы поручили ему первым делом?»</div>
+        </div>
+        <div class="question-block">
+          <div class="q-num">5.4 Красные линии</div>
+          <div class="q-text">«Что в работе вашего отдела вы точно не хотели бы отдавать AI? Где человеческий глаз обязателен?»</div>
+        </div>
+        <div class="question-block">
+          <div class="q-num">5.5 Команда и AI-грамотность</div>
+          <div class="q-text">«Есть ли в команде кто-то, кто уже активно экспериментирует с AI-инструментами помимо ChatGPT? Как другие художники относятся к идее использовать AI в пайплайне?»</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ARTIFACT -->
+  <div class="section" id="artifact">
+    <div class="section-card">
+      <div class="section-header" onclick="toggleSection(this)">
+        <div class="section-icon">📝</div>
+        <div>
+          <div class="section-title">Артефакт интервью</div>
+          <div class="section-sub">Заполнить во время / сразу после</div>
+        </div>
+        <span class="section-toggle open">▼</span>
+      </div>
+      <div class="section-body">
+        <div class="artifact-section">
+          <div class="artifact-sub">Карта процессов Environment</div>
+          <table class="artifact-table">
+            <thead>
+              <tr><th>Процесс</th><th>Исполнитель</th><th>Частота</th><th>Время</th><th>Ручная работа?</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>Приёмка LD-блокаута</td><td><input class="fill-field"></td><td><input class="fill-field"></td><td><input class="fill-field"></td><td><input class="fill-field"></td></tr>
+              <tr><td>Подготовка референсов</td><td><input class="fill-field"></td><td><input class="fill-field"></td><td><input class="fill-field"></td><td><input class="fill-field"></td></tr>
+              <tr><td>Моделинг</td><td><input class="fill-field"></td><td><input class="fill-field"></td><td><input class="fill-field"></td><td><input class="fill-field"></td></tr>
+              <tr><td>Текстуринг в Substance</td><td><input class="fill-field"></td><td><input class="fill-field"></td><td><input class="fill-field"></td><td><input class="fill-field"></td></tr>
+              <tr><td>Синхронизация материалов</td><td><input class="fill-field"></td><td><input class="fill-field"></td><td><input class="fill-field"></td><td><input class="fill-field"></td></tr>
+              <tr><td>Сборка/интеграция</td><td><input class="fill-field"></td><td><input class="fill-field"></td><td><input class="fill-field"></td><td><input class="fill-field"></td></tr>
+              <tr><td>Ревью (художник)</td><td><input class="fill-field"></td><td><input class="fill-field"></td><td><input class="fill-field"></td><td><input class="fill-field"></td></tr>
+              <tr><td>Ревью (лид)</td><td><input class="fill-field"></td><td><input class="fill-field"></td><td><input class="fill-field"></td><td><input class="fill-field"></td></tr>
+            </tbody>
+          </table>
+
+          <div class="artifact-sub">AI-возможности (выявленные)</div>
+          <table class="opp-table">
+            <thead>
+              <tr><th>Процесс</th><th>Тип</th><th>Приоритет</th><th>Сложность</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>Генерация texture maps</td><td>AUTO</td><td>HIGH</td><td>MED</td></tr>
+              <tr><td>Референс-подбор</td><td>AUGMENT</td><td>MED</td><td>EASY</td></tr>
+              <tr><td>Pre-check перед ревью</td><td>AUGMENT</td><td>MED</td><td>MED</td></tr>
+              <tr><td><input class="fill-field" placeholder="+ добавить..."></td><td><input class="fill-field"></td><td><input class="fill-field"></td><td><input class="fill-field"></td></tr>
+            </tbody>
+          </table>
+
+          <div class="artifact-sub">Сигнальные цитаты</div>
+          <textarea style="width:100%; min-height:80px; border:1px dashed var(--border); border-radius:8px; padding:.8rem; font-family:'Inter',sans-serif; font-size:.83rem; background:var(--white); resize:vertical;" placeholder="Записывай дословно — лучшие цитаты для отчёта..."></textarea>
+
+          <div class="artifact-sub">Открытые вопросы для follow-up</div>
+          <textarea style="width:100%; min-height:60px; border:1px dashed var(--border); border-radius:8px; padding:.8rem; font-family:'Inter',sans-serif; font-size:.83rem; background:var(--white); resize:vertical;" placeholder="Что нужно уточнить дополнительно..."></textarea>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TIMING -->
+  <div class="section" id="timing">
+    <div class="section-card">
+      <div class="section-header" onclick="toggleSection(this)">
+        <div class="section-icon">⏱</div>
+        <div>
+          <div class="section-title">Тайминг сессии</div>
+          <div class="section-sub">Отмечай по ходу интервью</div>
+        </div>
+        <span class="section-toggle open">▼</span>
+      </div>
+      <div class="section-body">
+        <div class="timing-list">
+          <div class="timing-item">
+            <div class="timing-time">0:00 – 0:10</div>
+            <div class="timing-label">Согласие + Rapport</div>
+            <div class="timing-mark"><input type="checkbox"></div>
+          </div>
+          <div class="timing-item">
+            <div class="timing-time">0:10 – 0:30</div>
+            <div class="timing-label">Волна 1: Карта процессов</div>
+            <div class="timing-mark"><input type="checkbox"></div>
+          </div>
+          <div class="timing-item">
+            <div class="timing-time">0:30 – 0:50</div>
+            <div class="timing-label">Волна 2: Боли</div>
+            <div class="timing-mark"><input type="checkbox"></div>
+          </div>
+          <div class="timing-item" style="opacity:.5">
+            <div class="timing-time">0:50 – 0:55</div>
+            <div class="timing-label">☕ Короткая пауза</div>
+            <div class="timing-mark"><input type="checkbox"></div>
+          </div>
+          <div class="timing-item">
+            <div class="timing-time">0:55 – 1:10</div>
+            <div class="timing-label">Волна 3: Scaling Stress Test</div>
+            <div class="timing-mark"><input type="checkbox"></div>
+          </div>
+          <div class="timing-item">
+            <div class="timing-time">1:10 – 1:25</div>
+            <div class="timing-label">Волна 4: Data & Tools X-Ray</div>
+            <div class="timing-mark"><input type="checkbox"></div>
+          </div>
+          <div class="timing-item">
+            <div class="timing-time">1:25 – 1:40</div>
+            <div class="timing-label">Волна 5: AI Signals</div>
+            <div class="timing-mark"><input type="checkbox"></div>
+          </div>
+          <div class="timing-item">
+            <div class="timing-time">1:40 – 2:00</div>
+            <div class="timing-label">Финальный вопрос + закрытие</div>
+            <div class="timing-mark"><input type="checkbox"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</main>
+</div>
+
+<button class="print-btn" onclick="window.print()">🖨️ Печать</button>
+
+<script>
+// Toggle sections
+function toggleSection(header) {
+  const body = header.nextElementSibling;
+  const toggle = header.querySelector('.section-toggle');
+  body.classList.toggle('hidden');
+  toggle.classList.toggle('open');
+}
+function toggleWave(header) {
+  const body = header.nextElementSibling;
+  const toggle = header.querySelector('.section-toggle');
+  body.classList.toggle('hidden');
+  toggle.classList.toggle('open');
+}
+
+// Nav active state
+function setActive(el) {
+  document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+  el.classList.add('active');
+}
+
+// Scroll spy
+const sections = document.querySelectorAll('.section');
+const navItems = document.querySelectorAll('.nav-item');
+window.addEventListener('scroll', () => {
+  let current = '';
+  sections.forEach(s => {
+    if (window.scrollY >= s.offsetTop - 80) current = s.id;
+  });
+  navItems.forEach(n => {
+    n.classList.remove('active');
+    if (n.getAttribute('href') === '#' + current) n.classList.add('active');
+  });
+});
+
+// Timer
+let timerInterval = null;
+let timerSeconds = 0;
+let running = false;
+function toggleTimer() {
+  const btn = document.getElementById('timerBtn');
+  if (running) {
+    clearInterval(timerInterval);
+    btn.textContent = '▶ Продолжить';
+  } else {
+    timerInterval = setInterval(() => {
+      timerSeconds++;
+      const m = Math.floor(timerSeconds / 60);
+      const s = timerSeconds % 60;
+      document.getElementById('timerDisplay').textContent = m + ':' + String(s).padStart(2,'0');
+    }, 1000);
+    btn.textContent = '⏸ Пауза';
+  }
+  running = !running;
+}
+
+// Set today's date
+document.getElementById('interviewDate').textContent = new Date().toLocaleDateString('ru-RU', {day:'numeric', month:'long', year:'numeric'});
+</script>
+</body>
+</html>
