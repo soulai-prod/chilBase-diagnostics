@@ -1,0 +1,962 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Диагностика — 2D Art / UI-UX | chilBase</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --ocean-deep: #0A2E4D;
+  --ocean-mid: #1B6B93;
+  --ocean-light: #5DB9C9;
+  --foam: #F5F0EB;
+  --sand: #E8DCC8;
+  --sun: #E8A838;
+  --sun-glow: #F4C56B;
+  --text-dark: #1a1a2e;
+  --text-light: #5a6577;
+  --white: #FFFFFF;
+  --success: #2ECC71;
+  --card-border: rgba(27,107,147,0.12);
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: 'Inter', sans-serif;
+  color: var(--text-dark);
+  background: var(--foam);
+  min-height: 100vh;
+}
+h1,h2,h3,h4 { font-family: 'Space Grotesk', sans-serif; line-height:1.2; }
+
+/* ─── HEADER ─── */
+.header {
+  background: linear-gradient(135deg, var(--ocean-deep) 0%, var(--ocean-mid) 100%);
+  padding: 1.5rem 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 4px 20px rgba(10,46,77,0.2);
+}
+.header-brand { display:flex; align-items:center; gap:.75rem; }
+.header-brand span { color: var(--white); font-family:'Space Grotesk',sans-serif; font-weight:600; font-size:1.05rem; }
+.header-dept {
+  color: var(--sun-glow);
+  font-size:.85rem;
+  font-weight:500;
+  padding:.3rem .9rem;
+  border:1px solid rgba(244,197,107,0.4);
+  border-radius:50px;
+}
+
+/* ─── PROGRESS ─── */
+.progress-wrap {
+  background: var(--white);
+  padding: 1rem 2rem;
+  border-bottom: 1px solid var(--card-border);
+}
+.progress-steps {
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+  max-width: 720px;
+  margin: 0 auto;
+}
+.step-dot {
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  display: flex; align-items:center; justify-content:center;
+  font-size: .7rem; font-weight:600;
+  flex-shrink: 0;
+  transition: all .3s;
+  cursor: default;
+}
+.step-dot.done { background: var(--ocean-mid); color: var(--white); }
+.step-dot.active { background: var(--sun); color: var(--ocean-deep); box-shadow:0 0 0 4px rgba(232,168,56,.2); }
+.step-dot.todo { background: var(--sand); color: var(--text-light); }
+.step-line { flex:1; height:2px; background: var(--sand); border-radius:2px; }
+.step-line.done { background: var(--ocean-light); }
+.progress-label {
+  text-align:center;
+  font-size:.8rem;
+  color: var(--text-light);
+  margin-top:.6rem;
+  max-width:720px;
+  margin-left:auto; margin-right:auto;
+}
+
+/* ─── MAIN ─── */
+.main { max-width: 720px; margin: 0 auto; padding: 2.5rem 1.5rem 4rem; }
+
+/* ─── BLOCK HEADER ─── */
+.block-header {
+  margin-bottom: 2rem;
+  animation: fadeUp .5s ease both;
+}
+.block-label {
+  display: inline-block;
+  font-size:.75rem; font-weight:600; letter-spacing:.12em;
+  text-transform:uppercase; color: var(--ocean-mid);
+  padding:.35rem .9rem; border:1px solid var(--ocean-light);
+  border-radius:50px; margin-bottom:1rem;
+}
+.block-title { font-size:1.7rem; color:var(--ocean-deep); margin-bottom:.6rem; }
+.block-sub { color:var(--text-light); font-size:.95rem; line-height:1.7; }
+
+/* ─── QUESTION ─── */
+.question {
+  background: var(--white);
+  border-radius: 16px;
+  padding: 1.75rem;
+  margin-bottom: 1.25rem;
+  border: 1px solid var(--card-border);
+  animation: fadeUp .4s ease both;
+}
+.question:nth-child(2) { animation-delay:.05s; }
+.question:nth-child(3) { animation-delay:.1s; }
+.question:nth-child(4) { animation-delay:.15s; }
+.question:nth-child(5) { animation-delay:.2s; }
+@keyframes fadeUp {
+  from { opacity:0; transform:translateY(20px); }
+  to { opacity:1; transform:translateY(0); }
+}
+.q-label { font-weight:600; color:var(--ocean-deep); margin-bottom:1.1rem; font-size:1rem; line-height:1.5; }
+.q-num {
+  display:inline-block; width:22px; height:22px; border-radius:50%;
+  background:var(--ocean-light); color:var(--white);
+  font-size:.7rem; font-weight:700; text-align:center; line-height:22px;
+  margin-right:.5rem; flex-shrink:0;
+}
+
+/* ─── RADIO / CHECKBOX ─── */
+.options { display:flex; flex-direction:column; gap:.6rem; }
+.opt {
+  display:flex; align-items:flex-start; gap:.75rem;
+  padding:.85rem 1rem;
+  border: 1.5px solid var(--sand);
+  border-radius:10px; cursor:pointer;
+  transition: all .2s;
+  position:relative;
+}
+.opt:hover { border-color: var(--ocean-light); background: rgba(93,185,201,.04); }
+.opt.selected { border-color: var(--ocean-mid); background: rgba(27,107,147,.06); }
+.opt.correct-highlight { border-color: var(--success); background: rgba(46,204,113,.08); }
+.opt input { position:absolute; opacity:0; pointer-events:none; }
+.opt-marker {
+  width:18px; height:18px; border-radius:50%; flex-shrink:0; margin-top:1px;
+  border: 2px solid var(--sand); background:var(--white);
+  transition: all .2s; display:flex; align-items:center; justify-content:center;
+}
+.opt.selected .opt-marker { border-color:var(--ocean-mid); background:var(--ocean-mid); }
+.opt.selected .opt-marker::after { content:''; width:6px; height:6px; border-radius:50%; background:var(--white); }
+.opt.checkbox-opt .opt-marker { border-radius:5px; }
+.opt.checkbox-opt.selected .opt-marker::after { content:'✓'; font-size:.65rem; color:var(--white); font-weight:700; }
+.opt-text { color:var(--text-dark); font-size:.93rem; line-height:1.5; }
+
+/* ─── LIKERT ─── */
+.likert-wrap { display:flex; flex-direction:column; gap:.75rem; }
+.likert-labels { display:flex; justify-content:space-between; font-size:.75rem; color:var(--text-light); }
+.likert-row { display:flex; gap:.5rem; justify-content:center; }
+.likert-btn {
+  width:44px; height:44px; border-radius:50%;
+  border: 2px solid var(--sand); background:var(--white);
+  font-weight:600; font-size:.9rem; color:var(--text-light);
+  cursor:pointer; transition:all .2s;
+  display:flex; align-items:center; justify-content:center;
+}
+.likert-btn:hover { border-color:var(--ocean-light); color:var(--ocean-mid); }
+.likert-btn.selected { background:var(--ocean-mid); border-color:var(--ocean-mid); color:var(--white); }
+
+/* ─── TASK (mini LLM tasks) ─── */
+.task-situation {
+  background: linear-gradient(135deg, var(--ocean-deep), var(--ocean-mid));
+  border-radius: 12px; padding:1.25rem 1.5rem; margin-bottom:1.25rem; color:var(--white);
+}
+.task-situation .sit-label { font-size:.7rem; text-transform:uppercase; letter-spacing:.1em; opacity:.6; margin-bottom:.4rem; }
+.task-situation p { font-size:.92rem; line-height:1.6; opacity:.9; }
+.task-q { font-weight:600; color:var(--ocean-deep); margin-bottom:1rem; font-size:.95rem; }
+.task-options { display:flex; flex-direction:column; gap:.6rem; }
+.task-opt {
+  display:flex; gap:.75rem; align-items:flex-start;
+  padding:.9rem 1rem; border:1.5px solid var(--sand); border-radius:10px;
+  cursor:pointer; transition:all .2s;
+}
+.task-opt:hover { border-color:var(--ocean-light); background:rgba(93,185,201,.04); }
+.task-opt.selected { border-color:var(--ocean-mid); background:rgba(27,107,147,.06); }
+.task-opt.correct { border-color:var(--success)!important; background:rgba(46,204,113,.08)!important; }
+.task-opt.wrong { border-color:#E74C3C!important; background:rgba(231,76,60,.06)!important; opacity:.7; }
+.task-letter {
+  width:24px; height:24px; border-radius:6px; flex-shrink:0;
+  background:var(--sand); color:var(--text-dark);
+  font-weight:700; font-size:.8rem; display:flex; align-items:center; justify-content:center;
+  transition:all .2s;
+}
+.task-opt.selected .task-letter { background:var(--ocean-mid); color:var(--white); }
+.task-opt.correct .task-letter { background:var(--success); color:var(--white); }
+.task-opt.wrong .task-letter { background:#E74C3C; color:var(--white); }
+.task-text { font-size:.88rem; color:var(--text-dark); line-height:1.5; }
+.task-explain {
+  margin-top:.75rem; padding:.75rem 1rem;
+  background:rgba(46,204,113,.1); border-radius:8px;
+  font-size:.82rem; color:#1a6b3a; line-height:1.5; display:none;
+}
+.task-explain.show { display:block; }
+
+/* ─── TEXTAREA ─── */
+.open-q textarea {
+  width:100%; padding:1rem; border:1.5px solid var(--sand); border-radius:10px;
+  font-family:'Inter',sans-serif; font-size:.93rem; color:var(--text-dark);
+  resize:vertical; min-height:80px; background:var(--white);
+  transition:border-color .2s; outline:none;
+}
+.open-q textarea:focus { border-color:var(--ocean-mid); }
+
+/* ─── TIME SPLIT ─── */
+.time-split { display:flex; flex-direction:column; gap:.75rem; }
+.time-row { display:flex; align-items:center; gap:1rem; }
+.time-label { flex:1; font-size:.88rem; color:var(--text-dark); }
+.time-input {
+  width:70px; padding:.45rem .6rem; border:1.5px solid var(--sand); border-radius:8px;
+  font-size:.9rem; font-weight:600; color:var(--ocean-mid); text-align:center; outline:none;
+  transition:border-color .2s;
+}
+.time-input:focus { border-color:var(--ocean-mid); }
+.time-unit { font-size:.8rem; color:var(--text-light); width:16px; }
+.time-total {
+  display:flex; justify-content:flex-end; align-items:center; gap:.5rem;
+  padding:.6rem 1rem; background:var(--sand); border-radius:8px; margin-top:.25rem;
+  font-size:.85rem; color:var(--text-dark);
+}
+.time-total strong { font-family:'Space Grotesk',sans-serif; font-size:1rem; color:var(--ocean-mid); }
+.time-total.over strong { color:#E74C3C; }
+
+/* ─── NAVIGATION ─── */
+.nav-row {
+  display:flex; gap:1rem; margin-top:2.5rem; justify-content:space-between; align-items:center;
+}
+.btn {
+  padding:.85rem 2rem; border-radius:50px; font-weight:600; font-size:.95rem;
+  cursor:pointer; border:none; transition:all .25s; font-family:'Inter',sans-serif;
+}
+.btn-primary {
+  background:linear-gradient(135deg, var(--ocean-mid), var(--ocean-deep));
+  color:var(--white); box-shadow:0 4px 16px rgba(27,107,147,.3);
+}
+.btn-primary:hover { transform:translateY(-2px); box-shadow:0 8px 24px rgba(27,107,147,.4); }
+.btn-secondary { background:transparent; color:var(--text-light); border:1.5px solid var(--sand); }
+.btn-secondary:hover { border-color:var(--ocean-light); color:var(--ocean-mid); }
+.btn-submit {
+  background:linear-gradient(135deg, var(--sun), var(--sun-glow));
+  color:var(--ocean-deep); box-shadow:0 4px 16px rgba(232,168,56,.3);
+  flex:1; text-align:center; font-size:1rem;
+}
+.btn-submit:hover { transform:translateY(-2px); box-shadow:0 8px 24px rgba(232,168,56,.4); }
+
+/* ─── THANK YOU ─── */
+.thankyou {
+  text-align:center; padding:4rem 2rem; display:none;
+}
+.thankyou.show { display:block; animation: fadeUp .6s ease both; }
+.ty-icon { font-size:3.5rem; margin-bottom:1.5rem; }
+.ty-title { font-size:2rem; color:var(--ocean-deep); margin-bottom:1rem; }
+.ty-sub { color:var(--text-light); font-size:1.05rem; line-height:1.7; max-width:480px; margin:0 auto; }
+.ty-type {
+  margin:2rem auto; max-width:400px; padding:1.5rem 2rem;
+  background:linear-gradient(135deg, var(--ocean-deep), var(--ocean-mid));
+  border-radius:20px; color:var(--white);
+}
+.ty-type .type-label { font-size:.75rem; text-transform:uppercase; letter-spacing:.1em; opacity:.6; margin-bottom:.4rem; }
+.ty-type .type-name { font-size:1.3rem; font-weight:700; margin-bottom:.4rem; }
+.ty-type .type-desc { font-size:.88rem; opacity:.8; line-height:1.6; }
+
+/* ─── CONFIDENTIAL BANNER ─── */
+.confidential {
+  background:rgba(27,107,147,.06); border:1px solid rgba(27,107,147,.15);
+  border-radius:10px; padding:.75rem 1rem; margin-bottom:2rem;
+  display:flex; gap:.75rem; align-items:flex-start;
+  font-size:.85rem; color:var(--text-light); line-height:1.5;
+}
+.confidential-icon { font-size:1rem; flex-shrink:0; margin-top:.05rem; }
+
+/* ─── WAVE TOP ─── */
+.wave-top {
+  background:linear-gradient(135deg, var(--ocean-deep), var(--ocean-mid));
+  padding:2.5rem 2rem 3.5rem; text-align:center; color:var(--white);
+  position:relative; overflow:hidden;
+}
+.wave-top::after {
+  content:'';
+  position:absolute; bottom:-1px; left:0; right:0; height:50px;
+  background:var(--foam);
+  clip-path: ellipse(55% 100% at 50% 100%);
+}
+.wave-top h1 { font-size:1.6rem; margin-bottom:.5rem; }
+.wave-top p { opacity:.75; font-size:.9rem; }
+
+/* ─── RESPONSIVE ─── */
+@media (max-width:600px) {
+  .main { padding:1.5rem 1rem 3rem; }
+  .block-title { font-size:1.4rem; }
+  .progress-steps { gap:.3rem; }
+  .step-dot { width:24px; height:24px; font-size:.65rem; }
+  .likert-btn { width:38px; height:38px; }
+}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-brand">
+    <span>AI Диагностика chilBase</span>
+  </div>
+  <div class="header-dept">2D Art / UI-UX</div>
+</div>
+
+<!-- PROGRESS -->
+<div class="progress-wrap">
+  <div class="progress-steps" id="progressSteps"></div>
+  <div class="progress-label" id="progressLabel"></div>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+  <div class="confidential">
+    <span class="confidential-icon">🔒</span>
+    <span>Ваши ответы конфиденциальны — результаты агрегируются по отделу без имён и не передаются руководству в детальном виде.</span>
+  </div>
+
+  <div id="surveyContainer"></div>
+
+  <div class="thankyou" id="thankyou">
+    <div class="ty-icon">🌊</div>
+    <h2 class="ty-title">Спасибо!</h2>
+    <p class="ty-sub">Ваши ответы сохранены. Результаты появятся в общем отчёте по отделу — без имён, только агрегированно.</p>
+    <div class="ty-type" id="tyType"></div>
+    <p class="ty-sub" style="margin-top:1.5rem; font-size:.88rem;">Скоро мы поделимся картой AI-возможностей для chilBase — и расскажем, что реально можно автоматизировать в вашем отделе.</p>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════
+// CONFIG — вставьте URL вашего Apps Script для Google Sheets
+// ═══════════════════════════════════════════
+const SHEETS_WEBHOOK = ''; // 'https://script.google.com/macros/s/YOUR_ID/exec'
+const DEPT = '2d';
+const SESSION_ID = Date.now() + '_' + Math.random().toString(36).slice(2,8);
+
+// ═══════════════════════════════════════════
+// SURVEY DATA
+// ═══════════════════════════════════════════
+const BLOCKS = [
+  {
+    id: 'b0', label: 'Блок 0', title: 'Профиль восприятия изменений',
+    sub: 'Как вы относитесь к новым инструментам и изменениям. Нет правильных ответов.',
+    questions: [
+      { id:'q0_1', type:'radio', text:'Когда в компании внедряется новый инструмент или процесс, вы обычно...', opts:[
+        {v:'A', t:'Один из первых, кто пробует — мне интересно, как это работает'},
+        {v:'B', t:'Жду, пока коллеги опробуют, потом подключаюсь'},
+        {v:'C', t:'Начинаю использовать, когда это становится обязательным'},
+        {v:'D', t:'Предпочитаю проверенные инструменты, к новым отношусь осторожно'},
+      ]},
+      { id:'q0_2', type:'radio', text:'Как вы обычно учите что-то новое в работе?', opts:[
+        {v:'A', t:'Сразу пробую — учусь в процессе'},
+        {v:'B', t:'Смотрю туториалы / читаю документацию, потом применяю'},
+        {v:'C', t:'Прошу коллегу показать лично'},
+        {v:'D', t:'Жду, пока кто-то объяснит в рамках обучения'},
+      ]},
+      { id:'q0_3', type:'radio', text:'Когда задача занимает больше времени, чем должна, вы...', opts:[
+        {v:'A', t:'Сразу ищу способ ускорить или автоматизировать'},
+        {v:'B', t:'Делаю как есть, но запоминаю — вернусь к этому позже'},
+        {v:'C', t:'Делаю как есть — это часть работы'},
+        {v:'D', t:'Сообщаю руководителю, что нужно больше ресурсов'},
+      ]},
+      { id:'q0_4', type:'radio', text:'Как вы относитесь к идее, что AI будет помогать вам в работе?', opts:[
+        {v:'A', t:'Очень позитивно — хочу попробовать прямо сейчас'},
+        {v:'B', t:'Позитивно, если это реально экономит время'},
+        {v:'C', t:'Нейтрально — посмотрю на результаты'},
+        {v:'D', t:'С осторожностью — важно не потерять качество'},
+        {v:'E', t:'Скептически — AI в моей работе не применим'},
+      ]},
+      { id:'q0_5', type:'radio', text:'Ваш основной стиль работы:', opts:[
+        {v:'A', t:'Работаю по чётким процессам и правилам — предсказуемость важна'},
+        {v:'B', t:'Адаптируюсь под задачу — каждый раз немного по-разному'},
+        {v:'C', t:'Люблю экспериментировать и искать новые подходы'},
+        {v:'D', t:'Фокусируюсь на результате — как добраться, не так важно'},
+      ]},
+      { id:'q0_6', type:'radio', text:'Если бы у вас был свободный час на изучение AI-инструмента для работы, вы бы...', opts:[
+        {v:'A', t:'Сразу открыл и начал пробовать на реальных задачах'},
+        {v:'B', t:'Посмотрел обзор или примеры использования коллег'},
+        {v:'C', t:'Подождал бы официального обучения от компании'},
+        {v:'D', t:'Потратил час на другие рабочие задачи'},
+      ]},
+    ]
+  },
+  {
+    id: 'b1', label: 'Блок 1', title: 'Ваш профиль', sub: '5 вопросов о роли и опыте.',
+    questions: [
+      { id:'q1_1', type:'radio', text:'Ваша основная роль:', opts:[
+        {v:'uiux', t:'UI/UX Designer'},{v:'2d_art', t:'2D Artist (иллюстрации)'},
+        {v:'anim', t:'2D Animator'},{v:'mkt_art', t:'Marketing Artist'},
+        {v:'concept', t:'Concept Artist'},{v:'lead', t:'Lead / Art Director'},{v:'other', t:'Другое'},
+      ]},
+      { id:'q1_2', type:'radio', text:'Опыт в индустрии:', opts:[
+        {v:'<1', t:'< 1 года'},{v:'1-3', t:'1–3 года'},{v:'3-5', t:'3–5 лет'},{v:'5-10', t:'5–10 лет'},{v:'10+', t:'10+ лет'},
+      ]},
+      { id:'q1_3', type:'radio', text:'Сколько вы в chilBase:', opts:[
+        {v:'<6m', t:'< 6 месяцев'},{v:'6-12m', t:'6–12 месяцев'},{v:'1-2y', t:'1–2 года'},{v:'2-4y', t:'2–4 года'},{v:'4+y', t:'4+ года'},
+      ]},
+      { id:'q1_4', type:'radio', text:'Основной инструмент:', opts:[
+        {v:'figma', t:'Figma'},{v:'ps', t:'Photoshop'},{v:'ai', t:'Illustrator'},
+        {v:'procreate', t:'Procreate'},{v:'spine', t:'Spine / DragonBones'},{v:'ae', t:'After Effects'},{v:'other', t:'Другое'},
+      ]},
+      { id:'q1_5', type:'radio', text:'Задач/тикетов в среднюю неделю:', opts:[
+        {v:'<5', t:'< 5'},{v:'5-10', t:'5–10'},{v:'11-20', t:'11–20'},{v:'21-40', t:'21–40'},{v:'40+', t:'40+'},
+      ]},
+    ]
+  },
+  {
+    id: 'b2', label: 'Блок 2', title: 'Понимание AI и LLM', sub: '9 вопросов.',
+    questions: [
+      { id:'q2_1', type:'radio', text:'Что такое LLM:', opts:[
+        {v:'A', t:'Поисковик в интернете'},{v:'B', t:'Модель, предсказывающая следующий токен на основе обученных данных'},
+        {v:'C', t:'База знаний с готовыми ответами'},{v:'D', t:'Программа, думающая как человек'},{v:'E', t:'Не знаю'},
+      ]},
+      { id:'q2_2', type:'radio', text:'Что такое «промт»:', opts:[
+        {v:'A', t:'Кнопка в интерфейсе'},{v:'B', t:'Текстовый запрос/инструкция для модели'},
+        {v:'C', t:'Название модели'},{v:'D', t:'Результат работы AI'},{v:'E', t:'Не знаю'},
+      ]},
+      { id:'q2_3', type:'radio', text:'Разница между Midjourney и Stable Diffusion:', opts:[
+        {v:'A', t:'Midjourney — облачный сервис, SD — открытая модель для локального запуска'},
+        {v:'B', t:'Они одинаковые, разные названия'},{v:'C', t:'MJ только для anime'},
+        {v:'D', t:'SD бесплатный — единственная разница'},{v:'E', t:'Не знаю'},
+      ]},
+      { id:'q2_4', type:'radio', text:'Что такое LoRA:', opts:[
+        {v:'A', t:'Тип шрифта'},{v:'B', t:'Лёгкий адаптер для дообучения стиля/персонажа'},
+        {v:'C', t:'Формат изображения'},{v:'D', t:'Плагин Photoshop'},{v:'E', t:'Не знаю'},
+      ]},
+      { id:'q2_5', type:'radio', text:'Что такое ControlNet:', opts:[
+        {v:'A', t:'Контроль подписок'},{v:'B', t:'Модуль управления генерацией через референс (позу, края, глубину)'},
+        {v:'C', t:'Защита от NSFW'},{v:'D', t:'Не знаю'},
+      ]},
+      { id:'q2_6', type:'radio', text:'Что такое «галлюцинация» LLM:', opts:[
+        {v:'A', t:'Ошибка сервера'},{v:'B', t:'Модель уверенно выдаёт фактически неверную информацию'},
+        {v:'C', t:'Модель отказывается отвечать'},{v:'D', t:'Не знаю'},
+      ]},
+      { id:'q2_7', type:'radio', text:'Почему одинаковый промт в Midjourney даёт разные картинки:', opts:[
+        {v:'A', t:'Баг'},{v:'B', t:'Генерация вероятностна, seed случаен если не зафиксирован'},
+        {v:'C', t:'Модель учится на предыдущих запросах'},{v:'D', t:'Не знаю'},
+      ]},
+      { id:'q2_8', type:'likert', text:'Уровень владения промтингом (текст):', labelLeft:'Никогда не писал(а)', labelRight:'Продвинутые техники'},
+      { id:'q2_9', type:'likert', text:'Уровень владения промтингом для изображений:', labelLeft:'Не пробовал(а)', labelRight:'Эксперт'},
+    ]
+  },
+  {
+    id: 'b3', label: 'Блок 3', title: 'Текущая рутина', sub: 'Распределение времени и задачи.',
+    questions: [
+      { id:'q3_1', type:'timesplit', text:'Распределите % рабочего времени:', items:[
+        {k:'uiux', l:'UI/UX дизайн новых экранов'},{k:'fixes', l:'Правки существующих экранов'},
+        {k:'art', l:'Иллюстрации / арт'},{k:'mkt_static', l:'Маркетинговые креативы (статика)'},
+        {k:'mkt_video', l:'Маркетинговые креативы (видео/анимация)'},{k:'anim_ui', l:'Анимации UI'},
+        {k:'export', l:'Подготовка ассетов к сдаче'},{k:'comms', l:'Коммуникация / ревью'},{k:'other', l:'Другое'},
+      ]},
+      { id:'q3_2', type:'radio', text:'Итераций в среднем до финального approve:', opts:[
+        {v:'1-2', t:'1–2'},{v:'3-5', t:'3–5'},{v:'6-10', t:'6–10'},{v:'10+', t:'10+'},
+      ]},
+      { id:'q3_3', type:'checkbox', text:'Задачи, отнимающие больше всего времени «не по делу»:', opts:[
+        {v:'resize', t:'Адаптации под разные разрешения'},{v:'localize', t:'Локализация'},
+        {v:'platforms', t:'Ресайз под маркетинговые площадки'},{v:'fixes', t:'Мелкие правки цветов/текста'},
+        {v:'export', t:'Экспорт/подготовка ассетов'},{v:'search', t:'Поиск предыдущих версий'},
+        {v:'3d_wait', t:'Ожидание рендеров от 3D-отдела'},{v:'motion', t:'Ручная сборка моушнов'},
+        {v:'comms', t:'Коммуникация (где этот файл?)'},
+      ]},
+      { id:'q3_4', type:'likert', text:'Зависимость маркетинга от рендеров 3D-отдела:', labelLeft:'Не зависит', labelRight:'Полностью блокирует'},
+      { id:'q3_5', type:'radio', text:'Языков нужно поддерживать в одном маркетинговом креативе:', opts:[
+        {v:'1', t:'1'},{v:'2-5', t:'2–5'},{v:'6-10', t:'6–10'},{v:'10+', t:'10+'},
+      ]},
+      { id:'q3_6', type:'radio', text:'Форматов (соотношений сторон) для одного креатива:', opts:[
+        {v:'1', t:'1'},{v:'2-3', t:'2–3'},{v:'4-6', t:'4–6'},{v:'7+', t:'7+'},
+      ]},
+      { id:'q3_7', type:'radio', text:'Как часто приходят срочные правки «на вчера»:', opts:[
+        {v:'daily', t:'Ежедневно'},{v:'few_week', t:'Несколько раз в неделю'},{v:'weekly', t:'Раз в неделю'},{v:'rarely', t:'Реже'},
+      ]},
+      { id:'q3_8', type:'likert', text:'Насколько структурированы брифы:', labelLeft:'Хаос', labelRight:'Всё чётко'},
+      { id:'q3_9', type:'radio', text:'Как часто теряете время на поиск референсов:', opts:[
+        {v:'daily', t:'Ежедневно'},{v:'few_week', t:'Несколько раз в неделю'},{v:'rarely', t:'Редко'},
+      ]},
+      { id:'q3_10', type:'radio', text:'Минут в день на подготовку ассетов к сдаче:', opts:[
+        {v:'<15', t:'< 15 мин'},{v:'15-30', t:'15–30 мин'},{v:'30-60', t:'30–60 мин'},{v:'1-2h', t:'1–2 часа'},{v:'>2h', t:'> 2 часов'},
+      ]},
+      { id:'q3_11', type:'likert', text:'Как часто дублируете работу коллег:', labelLeft:'Никогда', labelRight:'Постоянно'},
+      { id:'q3_12', type:'checkbox', text:'Задачи, которые делаете руками, хотя можно автоматизировать:', opts:[
+        {v:'resize', t:'Ресайз/адаптация под форматы'},{v:'localize', t:'Локализация текста на макетах'},
+        {v:'bg', t:'Замена фоновых изображений'},{v:'rembg', t:'Удаление фона'},
+        {v:'upscale', t:'Upscale изображений'},{v:'thumbs', t:'Подготовка превью / тамбнейлов'},{v:'none', t:'Ничего'},
+      ]},
+    ]
+  },
+  {
+    id: 'b4', label: 'Блок 4', title: 'Мини-задачи на логику LLM', sub: 'Реальные сценарии из вашей работы.',
+    questions: [
+      { id:'q4_1', type:'task',
+        situation: 'Вам нужен референс-лист для экрана «магазин внутриигровой валюты» в стилизованной open-world игре. Стиль — тёплый, fantasy, не реалистичный. Нужны идеи как обыграть UI.',
+        question: 'Лучший промт к Claude/ChatGPT:',
+        correct: 'C',
+        explain: 'C — лучший: задана роль, стиль, ограничения, конкретный формат (7 концепций → таблица). Чем больше контекста — тем точнее вывод модели.',
+        opts:[
+          {v:'A', t:'«Придумай магазин»'},{v:'B', t:'«UI для магазина»'},
+          {v:'C', t:'«Ты — UI-дизайнер стилизованной fantasy open-world игры. Экран внутриигрового магазина валюты, мобильный портрет, tap-friendly, тёплая палитра, не карточный grid. Предложи 7 концепций макета: метафору, расположение кнопок, где скидки, как выделить премиум. Формат: таблица»'},
+          {v:'D', t:'«Напиши про магазин в игре»'},{v:'E', t:'«Сделай как у Clash Royale»'},
+        ]
+      },
+      { id:'q4_2', type:'task',
+        situation: 'Прислали 30 маркетинговых баннеров на английском. Нужно локализовать на 8 языков с учётом длины.',
+        question: 'Лучший промт:',
+        correct: 'C',
+        explain: 'C — лучший: задана роль, все 8 языков, лимиты символов (22 и 16 для JA/KO), тон, формат таблицы с альтернативами.',
+        opts:[
+          {v:'A', t:'«Переведи»'},{v:'B', t:'«Переведи на 8 языков»'},
+          {v:'C', t:'«Ты — переводчик маркетинговых текстов для мобильных игр. Переведи 30 CTA с EN на DE, FR, ES, IT, PT-BR, RU, JA, KO. Макс символов — 22 (JA/KO — 16). Если длиннее — 2 альтернативы. Тон: энергичный. Формат: таблица language/original/translation/chars/alt. Тексты: [...]»'},
+          {v:'D', t:'«Преврати в немецкий»'},{v:'E', t:'«Используй Google Translate»'},
+        ]
+      },
+      { id:'q4_3', type:'task',
+        situation: 'Хотите сгенерировать в Midjourney набор из 10 иконок способностей для UI: единый стиль, outlined, тёплая палитра, без фона.',
+        question: 'Лучший промт для Midjourney:',
+        correct: 'C',
+        explain: 'C — лучший: указан сет, жанр, стиль, палитра, фон, размер и технические флаги. Это обеспечивает консистентный результат.',
+        opts:[
+          {v:'A', t:'«icons»'},{v:'B', t:'«10 fantasy icons»'},
+          {v:'C', t:'«ability icons set, fantasy game UI, flat vector style, bold outline, warm color palette (orange, gold, red), transparent background, consistent line weight, no text, readable at 64px --style raw --ar 1:1»'},
+          {v:'D', t:'«красивые иконки»'},{v:'E', t:'«draw something cool»'},
+        ]
+      },
+      { id:'q4_4', type:'task',
+        situation: 'Нужно проверить, подходит ли концепт персонажа от аутсорса под стайл-гайд. У вас 5 эталонных персонажей и 1 новый.',
+        question: 'Лучший промт (vision-модель Claude):',
+        correct: 'C',
+        explain: 'C — лучший: задана роль, 5 критериев оценки со шкалой 1-5, структурированный вердикт. Без критериев — субъективное мнение вместо ревью.',
+        opts:[
+          {v:'A', t:'«Нравится?»'},{v:'B', t:'«Сравни картинки»'},
+          {v:'C', t:'«Ты — арт-директор. Файлы 1–5 — эталоны, файл 6 — новый от аутсорса. Оцени по 5 критериям: палитра, стилизация, пропорции, детализация, читаемость силуэта. По каждому — оценка 1–5 + замечания. Вердикт: approve/rework/reject + топ-3 правки»'},
+          {v:'D', t:'«Это красиво?»'},{v:'E', t:'«Дай отзыв»'},
+        ]
+      },
+    ]
+  },
+  {
+    id: 'b5', label: 'Блок 5', title: 'AI в работе сейчас', sub: 'Что вы уже используете.',
+    questions: [
+      { id:'q5_1', type:'checkbox', text:'AI-инструменты, которыми пользовались по работе:', opts:[
+        {v:'chatgpt', t:'ChatGPT'},{v:'claude', t:'Claude'},{v:'gemini', t:'Gemini'},
+        {v:'mj', t:'Midjourney'},{v:'sd', t:'Stable Diffusion (ComfyUI / A1111)'},{v:'dalle', t:'DALL·E'},
+        {v:'firefly', t:'Adobe Firefly'},{v:'runway', t:'Runway / Pika / Kling'},{v:'ps_ai', t:'Photoshop AI'},
+        {v:'figma_ai', t:'Figma AI'},{v:'suno', t:'Suno / ElevenLabs'},{v:'none', t:'Не использую AI'},
+      ]},
+      { id:'q5_2', type:'radio', text:'Как часто используете AI в работе:', opts:[
+        {v:'daily', t:'Ежедневно'},{v:'few_week', t:'Несколько раз в неделю'},{v:'weekly', t:'Раз в неделю'},{v:'rarely', t:'Реже / никогда'},
+      ]},
+      { id:'q5_3', type:'checkbox', text:'Для каких задач используете AI:', opts:[
+        {v:'refs', t:'Поиск референсов / мудборды'},{v:'gen_final', t:'Генерация иллюстраций (финал)'},
+        {v:'gen_draft', t:'Генерация черновиков'},{v:'rembg', t:'Удаление фона / апскейл'},
+        {v:'compos', t:'Варианты композиции'},{v:'ui_ideas', t:'Идеи для UI'},
+        {v:'translate', t:'Переводы'},{v:'text', t:'Тексты / описания'},{v:'video', t:'Анимация / видео'},{v:'none', t:'Ничего'},
+      ]},
+      { id:'q5_4', type:'likert', text:'Ценность AI для вашей работы:', labelLeft:'Бесполезно', labelRight:'Сильно экономит время'},
+      { id:'q5_5', type:'checkbox', text:'Что мешает использовать AI больше:', opts:[
+        {v:'time', t:'Нет времени разбираться'},{v:'access', t:'Нет доступа к платным инструментам'},
+        {v:'unstable', t:'Результат нестабильный'},{v:'style', t:'Не подходит под наш style guide'},
+        {v:'nda', t:'Опасения по NDA'},{v:'legal', t:'Юридические ограничения (AI blacklist)'},
+        {v:'prod', t:'Не уверен(а), можно ли на проде'},{v:'nothing', t:'Ничего не мешает'},
+      ]},
+      { id:'q5_6', type:'radio', text:'Сталкивались с AI blacklist ограничениями (Apple/Google):', opts:[
+        {v:'yes', t:'Да, регулярно'},{v:'heard', t:'Слышал(а), не сталкивался(ась)'},{v:'dk', t:'Не знаю, что это'},{v:'no', t:'Нет'},
+      ]},
+      { id:'q5_7', type:'radio', text:'Пробовали LoRA / dreambooth под стиль chilBase:', opts:[
+        {v:'yes', t:'Да, использую'},{v:'tried', t:'Пробовал(а), не зашло'},{v:'heard', t:'Слышал(а), не пробовал(а)'},{v:'never', t:'Впервые слышу'},
+      ]},
+      { id:'q5_8', type:'likert', text:'Насколько доверяете результатам AI:', labelLeft:'Не доверяю', labelRight:'Полностью доверяю'},
+      { id:'q5_9', type:'radio', text:'Используете ли AI-анимацию (Runway, Pika, Kling):', opts:[
+        {v:'reg', t:'Регулярно'},{v:'tried', t:'Пробовал(а)'},{v:'heard', t:'Знаю, не пробовал(а)'},{v:'never', t:'Впервые слышу'},
+      ]},
+      { id:'q5_10', type:'radio', text:'Делитесь ли находками с коллегами:', opts:[
+        {v:'reg', t:'Регулярно'},{v:'sometimes', t:'Иногда'},{v:'rarely', t:'Редко'},{v:'no', t:'Нет'},
+      ]},
+    ]
+  },
+  {
+    id: 'b6', label: 'Блок 6', title: 'Желания и опасения', sub: 'Что хотелось бы автоматизировать.',
+    questions: [
+      { id:'q6_1', type:'checkbox', text:'Рутины, которые хотели бы отдать AI (до 5):', opts:[
+        {v:'adapt', t:'Адаптация под форматы'},{v:'localize', t:'Локализация макетов'},
+        {v:'upscale', t:'Ресайз / upscale'},{v:'rembg', t:'Удаление фона'},
+        {v:'banners', t:'Генерация маркетинговых баннеров'},{v:'icons', t:'Генерация иконок'},
+        {v:'mood', t:'Мудборды'},{v:'drafts', t:'Черновики / первый layout'},
+        {v:'anim', t:'Анимация UI'},{v:'export', t:'Подготовка к сдаче (экспорт, нейминг)'},{v:'translate', t:'Перевод брифов'},
+      ]},
+      { id:'q6_2', type:'checkbox', text:'Задачи, которые НЕ хотели бы отдавать AI:', opts:[
+        {v:'art', t:'Финальная художественная доводка'},{v:'screens', t:'Дизайн ключевых экранов'},
+        {v:'style', t:'Стилистические решения'},{v:'review', t:'Ревью коллег'},
+        {v:'concept', t:'Концепты персонажей'},{v:'all', t:'Всё можно делегировать'},
+      ]},
+      { id:'q6_3', type:'likert', text:'Насколько беспокоит, что AI «заменит» художников за 3 года:', labelLeft:'Не беспокоит', labelRight:'Сильно беспокоит'},
+      { id:'q6_4', type:'likert', text:'Готовность тратить рабочее время на обучение:', labelLeft:'Не готов(а)', labelRight:'Готов(а) сейчас'},
+      { id:'q6_5', type:'radio', text:'Часов в неделю на обучение:', opts:[
+        {v:'0', t:'0'},{v:'1-2', t:'1–2'},{v:'3-5', t:'3–5'},{v:'6+', t:'6+'},
+      ]},
+      { id:'q6_6', type:'radio', text:'Предпочтительный формат обучения:', opts:[
+        {v:'video', t:'Короткие видео'},{v:'zoom', t:'Воркшоп в Zoom'},{v:'live', t:'Очный воркшоп'},
+        {v:'guide', t:'Письменные гайды'},{v:'pair', t:'Парное наблюдение'},{v:'self', t:'Самостоятельно'},
+      ]},
+      { id:'q6_7', type:'checkbox', text:'Что бы сильнее всего ускорило работу:', opts:[
+        {v:'lora', t:'Кастомная LoRA под стиль chilBase'},{v:'prompts', t:'Библиотека промтов для MJ/SD'},
+        {v:'figma', t:'Плагин Figma с генерацией'},{v:'localize_ai', t:'AI для локализации с учётом длины'},
+        {v:'resize_ai', t:'AI для авто-адаптации форматов'},{v:'icons_ai', t:'AI для генерации иконок'},{v:'other', t:'Другое'},
+      ]},
+      { id:'q6_8', type:'checkbox', text:'Что мотивирует в освоении AI:', opts:[
+        {v:'boring', t:'Ускорение рутины'},{v:'creative', t:'Новые творческие возможности'},
+        {v:'career', t:'Карьерный рост'},{v:'fear', t:'Страх отстать'},{v:'pressure', t:'Давление сверху'},{v:'none', t:'Ничего'},
+      ]},
+      { id:'q6_9', type:'radio', text:'Готовы участвовать в пилоте «AI creative pipeline»:', opts:[
+        {v:'yes', t:'Да, с удовольствием'},{v:'if_ok', t:'Да, если не ломает мой workflow'},{v:'no', t:'Скорее нет'},{v:'nope', t:'Нет'},
+      ]},
+      { id:'q6_10', type:'likert', text:'Комфортно ли, если ваш workflow станет публичным внутри компании:', labelLeft:'Некомфортно', labelRight:'Полностью комфортно'},
+    ]
+  },
+    {
+    id: 'b7', label: 'Блок 7', title: 'Ваши слова',
+    sub: '3 открытых вопроса — отвечайте как хочется, можно кратко.',
+    questions: [
+      { id:'q7_1', type:'textarea', text:'Если бы вы могли устранить одну рутину прямо сейчас — что бы это было?' },
+      { id:'q7_2', type:'textarea', text:'Какой AI-инструмент попробовали бы в ближайший месяц, если бы было 2 свободных часа и доступ?' },
+      { id:'q7_3', type:'textarea', text:'Что хотите сказать команде, которая будет внедрять AI в chilBase — пожелания, опасения, идеи:' },
+    ]
+  }
+];
+
+const BLOCK_NAMES = ['Восприятие изменений','Профиль','Понимание AI','Рутина','LLM Задачи','AI сейчас','Желания','Ваши слова'];
+
+// Психотипы
+const PSYCHOTYPES = {
+  innovator: { name:'Новатор 🚀', desc:'Вы первыми пробуете новое и быстро осваиваете инструменты. Для вас подойдёт углублённый трек с практикой сложных AI-pipelines.' },
+  pragmatist: { name:'Прагматик ⚡', desc:'Вы за инструменты, которые реально работают. Оптимальный формат — практические кейсы с измеримым ROI.' },
+  conservative: { name:'Консерватор 🛡️', desc:'Вы цените стабильность и проверенные решения. Постепенное внедрение с поддержкой — ваш путь.' },
+  skeptic: { name:'Скептик 🔍', desc:'Вы задаёте правильные вопросы и требуете доказательств. Ваша позиция помогает избежать внедрения ради галочки.' },
+};
+
+// ═══════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════
+let currentBlock = 0;
+let answers = {};
+
+function loadSaved() {
+  try {
+    const saved = localStorage.getItem(`chilbase_${DEPT}_${SESSION_ID}`);
+    if (saved) answers = JSON.parse(saved);
+  } catch(e) {}
+}
+function saveProgress() {
+  try {
+    localStorage.setItem(`chilbase_${DEPT}_${SESSION_ID}`, JSON.stringify(answers));
+  } catch(e) {}
+}
+
+// ═══════════════════════════════════════════
+// RENDER
+// ═══════════════════════════════════════════
+function renderProgress() {
+  const steps = document.getElementById('progressSteps');
+  const label = document.getElementById('progressLabel');
+  steps.innerHTML = '';
+  BLOCKS.forEach((b, i) => {
+    if (i > 0) {
+      const line = document.createElement('div');
+      line.className = 'step-line' + (i <= currentBlock ? ' done' : '');
+      steps.appendChild(line);
+    }
+    const dot = document.createElement('div');
+    dot.className = 'step-dot ' + (i < currentBlock ? 'done' : i === currentBlock ? 'active' : 'todo');
+    dot.textContent = i < currentBlock ? '✓' : (i + 1);
+    dot.title = BLOCK_NAMES[i];
+    steps.appendChild(dot);
+  });
+  label.textContent = `${BLOCK_NAMES[currentBlock]} — шаг ${currentBlock + 1} из ${BLOCKS.length}`;
+}
+
+function renderBlock(blockIdx) {
+  const block = BLOCKS[blockIdx];
+  const container = document.getElementById('surveyContainer');
+  container.innerHTML = '';
+
+  const header = document.createElement('div');
+  header.className = 'block-header';
+  header.innerHTML = `<div class="block-label">${block.label}</div><h2 class="block-title">${block.title}</h2><p class="block-sub">${block.sub}</p>`;
+  container.appendChild(header);
+
+  block.questions.forEach((q, qi) => {
+    const card = document.createElement('div');
+    card.className = 'question';
+    card.style.animationDelay = (qi * 0.06) + 's';
+    card.innerHTML = renderQuestion(q, qi);
+    container.appendChild(card);
+  });
+
+  const nav = document.createElement('div');
+  nav.className = 'nav-row';
+  if (blockIdx > 0) {
+    nav.innerHTML += `<button class="btn btn-secondary" onclick="prevBlock()">← Назад</button>`;
+  } else {
+    nav.innerHTML += `<div></div>`;
+  }
+  if (blockIdx < BLOCKS.length - 1) {
+    nav.innerHTML += `<button class="btn btn-primary" onclick="nextBlock()">Далее →</button>`;
+  } else {
+    nav.innerHTML += `<button class="btn btn-submit" onclick="submitSurvey()">Отправить результаты ✓</button>`;
+  }
+  container.appendChild(nav);
+
+  attachListeners(block);
+  window.scrollTo({top: 0, behavior:'smooth'});
+}
+
+function renderQuestion(q, idx) {
+  const num = `<span class="q-num">${idx + 1}</span>`;
+  const label = `<div class="q-label">${num}${q.text}</div>`;
+
+  if (q.type === 'radio') {
+    const opts = q.opts.map(o => `
+      <label class="opt${answers[q.id] === o.v ? ' selected':''}" data-qid="${q.id}" data-val="${o.v}">
+        <input type="radio" name="${q.id}" value="${o.v}" ${answers[q.id]===o.v?'checked':''}>
+        <div class="opt-marker"></div>
+        <span class="opt-text">${o.t}</span>
+      </label>`).join('');
+    return `${label}<div class="options">${opts}</div>`;
+  }
+
+  if (q.type === 'checkbox') {
+    const vals = answers[q.id] || [];
+    const opts = q.opts.map(o => `
+      <label class="opt checkbox-opt${vals.includes(o.v)?' selected':''}" data-qid="${q.id}" data-val="${o.v}" data-multi="1">
+        <input type="checkbox" name="${q.id}" value="${o.v}" ${vals.includes(o.v)?'checked':''}>
+        <div class="opt-marker"></div>
+        <span class="opt-text">${o.t}</span>
+      </label>`).join('');
+    return `${label}<div class="options">${opts}</div>`;
+  }
+
+  if (q.type === 'likert') {
+    const val = answers[q.id] || null;
+    const btns = [1,2,3,4,5].map(n => `<button class="likert-btn${val==n?' selected':''}" data-qid="${q.id}" data-val="${n}" onclick="">${n}</button>`).join('');
+    return `${label}<div class="likert-wrap"><div class="likert-labels"><span>${q.labelLeft}</span><span>${q.labelRight}</span></div><div class="likert-row">${btns}</div></div>`;
+  }
+
+  if (q.type === 'task') {
+    const answered = answers[q.id];
+    const opts = q.opts.map(o => {
+      let cls = 'task-opt';
+      if (answered) {
+        if (o.v === q.correct) cls += ' correct';
+        else if (o.v === answered) cls += ' wrong';
+      } else if (answered === o.v) cls += ' selected';
+      return `<div class="${cls}" data-qid="${q.id}" data-val="${o.v}" data-correct="${q.correct}" data-explain="${q.explain}">
+        <div class="task-letter">${o.v}</div>
+        <div class="task-text">${o.t}</div>
+      </div>`;
+    }).join('');
+    const explainShow = answered ? ' show' : '';
+    return `<div class="task-situation"><div class="sit-label">Ситуация</div><p>${q.situation}</p></div>
+    <div class="task-q">${q.question}</div>
+    <div class="task-options">${opts}</div>
+    <div class="task-explain${explainShow}" id="explain_${q.id}">${answered ? q.explain : ''}</div>`;
+  }
+
+  if (q.type === 'timesplit') {
+    const saved = answers[q.id] || {};
+    const rows = q.items.map(item => `
+      <div class="time-row">
+        <span class="time-label">${item.l}</span>
+        <input class="time-input" type="number" min="0" max="100" data-qid="${q.id}" data-key="${item.k}"
+          value="${saved[item.k]||''}" placeholder="0">
+        <span class="time-unit">%</span>
+      </div>`).join('');
+    return `${label}<div class="time-split">${rows}<div class="time-total" id="total_${q.id}">Итого: <strong id="totalVal_${q.id}">0</strong>%</div></div>`;
+  }
+
+  if (q.type === 'textarea') {
+    return `${label}<div class="open-q"><textarea data-qid="${q.id}" rows="3" placeholder="Ваш ответ...">${answers[q.id]||''}</textarea></div>`;
+  }
+
+  return label;
+}
+
+function attachListeners(block) {
+  // Radio / checkbox
+  document.querySelectorAll('.opt').forEach(el => {
+    el.addEventListener('click', function() {
+      const qid = this.dataset.qid;
+      const val = this.dataset.val;
+      const multi = this.dataset.multi;
+      if (multi) {
+        let arr = answers[qid] || [];
+        if (arr.includes(val)) arr = arr.filter(v => v !== val);
+        else arr.push(val);
+        answers[qid] = arr;
+        document.querySelectorAll(`.opt[data-qid="${qid}"]`).forEach(o => {
+          o.classList.toggle('selected', arr.includes(o.dataset.val));
+        });
+      } else {
+        answers[qid] = val;
+        document.querySelectorAll(`.opt[data-qid="${qid}"]`).forEach(o => {
+          o.classList.toggle('selected', o.dataset.val === val);
+        });
+      }
+      saveProgress();
+    });
+  });
+
+  // Likert
+  document.querySelectorAll('.likert-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+      const qid = this.dataset.qid;
+      const val = parseInt(this.dataset.val);
+      answers[qid] = val;
+      document.querySelectorAll(`.likert-btn[data-qid="${qid}"]`).forEach(b => {
+        b.classList.toggle('selected', parseInt(b.dataset.val) === val);
+      });
+      saveProgress();
+    });
+  });
+
+  // Task
+  document.querySelectorAll('.task-opt').forEach(el => {
+    el.addEventListener('click', function() {
+      const qid = this.dataset.qid;
+      if (answers[qid]) return; // already answered
+      const val = this.dataset.val;
+      const correct = this.dataset.correct;
+      const explain = this.dataset.explain;
+      answers[qid] = val;
+      document.querySelectorAll(`.task-opt[data-qid="${qid}"]`).forEach(o => {
+        if (o.dataset.val === correct) o.classList.add('correct');
+        else if (o.dataset.val === val) o.classList.add('wrong');
+      });
+      const expEl = document.getElementById(`explain_${qid}`);
+      if (expEl) { expEl.textContent = explain; expEl.classList.add('show'); }
+      saveProgress();
+    });
+  });
+
+  // Time split
+  document.querySelectorAll('.time-input').forEach(inp => {
+    inp.addEventListener('input', function() {
+      const qid = this.dataset.qid;
+      const key = this.dataset.key;
+      if (!answers[qid]) answers[qid] = {};
+      answers[qid][key] = parseInt(this.value) || 0;
+      const all = document.querySelectorAll(`.time-input[data-qid="${qid}"]`);
+      let total = 0;
+      all.forEach(i => total += (parseInt(i.value) || 0));
+      const totalEl = document.getElementById(`total_${qid}`);
+      const valEl = document.getElementById(`totalVal_${qid}`);
+      if (valEl) valEl.textContent = total;
+      if (totalEl) totalEl.classList.toggle('over', total > 100);
+      saveProgress();
+    });
+  });
+
+  // Textarea
+  document.querySelectorAll('textarea[data-qid]').forEach(ta => {
+    ta.addEventListener('input', function() {
+      answers[this.dataset.qid] = this.value;
+      saveProgress();
+    });
+  });
+}
+
+// ═══════════════════════════════════════════
+// NAVIGATION
+// ═══════════════════════════════════════════
+function nextBlock() {
+  if (currentBlock < BLOCKS.length - 1) {
+    currentBlock++;
+    renderProgress();
+    renderBlock(currentBlock);
+  }
+}
+function prevBlock() {
+  if (currentBlock > 0) {
+    currentBlock--;
+    renderProgress();
+    renderBlock(currentBlock);
+  }
+}
+
+// ═══════════════════════════════════════════
+// PSYCHOTYPE CALCULATION
+// ═══════════════════════════════════════════
+function calcPsychotype() {
+  const b0 = ['q0_1','q0_2','q0_3','q0_4','q0_5','q0_6'];
+  let counts = {A:0, B:0, C:0, D:0, E:0};
+  b0.forEach(qid => { if (answers[qid]) counts[answers[qid]]++; });
+  const maxKey = Object.keys(counts).reduce((a, b) => counts[a] > counts[b] ? a : b);
+  if (maxKey === 'A') return 'innovator';
+  if (maxKey === 'B') return 'pragmatist';
+  if (maxKey === 'C') return 'conservative';
+  return 'skeptic';
+}
+
+// ═══════════════════════════════════════════
+// SUBMIT
+// ═══════════════════════════════════════════
+function submitSurvey() {
+  const submission = {
+    id: SESSION_ID,
+    dept: DEPT,
+    timestamp: Date.now(),
+    answers: answers,
+    psychotype: calcPsychotype(),
+  };
+
+  // Save to localStorage (for dashboard)
+  try {
+    const all = JSON.parse(localStorage.getItem('chilbase_survey_results') || '[]');
+    all.push(submission);
+    localStorage.setItem('chilbase_survey_results', JSON.stringify(all));
+  } catch(e) {}
+
+  // Send to Google Sheets (if configured)
+  if (SHEETS_WEBHOOK) {
+    fetch(SHEETS_WEBHOOK, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify(submission),
+    }).catch(() => {});
+  }
+
+  // Show thank you
+  document.getElementById('surveyContainer').style.display = 'none';
+  const ty = document.getElementById('thankyou');
+  ty.classList.add('show');
+  const ptype = PSYCHOTYPES[submission.psychotype];
+  document.getElementById('tyType').innerHTML = `
+    <div class="type-label">Ваш профиль восприятия изменений</div>
+    <div class="type-name">${ptype.name}</div>
+    <div class="type-desc">${ptype.desc}</div>`;
+  window.scrollTo({top: 0, behavior:'smooth'});
+}
+
+// ═══════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════
+loadSaved();
+renderProgress();
+renderBlock(0);
+</script>
+</body>
+</html>

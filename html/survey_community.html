@@ -1,0 +1,990 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Диагностика — Community | chilBase</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --ocean-deep: #0A2E4D;
+  --ocean-mid: #1B6B93;
+  --ocean-light: #5DB9C9;
+  --foam: #F5F0EB;
+  --sand: #E8DCC8;
+  --sun: #E8A838;
+  --sun-glow: #F4C56B;
+  --text-dark: #1a1a2e;
+  --text-light: #5a6577;
+  --white: #FFFFFF;
+  --success: #2ECC71;
+  --card-border: rgba(27,107,147,0.12);
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: 'Inter', sans-serif;
+  color: var(--text-dark);
+  background: var(--foam);
+  min-height: 100vh;
+}
+h1,h2,h3,h4 { font-family: 'Space Grotesk', sans-serif; line-height:1.2; }
+
+/* ─── HEADER ─── */
+.header {
+  background: linear-gradient(135deg, var(--ocean-deep) 0%, var(--ocean-mid) 100%);
+  padding: 1.5rem 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 4px 20px rgba(10,46,77,0.2);
+}
+.header-brand { display:flex; align-items:center; gap:.75rem; }
+.header-brand span { color: var(--white); font-family:'Space Grotesk',sans-serif; font-weight:600; font-size:1.05rem; }
+.header-dept {
+  color: var(--sun-glow);
+  font-size:.85rem;
+  font-weight:500;
+  padding:.3rem .9rem;
+  border:1px solid rgba(244,197,107,0.4);
+  border-radius:50px;
+}
+
+/* ─── PROGRESS ─── */
+.progress-wrap {
+  background: var(--white);
+  padding: 1rem 2rem;
+  border-bottom: 1px solid var(--card-border);
+}
+.progress-steps {
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+  max-width: 720px;
+  margin: 0 auto;
+}
+.step-dot {
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  display: flex; align-items:center; justify-content:center;
+  font-size: .7rem; font-weight:600;
+  flex-shrink: 0;
+  transition: all .3s;
+  cursor: default;
+}
+.step-dot.done { background: var(--ocean-mid); color: var(--white); }
+.step-dot.active { background: var(--sun); color: var(--ocean-deep); box-shadow:0 0 0 4px rgba(232,168,56,.2); }
+.step-dot.todo { background: var(--sand); color: var(--text-light); }
+.step-line { flex:1; height:2px; background: var(--sand); border-radius:2px; }
+.step-line.done { background: var(--ocean-light); }
+.progress-label {
+  text-align:center;
+  font-size:.8rem;
+  color: var(--text-light);
+  margin-top:.6rem;
+  max-width:720px;
+  margin-left:auto; margin-right:auto;
+}
+
+/* ─── MAIN ─── */
+.main { max-width: 720px; margin: 0 auto; padding: 2.5rem 1.5rem 4rem; }
+
+/* ─── BLOCK HEADER ─── */
+.block-header {
+  margin-bottom: 2rem;
+  animation: fadeUp .5s ease both;
+}
+.block-label {
+  display: inline-block;
+  font-size:.75rem; font-weight:600; letter-spacing:.12em;
+  text-transform:uppercase; color: var(--ocean-mid);
+  padding:.35rem .9rem; border:1px solid var(--ocean-light);
+  border-radius:50px; margin-bottom:1rem;
+}
+.block-title { font-size:1.7rem; color:var(--ocean-deep); margin-bottom:.6rem; }
+.block-sub { color:var(--text-light); font-size:.95rem; line-height:1.7; }
+
+/* ─── QUESTION ─── */
+.question {
+  background: var(--white);
+  border-radius: 16px;
+  padding: 1.75rem;
+  margin-bottom: 1.25rem;
+  border: 1px solid var(--card-border);
+  animation: fadeUp .4s ease both;
+}
+.question:nth-child(2) { animation-delay:.05s; }
+.question:nth-child(3) { animation-delay:.1s; }
+.question:nth-child(4) { animation-delay:.15s; }
+.question:nth-child(5) { animation-delay:.2s; }
+@keyframes fadeUp {
+  from { opacity:0; transform:translateY(20px); }
+  to { opacity:1; transform:translateY(0); }
+}
+.q-label { font-weight:600; color:var(--ocean-deep); margin-bottom:1.1rem; font-size:1rem; line-height:1.5; }
+.q-num {
+  display:inline-block; width:22px; height:22px; border-radius:50%;
+  background:var(--ocean-light); color:var(--white);
+  font-size:.7rem; font-weight:700; text-align:center; line-height:22px;
+  margin-right:.5rem; flex-shrink:0;
+}
+
+/* ─── RADIO / CHECKBOX ─── */
+.options { display:flex; flex-direction:column; gap:.6rem; }
+.opt {
+  display:flex; align-items:flex-start; gap:.75rem;
+  padding:.85rem 1rem;
+  border: 1.5px solid var(--sand);
+  border-radius:10px; cursor:pointer;
+  transition: all .2s;
+  position:relative;
+}
+.opt:hover { border-color: var(--ocean-light); background: rgba(93,185,201,.04); }
+.opt.selected { border-color: var(--ocean-mid); background: rgba(27,107,147,.06); }
+.opt.correct-highlight { border-color: var(--success); background: rgba(46,204,113,.08); }
+.opt input { position:absolute; opacity:0; pointer-events:none; }
+.opt-marker {
+  width:18px; height:18px; border-radius:50%; flex-shrink:0; margin-top:1px;
+  border: 2px solid var(--sand); background:var(--white);
+  transition: all .2s; display:flex; align-items:center; justify-content:center;
+}
+.opt.selected .opt-marker { border-color:var(--ocean-mid); background:var(--ocean-mid); }
+.opt.selected .opt-marker::after { content:''; width:6px; height:6px; border-radius:50%; background:var(--white); }
+.opt.checkbox-opt .opt-marker { border-radius:5px; }
+.opt.checkbox-opt.selected .opt-marker::after { content:'✓'; font-size:.65rem; color:var(--white); font-weight:700; }
+.opt-text { color:var(--text-dark); font-size:.93rem; line-height:1.5; }
+
+/* ─── LIKERT ─── */
+.likert-wrap { display:flex; flex-direction:column; gap:.75rem; }
+.likert-labels { display:flex; justify-content:space-between; font-size:.75rem; color:var(--text-light); }
+.likert-row { display:flex; gap:.5rem; justify-content:center; }
+.likert-btn {
+  width:44px; height:44px; border-radius:50%;
+  border: 2px solid var(--sand); background:var(--white);
+  font-weight:600; font-size:.9rem; color:var(--text-light);
+  cursor:pointer; transition:all .2s;
+  display:flex; align-items:center; justify-content:center;
+}
+.likert-btn:hover { border-color:var(--ocean-light); color:var(--ocean-mid); }
+.likert-btn.selected { background:var(--ocean-mid); border-color:var(--ocean-mid); color:var(--white); }
+
+/* ─── TASK (mini LLM tasks) ─── */
+.task-situation {
+  background: linear-gradient(135deg, var(--ocean-deep), var(--ocean-mid));
+  border-radius: 12px; padding:1.25rem 1.5rem; margin-bottom:1.25rem; color:var(--white);
+}
+.task-situation .sit-label { font-size:.7rem; text-transform:uppercase; letter-spacing:.1em; opacity:.6; margin-bottom:.4rem; }
+.task-situation p { font-size:.92rem; line-height:1.6; opacity:.9; }
+.task-q { font-weight:600; color:var(--ocean-deep); margin-bottom:1rem; font-size:.95rem; }
+.task-options { display:flex; flex-direction:column; gap:.6rem; }
+.task-opt {
+  display:flex; gap:.75rem; align-items:flex-start;
+  padding:.9rem 1rem; border:1.5px solid var(--sand); border-radius:10px;
+  cursor:pointer; transition:all .2s;
+}
+.task-opt:hover { border-color:var(--ocean-light); background:rgba(93,185,201,.04); }
+.task-opt.selected { border-color:var(--ocean-mid); background:rgba(27,107,147,.06); }
+.task-opt.correct { border-color:var(--success)!important; background:rgba(46,204,113,.08)!important; }
+.task-opt.wrong { border-color:#E74C3C!important; background:rgba(231,76,60,.06)!important; opacity:.7; }
+.task-letter {
+  width:24px; height:24px; border-radius:6px; flex-shrink:0;
+  background:var(--sand); color:var(--text-dark);
+  font-weight:700; font-size:.8rem; display:flex; align-items:center; justify-content:center;
+  transition:all .2s;
+}
+.task-opt.selected .task-letter { background:var(--ocean-mid); color:var(--white); }
+.task-opt.correct .task-letter { background:var(--success); color:var(--white); }
+.task-opt.wrong .task-letter { background:#E74C3C; color:var(--white); }
+.task-text { font-size:.88rem; color:var(--text-dark); line-height:1.5; }
+.task-explain {
+  margin-top:.75rem; padding:.75rem 1rem;
+  background:rgba(46,204,113,.1); border-radius:8px;
+  font-size:.82rem; color:#1a6b3a; line-height:1.5; display:none;
+}
+.task-explain.show { display:block; }
+
+/* ─── TEXTAREA ─── */
+.open-q textarea {
+  width:100%; padding:1rem; border:1.5px solid var(--sand); border-radius:10px;
+  font-family:'Inter',sans-serif; font-size:.93rem; color:var(--text-dark);
+  resize:vertical; min-height:80px; background:var(--white);
+  transition:border-color .2s; outline:none;
+}
+.open-q textarea:focus { border-color:var(--ocean-mid); }
+
+/* ─── TIME SPLIT ─── */
+.time-split { display:flex; flex-direction:column; gap:.75rem; }
+.time-row { display:flex; align-items:center; gap:1rem; }
+.time-label { flex:1; font-size:.88rem; color:var(--text-dark); }
+.time-input {
+  width:70px; padding:.45rem .6rem; border:1.5px solid var(--sand); border-radius:8px;
+  font-size:.9rem; font-weight:600; color:var(--ocean-mid); text-align:center; outline:none;
+  transition:border-color .2s;
+}
+.time-input:focus { border-color:var(--ocean-mid); }
+.time-unit { font-size:.8rem; color:var(--text-light); width:16px; }
+.time-total {
+  display:flex; justify-content:flex-end; align-items:center; gap:.5rem;
+  padding:.6rem 1rem; background:var(--sand); border-radius:8px; margin-top:.25rem;
+  font-size:.85rem; color:var(--text-dark);
+}
+.time-total strong { font-family:'Space Grotesk',sans-serif; font-size:1rem; color:var(--ocean-mid); }
+.time-total.over strong { color:#E74C3C; }
+
+/* ─── NAVIGATION ─── */
+.nav-row {
+  display:flex; gap:1rem; margin-top:2.5rem; justify-content:space-between; align-items:center;
+}
+.btn {
+  padding:.85rem 2rem; border-radius:50px; font-weight:600; font-size:.95rem;
+  cursor:pointer; border:none; transition:all .25s; font-family:'Inter',sans-serif;
+}
+.btn-primary {
+  background:linear-gradient(135deg, var(--ocean-mid), var(--ocean-deep));
+  color:var(--white); box-shadow:0 4px 16px rgba(27,107,147,.3);
+}
+.btn-primary:hover { transform:translateY(-2px); box-shadow:0 8px 24px rgba(27,107,147,.4); }
+.btn-secondary { background:transparent; color:var(--text-light); border:1.5px solid var(--sand); }
+.btn-secondary:hover { border-color:var(--ocean-light); color:var(--ocean-mid); }
+.btn-submit {
+  background:linear-gradient(135deg, var(--sun), var(--sun-glow));
+  color:var(--ocean-deep); box-shadow:0 4px 16px rgba(232,168,56,.3);
+  flex:1; text-align:center; font-size:1rem;
+}
+.btn-submit:hover { transform:translateY(-2px); box-shadow:0 8px 24px rgba(232,168,56,.4); }
+
+/* ─── THANK YOU ─── */
+.thankyou {
+  text-align:center; padding:4rem 2rem; display:none;
+}
+.thankyou.show { display:block; animation: fadeUp .6s ease both; }
+.ty-icon { font-size:3.5rem; margin-bottom:1.5rem; }
+.ty-title { font-size:2rem; color:var(--ocean-deep); margin-bottom:1rem; }
+.ty-sub { color:var(--text-light); font-size:1.05rem; line-height:1.7; max-width:480px; margin:0 auto; }
+.ty-type {
+  margin:2rem auto; max-width:400px; padding:1.5rem 2rem;
+  background:linear-gradient(135deg, var(--ocean-deep), var(--ocean-mid));
+  border-radius:20px; color:var(--white);
+}
+.ty-type .type-label { font-size:.75rem; text-transform:uppercase; letter-spacing:.1em; opacity:.6; margin-bottom:.4rem; }
+.ty-type .type-name { font-size:1.3rem; font-weight:700; margin-bottom:.4rem; }
+.ty-type .type-desc { font-size:.88rem; opacity:.8; line-height:1.6; }
+
+/* ─── CONFIDENTIAL BANNER ─── */
+.confidential {
+  background:rgba(27,107,147,.06); border:1px solid rgba(27,107,147,.15);
+  border-radius:10px; padding:.75rem 1rem; margin-bottom:2rem;
+  display:flex; gap:.75rem; align-items:flex-start;
+  font-size:.85rem; color:var(--text-light); line-height:1.5;
+}
+.confidential-icon { font-size:1rem; flex-shrink:0; margin-top:.05rem; }
+
+/* ─── WAVE TOP ─── */
+.wave-top {
+  background:linear-gradient(135deg, var(--ocean-deep), var(--ocean-mid));
+  padding:2.5rem 2rem 3.5rem; text-align:center; color:var(--white);
+  position:relative; overflow:hidden;
+}
+.wave-top::after {
+  content:'';
+  position:absolute; bottom:-1px; left:0; right:0; height:50px;
+  background:var(--foam);
+  clip-path: ellipse(55% 100% at 50% 100%);
+}
+.wave-top h1 { font-size:1.6rem; margin-bottom:.5rem; }
+.wave-top p { opacity:.75; font-size:.9rem; }
+
+/* ─── RESPONSIVE ─── */
+@media (max-width:600px) {
+  .main { padding:1.5rem 1rem 3rem; }
+  .block-title { font-size:1.4rem; }
+  .progress-steps { gap:.3rem; }
+  .step-dot { width:24px; height:24px; font-size:.65rem; }
+  .likert-btn { width:38px; height:38px; }
+}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-brand">
+    <span>AI Диагностика chilBase</span>
+  </div>
+  <div class="header-dept">Community</div>
+</div>
+
+<!-- PROGRESS -->
+<div class="progress-wrap">
+  <div class="progress-steps" id="progressSteps"></div>
+  <div class="progress-label" id="progressLabel"></div>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+  <div class="confidential">
+    <span class="confidential-icon">🔒</span>
+    <span>Ваши ответы конфиденциальны — результаты агрегируются по отделу без имён и не передаются руководству в детальном виде.</span>
+  </div>
+
+  <div id="surveyContainer"></div>
+
+  <div class="thankyou" id="thankyou">
+    <div class="ty-icon">🌊</div>
+    <h2 class="ty-title">Спасибо!</h2>
+    <p class="ty-sub">Ваши ответы сохранены. Результаты появятся в общем отчёте по отделу — без имён, только агрегированно.</p>
+    <div class="ty-type" id="tyType"></div>
+    <p class="ty-sub" style="margin-top:1.5rem; font-size:.88rem;">Скоро мы поделимся картой AI-возможностей для chilBase — и расскажем, что реально можно автоматизировать в вашем отделе.</p>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════
+// CONFIG — вставьте URL вашего Apps Script для Google Sheets
+// ═══════════════════════════════════════════
+const SHEETS_WEBHOOK = ''; // 'https://script.google.com/macros/s/YOUR_ID/exec'
+const DEPT = 'community';
+const SESSION_ID = Date.now() + '_' + Math.random().toString(36).slice(2,8);
+
+// ═══════════════════════════════════════════
+// SURVEY DATA
+// ═══════════════════════════════════════════
+const BLOCKS = [
+  {
+    id: 'b0', label: 'Блок 0', title: 'Профиль восприятия изменений',
+    sub: 'Как вы относитесь к новым инструментам и изменениям. Нет правильных ответов.',
+    questions: [
+      { id:'q0_1', type:'radio', text:'Когда в компании внедряется новый инструмент или процесс, вы обычно...', opts:[
+        {v:'A', t:'Один из первых, кто пробует — мне интересно, как это работает'},
+        {v:'B', t:'Жду, пока коллеги опробуют, потом подключаюсь'},
+        {v:'C', t:'Начинаю использовать, когда это становится обязательным'},
+        {v:'D', t:'Предпочитаю проверенные инструменты, к новым отношусь осторожно'},
+      ]},
+      { id:'q0_2', type:'radio', text:'Как вы обычно учите что-то новое в работе?', opts:[
+        {v:'A', t:'Сразу пробую — учусь в процессе'},
+        {v:'B', t:'Смотрю туториалы / читаю документацию, потом применяю'},
+        {v:'C', t:'Прошу коллегу показать лично'},
+        {v:'D', t:'Жду, пока кто-то объяснит в рамках обучения'},
+      ]},
+      { id:'q0_3', type:'radio', text:'Когда задача занимает больше времени, чем должна, вы...', opts:[
+        {v:'A', t:'Сразу ищу способ ускорить или автоматизировать'},
+        {v:'B', t:'Делаю как есть, но запоминаю — вернусь к этому позже'},
+        {v:'C', t:'Делаю как есть — это часть работы'},
+        {v:'D', t:'Сообщаю руководителю, что нужно больше ресурсов'},
+      ]},
+      { id:'q0_4', type:'radio', text:'Как вы относитесь к идее, что AI будет помогать вам в работе?', opts:[
+        {v:'A', t:'Очень позитивно — хочу попробовать прямо сейчас'},
+        {v:'B', t:'Позитивно, если это реально экономит время'},
+        {v:'C', t:'Нейтрально — посмотрю на результаты'},
+        {v:'D', t:'С осторожностью — важно не потерять качество'},
+        {v:'E', t:'Скептически — AI в моей работе не применим'},
+      ]},
+      { id:'q0_5', type:'radio', text:'Ваш основной стиль работы:', opts:[
+        {v:'A', t:'Работаю по чётким процессам и правилам — предсказуемость важна'},
+        {v:'B', t:'Адаптируюсь под задачу — каждый раз немного по-разному'},
+        {v:'C', t:'Люблю экспериментировать и искать новые подходы'},
+        {v:'D', t:'Фокусируюсь на результате — как добраться, не так важно'},
+      ]},
+      { id:'q0_6', type:'radio', text:'Если бы у вас был свободный час на изучение AI-инструмента для работы, вы бы...', opts:[
+        {v:'A', t:'Сразу открыл и начал пробовать на реальных задачах'},
+        {v:'B', t:'Посмотрел обзор или примеры использования коллег'},
+        {v:'C', t:'Подождал бы официального обучения от компании'},
+        {v:'D', t:'Потратил час на другие рабочие задачи'},
+      ]},
+    ]
+  },
+  {
+    id: 'b1', label: 'Блок 1', title: 'Ваш профиль', sub: '5 вопросов о вашей роли.',
+    questions: [
+      { id:'q1_1', type:'radio', text:'Ваша роль:', opts:[
+        {v:'cm', t:'Community Manager (Discord / Reddit / Social)'},
+        {v:'mod', t:'Moderator'},{v:'support', t:'Player Support / CS (тикеты)'},
+        {v:'anticheat', t:'Anti-cheat / Safety'},{v:'events', t:'Event Manager'},
+        {v:'lead', t:'Lead / Senior'},{v:'other', t:'Другое'},
+      ]},
+      { id:'q1_2', type:'radio', text:'Опыт в community / саппорте:', opts:[
+        {v:'<1', t:'< 1 года'},{v:'1-3', t:'1–3 года'},{v:'3-5', t:'3–5 лет'},
+        {v:'5-10', t:'5–10 лет'},{v:'10+', t:'10+ лет'},
+      ]},
+      { id:'q1_3', type:'radio', text:'Как давно в chilBase:', opts:[
+        {v:'<6m', t:'< 6 месяцев'},{v:'6-12m', t:'6–12 месяцев'},{v:'1-2y', t:'1–2 года'},
+        {v:'2-4y', t:'2–4 года'},{v:'4+y', t:'4+ года'},
+      ]},
+      { id:'q1_4', type:'checkbox', text:'Основные регионы, с которыми работаете:', opts:[
+        {v:'en', t:'EN (global)'},{v:'eu', t:'DE / FR / ES / IT'},{v:'cis', t:'RU / CIS'},
+        {v:'asia', t:'JA / KO / CN'},{v:'latam', t:'BR / LATAM'},{v:'mena', t:'MENA'},{v:'other', t:'Другое'},
+      ]},
+      { id:'q1_5', type:'radio', text:'На скольких языках работаете ежедневно:', opts:[
+        {v:'1', t:'1'},{v:'2', t:'2'},{v:'3', t:'3'},{v:'4+', t:'4+'},
+      ]},
+    ]
+  },
+  {
+    id: 'b2', label: 'Блок 2', title: 'Понимание AI и LLM', sub: '9 вопросов. Нет правильных ответов — это не тест.',
+    questions: [
+      { id:'q2_1', type:'radio', text:'Что такое LLM:', opts:[
+        {v:'A', t:'Поисковик в интернете'},
+        {v:'B', t:'Модель, предсказывающая следующее слово/токен'},
+        {v:'C', t:'База готовых ответов'},{v:'D', t:'Программа, «думающая» как человек'},{v:'E', t:'Не знаю'},
+      ]},
+      { id:'q2_2', type:'radio', text:'Что такое «промт»:', opts:[
+        {v:'A', t:'Кнопка'},{v:'B', t:'Текстовая инструкция для модели'},
+        {v:'C', t:'Название модели'},{v:'D', t:'Не знаю'},
+      ]},
+      { id:'q2_3', type:'radio', text:'Что такое «галлюцинация» LLM:', opts:[
+        {v:'A', t:'Ошибка сервера'},
+        {v:'B', t:'Модель уверенно выдаёт фактически неверную информацию'},
+        {v:'C', t:'Модель зависает'},{v:'D', t:'Не знаю'},
+      ]},
+      { id:'q2_4', type:'radio', text:'Может ли LLM точно переводить игровой сленг и мемы:', opts:[
+        {v:'A', t:'Да, всегда точно'},
+        {v:'B', t:'Часто ошибается, особенно с локальным контекстом — требует человеческой проверки'},
+        {v:'C', t:'Только платная версия'},{v:'D', t:'Не знаю'},
+      ]},
+      { id:'q2_5', type:'radio', text:'Что такое «sentiment analysis»:', opts:[
+        {v:'A', t:'Анализ тональности текста (позитив / нейтрал / негатив)'},
+        {v:'B', t:'Скорость ответа'},{v:'C', t:'Размер сообщения'},{v:'D', t:'Не знаю'},
+      ]},
+      { id:'q2_6', type:'radio', text:'Безопасно ли загружать тикеты с персональными данными игроков в публичный ChatGPT:', opts:[
+        {v:'A', t:'Да'},
+        {v:'B', t:'Нет — это нарушение приватности/GDPR, нужен корпоративный аккаунт или анонимизация'},
+        {v:'C', t:'Если мало данных, можно'},{v:'D', t:'Не знаю'},
+      ]},
+      { id:'q2_7', type:'radio', text:'Что такое «контекстное окно»:', opts:[
+        {v:'A', t:'Окно чата'},
+        {v:'B', t:'Максимальный объём текста, который модель обрабатывает за один запрос'},
+        {v:'C', t:'Настройки UI'},{v:'D', t:'Не знаю'},
+      ]},
+      { id:'q2_8', type:'likert', text:'Оцените свой уровень владения промтингом:', labelLeft:'Новичок', labelRight:'Эксперт'},
+      { id:'q2_9', type:'likert', text:'Насколько вы понимаете, какие задачи AI делает хорошо, а какие плохо:', labelLeft:'Не понимаю', labelRight:'Хорошо понимаю'},
+    ]
+  },
+  {
+    id: 'b3', label: 'Блок 3', title: 'Текущая рутина', sub: '12 вопросов о вашей ежедневной работе.',
+    questions: [
+      { id:'q3_1', type:'timesplit', text:'Распределите % рабочего времени:', items:[
+        {k:'discord', l:'Модерация Discord / серверов'},{k:'tickets', l:'Обработка тикетов саппорта'},
+        {k:'refunds', l:'Рефанды'},{k:'events', l:'Ивенты / конкурсы'},
+        {k:'anticheat', l:'Анти-чит / safety'},{k:'surveys', l:'Обработка опросов игроков'},
+        {k:'appstore', l:'Ответы в app stores / соцсетях'},{k:'reports', l:'Отчёты / аналитика'},
+        {k:'meetings', l:'Созвоны / синки'},{k:'other', l:'Другое'},
+      ]},
+      { id:'q3_2', type:'radio', text:'Тикетов/сообщений обрабатываете в день:', opts:[
+        {v:'<20', t:'< 20'},{v:'20-50', t:'20–50'},{v:'51-150', t:'51–150'},
+        {v:'151-400', t:'151–400'},{v:'400+', t:'400+'},
+      ]},
+      { id:'q3_3', type:'radio', text:'Discord-серверов под модерацией:', opts:[
+        {v:'1-5', t:'1–5'},{v:'6-20', t:'6–20'},{v:'21-50', t:'21–50'},
+        {v:'51-100', t:'51–100'},{v:'100+', t:'100+'},
+      ]},
+      { id:'q3_4', type:'checkbox', text:'Что съедает больше всего времени «не по делу»:', opts:[
+        {v:'faq', t:'Повторяющиеся FAQ-вопросы от игроков'},{v:'translate', t:'Ручной перевод тикетов'},
+        {v:'history', t:'Поиск истории игрока по базам'},{v:'survey_proc', t:'Обработка открытых ответов в опросах'},
+        {v:'bugs', t:'Ручная сортировка багрепортов'},{v:'escalate', t:'Эскалация в другие отделы'},
+        {v:'toxic', t:'Модерация токсичности'},{v:'onboard', t:'Онбординг новых модераторов'},
+        {v:'appstore', t:'Рутинные ответы в App Store / Google Play'},
+      ]},
+      { id:'q3_5', type:'radio', text:'Опросов игроков запускаете в квартал:', opts:[
+        {v:'<3', t:'< 3'},{v:'3-6', t:'3–6'},{v:'7-12', t:'7–12'},{v:'12+', t:'12+'},
+      ]},
+      { id:'q3_6', type:'radio', text:'Открытых ответов в среднем в одном опросе:', opts:[
+        {v:'<100', t:'< 100'},{v:'100-500', t:'100–500'},{v:'501-2000', t:'501–2000'},{v:'2000+', t:'2000+'},
+      ]},
+      { id:'q3_7', type:'radio', text:'Как сейчас обрабатываете открытые ответы:', opts:[
+        {v:'manual_all', t:'Вручную, читаем все'},{v:'manual_sel', t:'Вручную, выборочно'},
+        {v:'ai', t:'С помощью ChatGPT / AI'},{v:'tool', t:'С помощью Sprout / AppFollow'},{v:'no', t:'Не обрабатываем'},
+      ]},
+      { id:'q3_8', type:'radio', text:'Часов в неделю на ручной анализ опросов:', opts:[
+        {v:'<2', t:'< 2'},{v:'2-5', t:'2–5'},{v:'5-10', t:'5–10'},{v:'10+', t:'10+'},
+      ]},
+      { id:'q3_9', type:'likert', text:'Как часто задачи блокируются из-за разных часовых поясов:', labelLeft:'Никогда', labelRight:'Постоянно'},
+      { id:'q3_10', type:'radio', text:'Как часто пишете один и тот же ответ на один и тот же вопрос:', opts:[
+        {v:'allday', t:'Весь день'},{v:'few_day', t:'Несколько раз в день'},
+        {v:'few_week', t:'Несколько раз в неделю'},{v:'rarely', t:'Редко'},
+      ]},
+      { id:'q3_11', type:'likert', text:'Насколько вас устраивает онбординг новых сотрудников под новые регионы:', labelLeft:'Не устраивает', labelRight:'Отлично'},
+      { id:'q3_12', type:'checkbox', text:'Задачи, которые делаете руками, хотя можно автоматизировать:', opts:[
+        {v:'classify', t:'Классификация тикетов'},{v:'translate', t:'Перевод ответов'},
+        {v:'faq', t:'FAQ-ответы'},{v:'summary', t:'Суммаризация опросов'},{v:'history', t:'Поиск истории игрока'},
+        {v:'toxic', t:'Анализ токсичности'},{v:'reports', t:'Отчёты в Redash'},{v:'none', t:'Ничего'},
+      ]},
+    ]
+  },
+  {
+    id: 'b4', label: 'Блок 4', title: 'Мини-задачи на логику LLM', sub: 'Реальные сценарии из Community.',
+    questions: [
+      { id:'q4_1', type:'task',
+        situation: 'Нужно обработать 1500 открытых ответов на вопрос «Что вам больше всего не нравится в текущем сезоне?» — суммаризовать темы и частоту жалоб.',
+        question: 'Лучший промт к Claude:',
+        correct: 'C',
+        explain: 'C — лучший: задана роль Community Analyst, 4 чётких задачи с кластерами, процентами, цитатами и эмоцией, явно «не выдумывай кластеры».',
+        opts:[
+          {v:'A', t:'«Суммаризуй эти ответы»'},{v:'B', t:'«Найди главное»'},
+          {v:'C', t:'«Ты — Community Analyst мобильной игры. Я дам 1500 открытых ответов игроков на вопрос «что не нравится в сезоне?». Задачи: (1) сгруппируй в 7–12 кластеров (например: «баланс PvP», «цена бандлов»), (2) для каждого — процент упоминаний, 3 репрезентативные цитаты дословно, преобладающая эмоция, (3) отметь кластеры action items vs вне нашего контроля, (4) топ-5 «исправить в первую очередь». НЕ выдумывай кластеры, которых нет в данных»'},
+          {v:'D', t:'«Что говорят игроки?»'},{v:'E', t:'«Посчитай негатив»'},
+        ]
+      },
+      { id:'q4_2', type:'task',
+        situation: 'На модерации Discord всплыло сообщение: «this event is so broken lol, u devs dont care about players, refund me now or i review bomb u on app store». Нужно решить: эскалировать или ответить шаблоном.',
+        question: 'Лучший промт к ChatGPT:',
+        correct: 'C',
+        explain: 'C — лучший: роль community moderator, 5 структурированных пунктов вывода, отдельный внутренний ответ команде, тон без обещаний рефанда.',
+        opts:[
+          {v:'A', t:'«Что ответить?»'},{v:'B', t:'«Игрок недоволен»'},
+          {v:'C', t:'«Ты — community moderator. Сообщение игрока в Discord: «[текст]». Классифицируй: (1) категория (bug report / rage / threat / refund / all), (2) urgency 1–5, (3) нужна ли эскалация в player support и какие данные собрать (playerID, билд, история покупок), (4) короткий эмпатичный публичный ответ (без обещаний рефанда), (5) что написать во внутренний канал. Тон — не защитный, не снисходительный»'},
+          {v:'D', t:'«Ответь»'},{v:'E', t:'«Скажи ему успокоиться»'},
+        ]
+      },
+      { id:'q4_3', type:'task',
+        situation: 'Хотите найти в Redash все рефанды игроков: билд 3.4.2, iOS, покупка bundle > $20. Знаете, что есть таблица purchases, но не помните точные имена колонок.',
+        question: 'Лучший промт:',
+        correct: 'C',
+        explain: 'C — лучший: роль community manager (не SQL-эксперт), конкретные условия фильтра, просьба предложить имена колонок, шаблон с плейсхолдерами и information_schema.',
+        opts:[
+          {v:'A', t:'«SQL query»'},{v:'B', t:'«Найди рефанды»'},
+          {v:'C', t:'«Я — community manager, не SQL-эксперт. Мне нужен запрос к таблице purchases в Redash (PostgreSQL). Условия: платформа = iOS, version = 3.4.2, тип = bundle, price_usd > 20, статус = refunded. Проблема: не помню точные имена колонок. (1) Предложи вероятные имена для каждого условия, (2) дай SQL-шаблон с плейсхолдерами, (3) укажи как проверить имена через information_schema, (4) предупреди о pitfalls (например, валюта). Не используй MySQL-специфику»'},
+          {v:'D', t:'«refunds iOS»'},{v:'E', t:'«SELECT * from purchases»'},
+        ]
+      },
+      { id:'q4_4', type:'task',
+        situation: 'Нужен шаблонный ответ на негативный отзыв в App Store: игрок жалуется на вылеты после обновления, но не пишет ни билд, ни девайс.',
+        question: 'Лучший промт:',
+        correct: 'C',
+        explain: 'C — лучший: лимит 350 символов (реальный лимит App Store), 3 варианта short/medium/long, признать проблему без обещаний, попросить данные.',
+        opts:[
+          {v:'A', t:'«Ответь в App Store»'},{v:'B', t:'«Напиши вежливо»'},
+          {v:'C', t:'«Ты — community manager. Ответ на 1-звёздочный отзыв: «Игра постоянно крашится после апдейта, разработчики криворукие, верните деньги». Ответ: (1) максимум 350 символов (лимит App Store), (2) признать проблему без прямых обещаний, (3) попросить билд, модель, OS, (4) предложить 1 канал эскалации, (5) тон — спокойный, человеческий, без «sorry for inconvenience». Дай 3 варианта — short / medium / long»'},
+          {v:'D', t:'«Извинись»'},{v:'E', t:'«Сделай как всегда»'},
+        ]
+      },
+      { id:'q4_5', type:'task',
+        situation: 'Новый модератор приходит в команду и должен разобраться с правилами модерации сервера EN. У вас есть 20-страничный документ с правилами.',
+        question: 'Лучший промт:',
+        correct: 'C',
+        explain: 'C — лучший: роль senior CM, 4 структурированные задачи (cheat sheet, сценарии, ошибки, глоссарий), явно «только из документа, не придумывай».',
+        opts:[
+          {v:'A', t:'«Расскажи правила»'},{v:'B', t:'«Обучи модератора»'},
+          {v:'C', t:'«Ты — senior community manager chilBase. Входные данные: полный документ «EN Server Moderation Guidelines» [вставлен]. Задачи: (1) 1-страничный cheat sheet (что ban, warn, ignore), (2) 10 реалистичных сценариев «что делать, если...», (3) 5 самых частых ошибок новых модераторов, (4) глоссарий (ban, mute, timeout, soft-ban). Только из документа, не придумывай правила. Формат — markdown»'},
+          {v:'D', t:'«Суммаризуй правила»'},{v:'E', t:'«Помоги новичку»'},
+        ]
+      },
+    ]
+  },
+  {
+    id: 'b5', label: 'Блок 5', title: 'AI в работе сейчас', sub: 'Что вы уже используете.',
+    questions: [
+      { id:'q5_1', type:'checkbox', text:'AI-инструменты, которые уже используете:', opts:[
+        {v:'chatgpt', t:'ChatGPT'},{v:'claude', t:'Claude'},{v:'gemini', t:'Gemini'},
+        {v:'appfollow', t:'AppFollow AI'},{v:'redash_ai', t:'Redash AI / SQL-ассистент'},
+        {v:'helpshift', t:'Helpshift AI'},{v:'sprout', t:'Sprout Social AI'},
+        {v:'deepl', t:'DeepL'},{v:'none', t:'Не использую'},
+      ]},
+      { id:'q5_2', type:'radio', text:'Как часто используете AI в работе:', opts:[
+        {v:'daily', t:'Ежедневно'},{v:'few_week', t:'Несколько раз в неделю'},
+        {v:'weekly', t:'Раз в неделю'},{v:'rarely', t:'Реже / никогда'},
+      ]},
+      { id:'q5_3', type:'checkbox', text:'Для каких задач используете AI:', opts:[
+        {v:'summary', t:'Суммаризация опросов'},{v:'appstore', t:'Ответы в App Store / Google Play'},
+        {v:'translate', t:'Перевод тикетов'},{v:'sql', t:'SQL / Redash'},
+        {v:'classify', t:'Классификация тикетов'},{v:'content', t:'Генерация контента для Discord'},
+        {v:'events', t:'Написание ивентов / анонсов'},{v:'none', t:'Ничего'},
+      ]},
+      { id:'q5_4', type:'likert', text:'Оцените ценность AI для вашей работы сейчас:', labelLeft:'Бесполезно', labelRight:'Очень ценно'},
+      { id:'q5_5', type:'checkbox', text:'Что мешает использовать AI больше:', opts:[
+        {v:'privacy', t:'Опасения по приватности игроков'},{v:'unstable', t:'Нестабильность результата'},
+        {v:'access', t:'Нет доступа к платным инструментам'},{v:'start', t:'Не знаю, с чего начать'},
+        {v:'slang', t:'AI плохо понимает сленг / мемы'},{v:'mgmt', t:'Руководство не поощряет'},
+        {v:'none', t:'Ничего не мешает'},
+      ]},
+      { id:'q5_6', type:'radio', text:'Оценивали ли Redash AI для написания SQL:', opts:[
+        {v:'active', t:'Активно использую'},{v:'tried', t:'Пробовал(а)'},
+        {v:'know', t:'Знаю, не пробовал(а)'},{v:'dk', t:'Впервые слышу'},
+      ]},
+      { id:'q5_7', type:'radio', text:'Оценивали ли AppFollow AI:', opts:[
+        {v:'active', t:'Активно использую'},{v:'tried', t:'Пробовал(а)'},{v:'no', t:'Не использовал(а)'},
+      ]},
+      { id:'q5_8', type:'likert', text:'Насколько доверяете AI в переводе тикетов на незнакомые языки:', labelLeft:'Не доверяю', labelRight:'Полностью доверяю'},
+      { id:'q5_9', type:'radio', text:'Используете ли AI для обнаружения токсичности / safety:', opts:[
+        {v:'active', t:'Да, регулярно'},{v:'tried', t:'Пробовал(а)'},{v:'no', t:'Нет'},
+      ]},
+      { id:'q5_10', type:'radio', text:'Делитесь ли находками с командой:', opts:[
+        {v:'often', t:'Регулярно'},{v:'sometimes', t:'Иногда'},{v:'rarely', t:'Редко'},{v:'no', t:'Нет'},
+      ]},
+    ]
+  },
+  {
+    id: 'b6', label: 'Блок 6', title: 'Желания и опасения', sub: '10 вопросов о будущем.',
+    questions: [
+      { id:'q6_1', type:'checkbox', text:'Какие рутины хотели бы отдать AI (до 5):', opts:[
+        {v:'classify', t:'Классификация тикетов'},{v:'translate', t:'Авто-перевод ответов'},
+        {v:'faq', t:'FAQ-ответы'},{v:'summary', t:'Суммаризация опросов'},
+        {v:'appstore', t:'Ответы в App Store / Google Play'},{v:'history', t:'Поиск истории игрока'},
+        {v:'toxic', t:'Обнаружение токсичности'},{v:'cheat', t:'Обнаружение подозрений в чите'},
+        {v:'sql', t:'SQL / Redash-запросы'},{v:'onboard', t:'Онбординг новых модераторов'},
+        {v:'reports', t:'Отчёты / дашборды'},
+      ]},
+      { id:'q6_2', type:'checkbox', text:'Какие задачи НЕ отдали бы AI:', opts:[
+        {v:'bans', t:'Решения о банах'},{v:'refunds', t:'Решения о рефандах'},
+        {v:'escalate', t:'Эскалации к разработке'},{v:'safety', t:'Критические safety-кейсы'},
+        {v:'stars', t:'Коммуникация со «звёздными» игроками'},{v:'all', t:'Всё можно'},
+      ]},
+      { id:'q6_3', type:'likert', text:'Беспокоит ли вас, что AI заменит саппорт/модераторов в ближайшие 3 года:', labelLeft:'Не беспокоит', labelRight:'Сильно беспокоит'},
+      { id:'q6_4', type:'likert', text:'Готовность тратить рабочее время на обучение AI:', labelLeft:'Не готов(а)', labelRight:'Очень готов(а)'},
+      { id:'q6_5', type:'radio', text:'Часов в неделю на обучение:', opts:[
+        {v:'0', t:'0'},{v:'1-2', t:'1–2'},{v:'3-5', t:'3–5'},{v:'6+', t:'6+'},
+      ]},
+      { id:'q6_6', type:'radio', text:'Формат обучения:', opts:[
+        {v:'video', t:'Короткие видео'},{v:'zoom', t:'Воркшоп в Zoom'},{v:'live', t:'Очный воркшоп'},
+        {v:'guides', t:'Письменные гайды'},{v:'pair', t:'Парное наблюдение'},{v:'self', t:'Самостоятельно'},
+      ]},
+      { id:'q6_7', type:'checkbox', text:'Что бы сильнее всего ускорило работу (до 3):', opts:[
+        {v:'survey_ai', t:'AI для авто-суммаризации опросов'},{v:'helpshift_ai', t:'AI-ассистент в Helpshift'},
+        {v:'translator', t:'AI-переводчик с учётом игрового сленга'},{v:'classify', t:'Авто-классификация тикетов'},
+        {v:'sql_gen', t:'Генератор SQL-запросов в Redash'},{v:'cheat_ai', t:'AI для обнаружения чита по паттернам'},
+        {v:'kb', t:'База знаний с AI-поиском для новичков'},{v:'other', t:'Другое'},
+      ]},
+      { id:'q6_8', type:'likert', text:'Насколько важна приватность игроков при внедрении AI:', labelLeft:'Не важна', labelRight:'Критично важна'},
+      { id:'q6_9', type:'radio', text:'Готовы быть AI-champion в отделе:', opts:[
+        {v:'yes', t:'Да'},{v:'maybe', t:'Может быть'},{v:'no', t:'Нет'},
+      ]},
+      { id:'q6_10', type:'checkbox', text:'Что мотивирует осваивать AI:', opts:[
+        {v:'routine', t:'Сокращение рутины'},{v:'growth', t:'Профессиональный рост'},
+        {v:'interest', t:'Интерес'},{v:'fear', t:'Страх отстать'},{v:'pressure', t:'Давление'},{v:'nothing', t:'Ничего'},
+      ]},
+    ]
+  },
+  {
+    id: 'b7', label: 'Блок 7', title: 'Открытые вопросы', sub: '3 свободных вопроса.',
+    questions: [
+      { id:'q7_1', type:'textarea', text:'Если бы вы могли устранить одну рутину прямо сейчас — что бы это было?' },
+      { id:'q7_2', type:'textarea', text:'Какой AI-инструмент попробовали бы в ближайший месяц, если было бы 2 свободных часа?' },
+      { id:'q7_3', type:'textarea', text:'Что хотите сказать команде, которая внедряет AI в chilBase?' },
+    ]
+  },
+];
+
+const BLOCK_NAMES = ['Восприятие', 'Профиль', 'AI-грамотность', 'Рутина', 'LLM-задачи', 'AI сейчас', 'Желания', 'Открытые'];
+
+// Психотипы
+const PSYCHOTYPES = {
+  innovator: { name:'Новатор 🚀', desc:'Вы первыми пробуете новое и быстро осваиваете инструменты. Для вас подойдёт углублённый трек с практикой сложных AI-pipelines.' },
+  pragmatist: { name:'Прагматик ⚡', desc:'Вы за инструменты, которые реально работают. Оптимальный формат — практические кейсы с измеримым ROI.' },
+  conservative: { name:'Консерватор 🛡️', desc:'Вы цените стабильность и проверенные решения. Постепенное внедрение с поддержкой — ваш путь.' },
+  skeptic: { name:'Скептик 🔍', desc:'Вы задаёте правильные вопросы и требуете доказательств. Ваша позиция помогает избежать внедрения ради галочки.' },
+};
+
+// ═══════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════
+let currentBlock = 0;
+let answers = {};
+
+function loadSaved() {
+  try {
+    const saved = localStorage.getItem(`chilbase_${DEPT}_${SESSION_ID}`);
+    if (saved) answers = JSON.parse(saved);
+  } catch(e) {}
+}
+function saveProgress() {
+  try {
+    localStorage.setItem(`chilbase_${DEPT}_${SESSION_ID}`, JSON.stringify(answers));
+  } catch(e) {}
+}
+
+// ═══════════════════════════════════════════
+// RENDER
+// ═══════════════════════════════════════════
+function renderProgress() {
+  const steps = document.getElementById('progressSteps');
+  const label = document.getElementById('progressLabel');
+  steps.innerHTML = '';
+  BLOCKS.forEach((b, i) => {
+    if (i > 0) {
+      const line = document.createElement('div');
+      line.className = 'step-line' + (i <= currentBlock ? ' done' : '');
+      steps.appendChild(line);
+    }
+    const dot = document.createElement('div');
+    dot.className = 'step-dot ' + (i < currentBlock ? 'done' : i === currentBlock ? 'active' : 'todo');
+    dot.textContent = i < currentBlock ? '✓' : (i + 1);
+    dot.title = BLOCK_NAMES[i];
+    steps.appendChild(dot);
+  });
+  label.textContent = `${BLOCK_NAMES[currentBlock]} — шаг ${currentBlock + 1} из ${BLOCKS.length}`;
+}
+
+function renderBlock(blockIdx) {
+  const block = BLOCKS[blockIdx];
+  const container = document.getElementById('surveyContainer');
+  container.innerHTML = '';
+
+  const header = document.createElement('div');
+  header.className = 'block-header';
+  header.innerHTML = `<div class="block-label">${block.label}</div><h2 class="block-title">${block.title}</h2><p class="block-sub">${block.sub}</p>`;
+  container.appendChild(header);
+
+  block.questions.forEach((q, qi) => {
+    const card = document.createElement('div');
+    card.className = 'question';
+    card.style.animationDelay = (qi * 0.06) + 's';
+    card.innerHTML = renderQuestion(q, qi);
+    container.appendChild(card);
+  });
+
+  const nav = document.createElement('div');
+  nav.className = 'nav-row';
+  if (blockIdx > 0) {
+    nav.innerHTML += `<button class="btn btn-secondary" onclick="prevBlock()">← Назад</button>`;
+  } else {
+    nav.innerHTML += `<div></div>`;
+  }
+  if (blockIdx < BLOCKS.length - 1) {
+    nav.innerHTML += `<button class="btn btn-primary" onclick="nextBlock()">Далее →</button>`;
+  } else {
+    nav.innerHTML += `<button class="btn btn-submit" onclick="submitSurvey()">Отправить результаты ✓</button>`;
+  }
+  container.appendChild(nav);
+
+  attachListeners(block);
+  window.scrollTo({top: 0, behavior:'smooth'});
+}
+
+function renderQuestion(q, idx) {
+  const num = `<span class="q-num">${idx + 1}</span>`;
+  const label = `<div class="q-label">${num}${q.text}</div>`;
+
+  if (q.type === 'radio') {
+    const opts = q.opts.map(o => `
+      <label class="opt${answers[q.id] === o.v ? ' selected':''}" data-qid="${q.id}" data-val="${o.v}">
+        <input type="radio" name="${q.id}" value="${o.v}" ${answers[q.id]===o.v?'checked':''}>
+        <div class="opt-marker"></div>
+        <span class="opt-text">${o.t}</span>
+      </label>`).join('');
+    return `${label}<div class="options">${opts}</div>`;
+  }
+
+  if (q.type === 'checkbox') {
+    const vals = answers[q.id] || [];
+    const opts = q.opts.map(o => `
+      <label class="opt checkbox-opt${vals.includes(o.v)?' selected':''}" data-qid="${q.id}" data-val="${o.v}" data-multi="1">
+        <input type="checkbox" name="${q.id}" value="${o.v}" ${vals.includes(o.v)?'checked':''}>
+        <div class="opt-marker"></div>
+        <span class="opt-text">${o.t}</span>
+      </label>`).join('');
+    return `${label}<div class="options">${opts}</div>`;
+  }
+
+  if (q.type === 'likert') {
+    const val = answers[q.id] || null;
+    const btns = [1,2,3,4,5].map(n => `<button class="likert-btn${val==n?' selected':''}" data-qid="${q.id}" data-val="${n}" onclick="">${n}</button>`).join('');
+    return `${label}<div class="likert-wrap"><div class="likert-labels"><span>${q.labelLeft}</span><span>${q.labelRight}</span></div><div class="likert-row">${btns}</div></div>`;
+  }
+
+  if (q.type === 'task') {
+    const answered = answers[q.id];
+    const opts = q.opts.map(o => {
+      let cls = 'task-opt';
+      if (answered) {
+        if (o.v === q.correct) cls += ' correct';
+        else if (o.v === answered) cls += ' wrong';
+      } else if (answered === o.v) cls += ' selected';
+      return `<div class="${cls}" data-qid="${q.id}" data-val="${o.v}" data-correct="${q.correct}" data-explain="${q.explain}">
+        <div class="task-letter">${o.v}</div>
+        <div class="task-text">${o.t}</div>
+      </div>`;
+    }).join('');
+    const explainShow = answered ? ' show' : '';
+    return `<div class="task-situation"><div class="sit-label">Ситуация</div><p>${q.situation}</p></div>
+    <div class="task-q">${q.question}</div>
+    <div class="task-options">${opts}</div>
+    <div class="task-explain${explainShow}" id="explain_${q.id}">${answered ? q.explain : ''}</div>`;
+  }
+
+  if (q.type === 'timesplit') {
+    const saved = answers[q.id] || {};
+    const rows = q.items.map(item => `
+      <div class="time-row">
+        <span class="time-label">${item.l}</span>
+        <input class="time-input" type="number" min="0" max="100" data-qid="${q.id}" data-key="${item.k}"
+          value="${saved[item.k]||''}" placeholder="0">
+        <span class="time-unit">%</span>
+      </div>`).join('');
+    return `${label}<div class="time-split">${rows}<div class="time-total" id="total_${q.id}">Итого: <strong id="totalVal_${q.id}">0</strong>%</div></div>`;
+  }
+
+  if (q.type === 'textarea') {
+    return `${label}<div class="open-q"><textarea data-qid="${q.id}" rows="3" placeholder="Ваш ответ...">${answers[q.id]||''}</textarea></div>`;
+  }
+
+  return label;
+}
+
+function attachListeners(block) {
+  // Radio / checkbox
+  document.querySelectorAll('.opt').forEach(el => {
+    el.addEventListener('click', function() {
+      const qid = this.dataset.qid;
+      const val = this.dataset.val;
+      const multi = this.dataset.multi;
+      if (multi) {
+        let arr = answers[qid] || [];
+        if (arr.includes(val)) arr = arr.filter(v => v !== val);
+        else arr.push(val);
+        answers[qid] = arr;
+        document.querySelectorAll(`.opt[data-qid="${qid}"]`).forEach(o => {
+          o.classList.toggle('selected', arr.includes(o.dataset.val));
+        });
+      } else {
+        answers[qid] = val;
+        document.querySelectorAll(`.opt[data-qid="${qid}"]`).forEach(o => {
+          o.classList.toggle('selected', o.dataset.val === val);
+        });
+      }
+      saveProgress();
+    });
+  });
+
+  // Likert
+  document.querySelectorAll('.likert-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+      const qid = this.dataset.qid;
+      const val = parseInt(this.dataset.val);
+      answers[qid] = val;
+      document.querySelectorAll(`.likert-btn[data-qid="${qid}"]`).forEach(b => {
+        b.classList.toggle('selected', parseInt(b.dataset.val) === val);
+      });
+      saveProgress();
+    });
+  });
+
+  // Task
+  document.querySelectorAll('.task-opt').forEach(el => {
+    el.addEventListener('click', function() {
+      const qid = this.dataset.qid;
+      if (answers[qid]) return; // already answered
+      const val = this.dataset.val;
+      const correct = this.dataset.correct;
+      const explain = this.dataset.explain;
+      answers[qid] = val;
+      document.querySelectorAll(`.task-opt[data-qid="${qid}"]`).forEach(o => {
+        if (o.dataset.val === correct) o.classList.add('correct');
+        else if (o.dataset.val === val) o.classList.add('wrong');
+      });
+      const expEl = document.getElementById(`explain_${qid}`);
+      if (expEl) { expEl.textContent = explain; expEl.classList.add('show'); }
+      saveProgress();
+    });
+  });
+
+  // Time split
+  document.querySelectorAll('.time-input').forEach(inp => {
+    inp.addEventListener('input', function() {
+      const qid = this.dataset.qid;
+      const key = this.dataset.key;
+      if (!answers[qid]) answers[qid] = {};
+      answers[qid][key] = parseInt(this.value) || 0;
+      const all = document.querySelectorAll(`.time-input[data-qid="${qid}"]`);
+      let total = 0;
+      all.forEach(i => total += (parseInt(i.value) || 0));
+      const totalEl = document.getElementById(`total_${qid}`);
+      const valEl = document.getElementById(`totalVal_${qid}`);
+      if (valEl) valEl.textContent = total;
+      if (totalEl) totalEl.classList.toggle('over', total > 100);
+      saveProgress();
+    });
+  });
+
+  // Textarea
+  document.querySelectorAll('textarea[data-qid]').forEach(ta => {
+    ta.addEventListener('input', function() {
+      answers[this.dataset.qid] = this.value;
+      saveProgress();
+    });
+  });
+}
+
+// ═══════════════════════════════════════════
+// NAVIGATION
+// ═══════════════════════════════════════════
+function nextBlock() {
+  if (currentBlock < BLOCKS.length - 1) {
+    currentBlock++;
+    renderProgress();
+    renderBlock(currentBlock);
+  }
+}
+function prevBlock() {
+  if (currentBlock > 0) {
+    currentBlock--;
+    renderProgress();
+    renderBlock(currentBlock);
+  }
+}
+
+// ═══════════════════════════════════════════
+// PSYCHOTYPE CALCULATION
+// ═══════════════════════════════════════════
+function calcPsychotype() {
+  const b0 = ['q0_1','q0_2','q0_3','q0_4','q0_5','q0_6'];
+  let counts = {A:0, B:0, C:0, D:0, E:0};
+  b0.forEach(qid => { if (answers[qid]) counts[answers[qid]]++; });
+  const maxKey = Object.keys(counts).reduce((a, b) => counts[a] > counts[b] ? a : b);
+  if (maxKey === 'A') return 'innovator';
+  if (maxKey === 'B') return 'pragmatist';
+  if (maxKey === 'C') return 'conservative';
+  return 'skeptic';
+}
+
+// ═══════════════════════════════════════════
+// SUBMIT
+// ═══════════════════════════════════════════
+function submitSurvey() {
+  const submission = {
+    id: SESSION_ID,
+    dept: DEPT,
+    timestamp: Date.now(),
+    answers: answers,
+    psychotype: calcPsychotype(),
+  };
+
+  // Save to localStorage (for dashboard)
+  try {
+    const all = JSON.parse(localStorage.getItem('chilbase_survey_results') || '[]');
+    all.push(submission);
+    localStorage.setItem('chilbase_survey_results', JSON.stringify(all));
+  } catch(e) {}
+
+  // Send to Google Sheets (if configured)
+  if (SHEETS_WEBHOOK) {
+    fetch(SHEETS_WEBHOOK, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify(submission),
+    }).catch(() => {});
+  }
+
+  // Show thank you
+  document.getElementById('surveyContainer').style.display = 'none';
+  const ty = document.getElementById('thankyou');
+  ty.classList.add('show');
+  const ptype = PSYCHOTYPES[submission.psychotype];
+  document.getElementById('tyType').innerHTML = `
+    <div class="type-label">Ваш профиль восприятия изменений</div>
+    <div class="type-name">${ptype.name}</div>
+    <div class="type-desc">${ptype.desc}</div>`;
+  window.scrollTo({top: 0, behavior:'smooth'});
+}
+
+// ═══════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════
+loadSaved();
+renderProgress();
+renderBlock(0);
+</script>
+</body>
+</html>

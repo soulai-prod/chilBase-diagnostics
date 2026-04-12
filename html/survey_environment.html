@@ -1,0 +1,1019 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Диагностика — Environment | chilBase</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --ocean-deep: #0A2E4D;
+  --ocean-mid: #1B6B93;
+  --ocean-light: #5DB9C9;
+  --foam: #F5F0EB;
+  --sand: #E8DCC8;
+  --sun: #E8A838;
+  --sun-glow: #F4C56B;
+  --text-dark: #1a1a2e;
+  --text-light: #5a6577;
+  --white: #FFFFFF;
+  --success: #2ECC71;
+  --card-border: rgba(27,107,147,0.12);
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: 'Inter', sans-serif;
+  color: var(--text-dark);
+  background: var(--foam);
+  min-height: 100vh;
+}
+h1,h2,h3,h4 { font-family: 'Space Grotesk', sans-serif; line-height:1.2; }
+
+/* ─── HEADER ─── */
+.header {
+  background: linear-gradient(135deg, var(--ocean-deep) 0%, var(--ocean-mid) 100%);
+  padding: 1.5rem 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 4px 20px rgba(10,46,77,0.2);
+}
+.header-brand { display:flex; align-items:center; gap:.75rem; }
+.header-brand span { color: var(--white); font-family:'Space Grotesk',sans-serif; font-weight:600; font-size:1.05rem; }
+.header-dept {
+  color: var(--sun-glow);
+  font-size:.85rem;
+  font-weight:500;
+  padding:.3rem .9rem;
+  border:1px solid rgba(244,197,107,0.4);
+  border-radius:50px;
+}
+
+/* ─── PROGRESS ─── */
+.progress-wrap {
+  background: var(--white);
+  padding: 1rem 2rem;
+  border-bottom: 1px solid var(--card-border);
+}
+.progress-steps {
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+  max-width: 720px;
+  margin: 0 auto;
+}
+.step-dot {
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  display: flex; align-items:center; justify-content:center;
+  font-size: .7rem; font-weight:600;
+  flex-shrink: 0;
+  transition: all .3s;
+  cursor: default;
+}
+.step-dot.done { background: var(--ocean-mid); color: var(--white); }
+.step-dot.active { background: var(--sun); color: var(--ocean-deep); box-shadow:0 0 0 4px rgba(232,168,56,.2); }
+.step-dot.todo { background: var(--sand); color: var(--text-light); }
+.step-line { flex:1; height:2px; background: var(--sand); border-radius:2px; }
+.step-line.done { background: var(--ocean-light); }
+.progress-label {
+  text-align:center;
+  font-size:.8rem;
+  color: var(--text-light);
+  margin-top:.6rem;
+  max-width:720px;
+  margin-left:auto; margin-right:auto;
+}
+
+/* ─── MAIN ─── */
+.main { max-width: 720px; margin: 0 auto; padding: 2.5rem 1.5rem 4rem; }
+
+/* ─── BLOCK HEADER ─── */
+.block-header {
+  margin-bottom: 2rem;
+  animation: fadeUp .5s ease both;
+}
+.block-label {
+  display: inline-block;
+  font-size:.75rem; font-weight:600; letter-spacing:.12em;
+  text-transform:uppercase; color: var(--ocean-mid);
+  padding:.35rem .9rem; border:1px solid var(--ocean-light);
+  border-radius:50px; margin-bottom:1rem;
+}
+.block-title { font-size:1.7rem; color:var(--ocean-deep); margin-bottom:.6rem; }
+.block-sub { color:var(--text-light); font-size:.95rem; line-height:1.7; }
+
+/* ─── QUESTION ─── */
+.question {
+  background: var(--white);
+  border-radius: 16px;
+  padding: 1.75rem;
+  margin-bottom: 1.25rem;
+  border: 1px solid var(--card-border);
+  animation: fadeUp .4s ease both;
+}
+.question:nth-child(2) { animation-delay:.05s; }
+.question:nth-child(3) { animation-delay:.1s; }
+.question:nth-child(4) { animation-delay:.15s; }
+.question:nth-child(5) { animation-delay:.2s; }
+@keyframes fadeUp {
+  from { opacity:0; transform:translateY(20px); }
+  to { opacity:1; transform:translateY(0); }
+}
+.q-label { font-weight:600; color:var(--ocean-deep); margin-bottom:1.1rem; font-size:1rem; line-height:1.5; }
+.q-num {
+  display:inline-block; width:22px; height:22px; border-radius:50%;
+  background:var(--ocean-light); color:var(--white);
+  font-size:.7rem; font-weight:700; text-align:center; line-height:22px;
+  margin-right:.5rem; flex-shrink:0;
+}
+
+/* ─── RADIO / CHECKBOX ─── */
+.options { display:flex; flex-direction:column; gap:.6rem; }
+.opt {
+  display:flex; align-items:flex-start; gap:.75rem;
+  padding:.85rem 1rem;
+  border: 1.5px solid var(--sand);
+  border-radius:10px; cursor:pointer;
+  transition: all .2s;
+  position:relative;
+}
+.opt:hover { border-color: var(--ocean-light); background: rgba(93,185,201,.04); }
+.opt.selected { border-color: var(--ocean-mid); background: rgba(27,107,147,.06); }
+.opt.correct-highlight { border-color: var(--success); background: rgba(46,204,113,.08); }
+.opt input { position:absolute; opacity:0; pointer-events:none; }
+.opt-marker {
+  width:18px; height:18px; border-radius:50%; flex-shrink:0; margin-top:1px;
+  border: 2px solid var(--sand); background:var(--white);
+  transition: all .2s; display:flex; align-items:center; justify-content:center;
+}
+.opt.selected .opt-marker { border-color:var(--ocean-mid); background:var(--ocean-mid); }
+.opt.selected .opt-marker::after { content:''; width:6px; height:6px; border-radius:50%; background:var(--white); }
+.opt.checkbox-opt .opt-marker { border-radius:5px; }
+.opt.checkbox-opt.selected .opt-marker::after { content:'✓'; font-size:.65rem; color:var(--white); font-weight:700; }
+.opt-text { color:var(--text-dark); font-size:.93rem; line-height:1.5; }
+
+/* ─── LIKERT ─── */
+.likert-wrap { display:flex; flex-direction:column; gap:.75rem; }
+.likert-labels { display:flex; justify-content:space-between; font-size:.75rem; color:var(--text-light); }
+.likert-row { display:flex; gap:.5rem; justify-content:center; }
+.likert-btn {
+  width:44px; height:44px; border-radius:50%;
+  border: 2px solid var(--sand); background:var(--white);
+  font-weight:600; font-size:.9rem; color:var(--text-light);
+  cursor:pointer; transition:all .2s;
+  display:flex; align-items:center; justify-content:center;
+}
+.likert-btn:hover { border-color:var(--ocean-light); color:var(--ocean-mid); }
+.likert-btn.selected { background:var(--ocean-mid); border-color:var(--ocean-mid); color:var(--white); }
+
+/* ─── TASK (mini LLM tasks) ─── */
+.task-situation {
+  background: linear-gradient(135deg, var(--ocean-deep), var(--ocean-mid));
+  border-radius: 12px; padding:1.25rem 1.5rem; margin-bottom:1.25rem; color:var(--white);
+}
+.task-situation .sit-label { font-size:.7rem; text-transform:uppercase; letter-spacing:.1em; opacity:.6; margin-bottom:.4rem; }
+.task-situation p { font-size:.92rem; line-height:1.6; opacity:.9; }
+.task-q { font-weight:600; color:var(--ocean-deep); margin-bottom:1rem; font-size:.95rem; }
+.task-options { display:flex; flex-direction:column; gap:.6rem; }
+.task-opt {
+  display:flex; gap:.75rem; align-items:flex-start;
+  padding:.9rem 1rem; border:1.5px solid var(--sand); border-radius:10px;
+  cursor:pointer; transition:all .2s;
+}
+.task-opt:hover { border-color:var(--ocean-light); background:rgba(93,185,201,.04); }
+.task-opt.selected { border-color:var(--ocean-mid); background:rgba(27,107,147,.06); }
+.task-opt.correct { border-color:var(--success)!important; background:rgba(46,204,113,.08)!important; }
+.task-opt.wrong { border-color:#E74C3C!important; background:rgba(231,76,60,.06)!important; opacity:.7; }
+.task-letter {
+  width:24px; height:24px; border-radius:6px; flex-shrink:0;
+  background:var(--sand); color:var(--text-dark);
+  font-weight:700; font-size:.8rem; display:flex; align-items:center; justify-content:center;
+  transition:all .2s;
+}
+.task-opt.selected .task-letter { background:var(--ocean-mid); color:var(--white); }
+.task-opt.correct .task-letter { background:var(--success); color:var(--white); }
+.task-opt.wrong .task-letter { background:#E74C3C; color:var(--white); }
+.task-text { font-size:.88rem; color:var(--text-dark); line-height:1.5; }
+.task-explain {
+  margin-top:.75rem; padding:.75rem 1rem;
+  background:rgba(46,204,113,.1); border-radius:8px;
+  font-size:.82rem; color:#1a6b3a; line-height:1.5; display:none;
+}
+.task-explain.show { display:block; }
+
+/* ─── TEXTAREA ─── */
+.open-q textarea {
+  width:100%; padding:1rem; border:1.5px solid var(--sand); border-radius:10px;
+  font-family:'Inter',sans-serif; font-size:.93rem; color:var(--text-dark);
+  resize:vertical; min-height:80px; background:var(--white);
+  transition:border-color .2s; outline:none;
+}
+.open-q textarea:focus { border-color:var(--ocean-mid); }
+
+/* ─── TIME SPLIT ─── */
+.time-split { display:flex; flex-direction:column; gap:.75rem; }
+.time-row { display:flex; align-items:center; gap:1rem; }
+.time-label { flex:1; font-size:.88rem; color:var(--text-dark); }
+.time-input {
+  width:70px; padding:.45rem .6rem; border:1.5px solid var(--sand); border-radius:8px;
+  font-size:.9rem; font-weight:600; color:var(--ocean-mid); text-align:center; outline:none;
+  transition:border-color .2s;
+}
+.time-input:focus { border-color:var(--ocean-mid); }
+.time-unit { font-size:.8rem; color:var(--text-light); width:16px; }
+.time-total {
+  display:flex; justify-content:flex-end; align-items:center; gap:.5rem;
+  padding:.6rem 1rem; background:var(--sand); border-radius:8px; margin-top:.25rem;
+  font-size:.85rem; color:var(--text-dark);
+}
+.time-total strong { font-family:'Space Grotesk',sans-serif; font-size:1rem; color:var(--ocean-mid); }
+.time-total.over strong { color:#E74C3C; }
+
+/* ─── NAVIGATION ─── */
+.nav-row {
+  display:flex; gap:1rem; margin-top:2.5rem; justify-content:space-between; align-items:center;
+}
+.btn {
+  padding:.85rem 2rem; border-radius:50px; font-weight:600; font-size:.95rem;
+  cursor:pointer; border:none; transition:all .25s; font-family:'Inter',sans-serif;
+}
+.btn-primary {
+  background:linear-gradient(135deg, var(--ocean-mid), var(--ocean-deep));
+  color:var(--white); box-shadow:0 4px 16px rgba(27,107,147,.3);
+}
+.btn-primary:hover { transform:translateY(-2px); box-shadow:0 8px 24px rgba(27,107,147,.4); }
+.btn-secondary { background:transparent; color:var(--text-light); border:1.5px solid var(--sand); }
+.btn-secondary:hover { border-color:var(--ocean-light); color:var(--ocean-mid); }
+.btn-submit {
+  background:linear-gradient(135deg, var(--sun), var(--sun-glow));
+  color:var(--ocean-deep); box-shadow:0 4px 16px rgba(232,168,56,.3);
+  flex:1; text-align:center; font-size:1rem;
+}
+.btn-submit:hover { transform:translateY(-2px); box-shadow:0 8px 24px rgba(232,168,56,.4); }
+
+/* ─── THANK YOU ─── */
+.thankyou {
+  text-align:center; padding:4rem 2rem; display:none;
+}
+.thankyou.show { display:block; animation: fadeUp .6s ease both; }
+.ty-icon { font-size:3.5rem; margin-bottom:1.5rem; }
+.ty-title { font-size:2rem; color:var(--ocean-deep); margin-bottom:1rem; }
+.ty-sub { color:var(--text-light); font-size:1.05rem; line-height:1.7; max-width:480px; margin:0 auto; }
+.ty-type {
+  margin:2rem auto; max-width:400px; padding:1.5rem 2rem;
+  background:linear-gradient(135deg, var(--ocean-deep), var(--ocean-mid));
+  border-radius:20px; color:var(--white);
+}
+.ty-type .type-label { font-size:.75rem; text-transform:uppercase; letter-spacing:.1em; opacity:.6; margin-bottom:.4rem; }
+.ty-type .type-name { font-size:1.3rem; font-weight:700; margin-bottom:.4rem; }
+.ty-type .type-desc { font-size:.88rem; opacity:.8; line-height:1.6; }
+
+/* ─── CONFIDENTIAL BANNER ─── */
+.confidential {
+  background:rgba(27,107,147,.06); border:1px solid rgba(27,107,147,.15);
+  border-radius:10px; padding:.75rem 1rem; margin-bottom:2rem;
+  display:flex; gap:.75rem; align-items:flex-start;
+  font-size:.85rem; color:var(--text-light); line-height:1.5;
+}
+.confidential-icon { font-size:1rem; flex-shrink:0; margin-top:.05rem; }
+
+/* ─── WAVE TOP ─── */
+.wave-top {
+  background:linear-gradient(135deg, var(--ocean-deep), var(--ocean-mid));
+  padding:2.5rem 2rem 3.5rem; text-align:center; color:var(--white);
+  position:relative; overflow:hidden;
+}
+.wave-top::after {
+  content:'';
+  position:absolute; bottom:-1px; left:0; right:0; height:50px;
+  background:var(--foam);
+  clip-path: ellipse(55% 100% at 50% 100%);
+}
+.wave-top h1 { font-size:1.6rem; margin-bottom:.5rem; }
+.wave-top p { opacity:.75; font-size:.9rem; }
+
+/* ─── RESPONSIVE ─── */
+@media (max-width:600px) {
+  .main { padding:1.5rem 1rem 3rem; }
+  .block-title { font-size:1.4rem; }
+  .progress-steps { gap:.3rem; }
+  .step-dot { width:24px; height:24px; font-size:.65rem; }
+  .likert-btn { width:38px; height:38px; }
+}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-brand">
+    <span>AI Диагностика chilBase</span>
+  </div>
+  <div class="header-dept">Environment</div>
+</div>
+
+<!-- PROGRESS -->
+<div class="progress-wrap">
+  <div class="progress-steps" id="progressSteps"></div>
+  <div class="progress-label" id="progressLabel"></div>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+  <div class="confidential">
+    <span class="confidential-icon">🔒</span>
+    <span>Ваши ответы конфиденциальны — результаты агрегируются по отделу без имён и не передаются руководству в детальном виде.</span>
+  </div>
+
+  <div id="surveyContainer"></div>
+
+  <div class="thankyou" id="thankyou">
+    <div class="ty-icon">🌊</div>
+    <h2 class="ty-title">Спасибо!</h2>
+    <p class="ty-sub">Ваши ответы сохранены. Результаты появятся в общем отчёте по отделу — без имён, только агрегированно.</p>
+    <div class="ty-type" id="tyType"></div>
+    <p class="ty-sub" style="margin-top:1.5rem; font-size:.88rem;">Скоро мы поделимся картой AI-возможностей для chilBase — и расскажем, что реально можно автоматизировать в вашем отделе.</p>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════
+// CONFIG — вставьте URL вашего Apps Script для Google Sheets
+// ═══════════════════════════════════════════
+const SHEETS_WEBHOOK = ''; // 'https://script.google.com/macros/s/YOUR_ID/exec'
+const DEPT = 'environment';
+const SESSION_ID = Date.now() + '_' + Math.random().toString(36).slice(2,8);
+
+// ═══════════════════════════════════════════
+// SURVEY DATA
+// ═══════════════════════════════════════════
+const BLOCKS = [
+  {
+    id: 'b0',
+    label: 'Блок 0',
+    title: 'Профиль восприятия изменений',
+    sub: 'Как вы относитесь к новым инструментам и изменениям. Нет правильных ответов.',
+    questions: [
+      { id:'q0_1', type:'radio', text:'Когда в компании внедряется новый инструмент или процесс, вы обычно...', opts:[
+        {v:'A', t:'Один из первых, кто пробует — мне интересно, как это работает'},
+        {v:'B', t:'Жду, пока коллеги опробуют, потом подключаюсь'},
+        {v:'C', t:'Начинаю использовать, когда это становится обязательным'},
+        {v:'D', t:'Предпочитаю проверенные инструменты, к новым отношусь осторожно'},
+      ]},
+      { id:'q0_2', type:'radio', text:'Как вы обычно учите что-то новое в работе?', opts:[
+        {v:'A', t:'Сразу пробую — учусь в процессе'},
+        {v:'B', t:'Смотрю туториалы / читаю документацию, потом применяю'},
+        {v:'C', t:'Прошу коллегу показать лично'},
+        {v:'D', t:'Жду, пока кто-то объяснит в рамках обучения'},
+      ]},
+      { id:'q0_3', type:'radio', text:'Когда задача занимает больше времени, чем должна, вы...', opts:[
+        {v:'A', t:'Сразу ищу способ ускорить или автоматизировать'},
+        {v:'B', t:'Делаю как есть, но запоминаю — вернусь к этому позже'},
+        {v:'C', t:'Делаю как есть — это часть работы'},
+        {v:'D', t:'Сообщаю руководителю, что нужно больше ресурсов'},
+      ]},
+      { id:'q0_4', type:'radio', text:'Как вы относитесь к идее, что AI будет помогать вам в работе?', opts:[
+        {v:'A', t:'Очень позитивно — хочу попробовать прямо сейчас'},
+        {v:'B', t:'Позитивно, если это реально экономит время'},
+        {v:'C', t:'Нейтрально — посмотрю на результаты'},
+        {v:'D', t:'С осторожностью — важно не потерять качество'},
+        {v:'E', t:'Скептически — AI в моей работе не применим'},
+      ]},
+      { id:'q0_5', type:'radio', text:'Ваш основной стиль работы:', opts:[
+        {v:'A', t:'Работаю по чётким процессам и правилам — предсказуемость важна'},
+        {v:'B', t:'Адаптируюсь под задачу — каждый раз немного по-разному'},
+        {v:'C', t:'Люблю экспериментировать и искать новые подходы'},
+        {v:'D', t:'Фокусируюсь на результате — как добраться, не так важно'},
+      ]},
+      { id:'q0_6', type:'radio', text:'Если бы у вас был свободный час на изучение AI-инструмента для работы, вы бы...', opts:[
+        {v:'A', t:'Сразу открыл и начал пробовать на реальных задачах'},
+        {v:'B', t:'Посмотрел обзор или примеры использования коллег'},
+        {v:'C', t:'Подождал бы официального обучения от компании'},
+        {v:'D', t:'Потратил час на другие рабочие задачи'},
+      ]},
+    ]
+  },
+  {
+    id: 'b1',
+    label: 'Блок 1',
+    title: 'Ваш профиль',
+    sub: '5 вопросов о вашей роли и опыте.',
+    questions: [
+      { id:'q1_1', type:'radio', text:'Ваша роль в отделе Environment:', opts:[
+        {v:'3D Artist', t:'3D Artist (моделлинг)'}, {v:'Texture Artist', t:'Texture Artist'},
+        {v:'Environment Artist', t:'Environment Artist (сборка сцен)'}, {v:'Technical Artist', t:'Technical Artist'},
+        {v:'Lead/Senior', t:'Lead / Senior Artist'}, {v:'Other', t:'Другое'},
+      ]},
+      { id:'q1_2', type:'radio', text:'Опыт работы в геймдеве:', opts:[
+        {v:'<1', t:'< 1 года'}, {v:'1-3', t:'1–3 года'}, {v:'3-5', t:'3–5 лет'},
+        {v:'5-10', t:'5–10 лет'}, {v:'10+', t:'10+ лет'},
+      ]},
+      { id:'q1_3', type:'radio', text:'Как давно вы в chilBase:', opts:[
+        {v:'<6m', t:'< 6 месяцев'}, {v:'6-12m', t:'6–12 месяцев'}, {v:'1-2y', t:'1–2 года'},
+        {v:'2-4y', t:'2–4 года'}, {v:'4+y', t:'4+ года'},
+      ]},
+      { id:'q1_4', type:'radio', text:'Основной инструмент в ежедневной работе:', opts:[
+        {v:'Blender', t:'Blender'}, {v:'3dsMax', t:'3ds Max'}, {v:'Maya', t:'Maya'},
+        {v:'SubstancePainter', t:'Substance Painter'}, {v:'SubstanceDesigner', t:'Substance Designer'},
+        {v:'Unity', t:'Unity'}, {v:'Other', t:'Другое'},
+      ]},
+      { id:'q1_5', type:'radio', text:'Ассетов (моделей/материалов/сцен) за среднюю неделю:', opts:[
+        {v:'<3', t:'< 3'}, {v:'3-7', t:'3–7'}, {v:'8-15', t:'8–15'},
+        {v:'16-30', t:'16–30'}, {v:'30+', t:'30+'},
+      ]},
+    ]
+  },
+  {
+    id: 'b2',
+    label: 'Блок 2',
+    title: 'Понимание AI и LLM',
+    sub: '9 вопросов. Нет правильных или неправильных — это не тест.',
+    questions: [
+      { id:'q2_1', type:'radio', text:'Что такое LLM (Large Language Model):', opts:[
+        {v:'A', t:'Поисковик, который ищет ответы в интернете в реальном времени'},
+        {v:'B', t:'Модель, предсказывающая следующее слово/токен на основе обученных данных'},
+        {v:'C', t:'База знаний с готовыми ответами'},
+        {v:'D', t:'Программа, которая «думает» как человек'},
+        {v:'E', t:'Не знаю точно'},
+      ]},
+      { id:'q2_2', type:'radio', text:'Что такое «промт» (prompt):', opts:[
+        {v:'A', t:'Кнопка запуска AI'}, {v:'B', t:'Текстовый запрос/инструкция, которую вы даёте модели'},
+        {v:'C', t:'Название модели'}, {v:'D', t:'Результат работы AI'}, {v:'E', t:'Не знаю'},
+      ]},
+      { id:'q2_3', type:'radio', text:'Почему два одинаковых запроса к ChatGPT могут дать разные ответы:', opts:[
+        {v:'A', t:'Это баг'},
+        {v:'B', t:'Модель генерирует ответы вероятностно, не детерминированно'},
+        {v:'C', t:'Разные серверы хранят разные данные'},
+        {v:'D', t:'Модель учится на ходу на ваших запросах'},
+        {v:'E', t:'Не знаю'},
+      ]},
+      { id:'q2_4', type:'radio', text:'Что такое «контекстное окно» модели:', opts:[
+        {v:'A', t:'Окно чата в браузере'},
+        {v:'B', t:'Объём текста (токенов), который модель держит «в памяти» за один запрос'},
+        {v:'C', t:'Настройки интерфейса'}, {v:'D', t:'Не знаю'},
+      ]},
+      { id:'q2_5', type:'radio', text:'Может ли ChatGPT/Claude открыть ваш файл .blend и отрендерить сцену:', opts:[
+        {v:'A', t:'Да, всегда'},
+        {v:'B', t:'Нет, LLM работает с текстом; для этого нужны отдельные плагины/API'},
+        {v:'C', t:'Только платная версия'}, {v:'D', t:'Не знаю'},
+      ]},
+      { id:'q2_6', type:'radio', text:'Что такое «галлюцинация» LLM:', opts:[
+        {v:'A', t:'Ошибка сервера'},
+        {v:'B', t:'Модель уверенно выдаёт фактически неверную информацию'},
+        {v:'C', t:'Модель зависает'}, {v:'D', t:'Модель отказывается отвечать'}, {v:'E', t:'Не знаю'},
+      ]},
+      { id:'q2_7', type:'likert', text:'Насколько вы понимаете, как работают AI-инструменты генерации изображений (Midjourney, Stable Diffusion):',
+        labelLeft:'Вообще не понимаю', labelRight:'Могу объяснить коллеге'},
+      { id:'q2_8', type:'likert', text:'Уровень владения промтингом:',
+        labelLeft:'Никогда не писал(а)', labelRight:'Использую продвинутые техники'},
+      { id:'q2_9', type:'radio', text:'Знаете ли вы разницу между 3D-генерацией (Meshy, TripoSR) и 2D-генерацией (Midjourney, SD):', opts:[
+        {v:'A', t:'Да, понимаю принципиальные отличия'},
+        {v:'B', t:'Слышал(а) названия, но не работал(а)'},
+        {v:'C', t:'Впервые слышу'}, {v:'D', t:'Неактуально для моей работы'},
+      ]},
+    ]
+  },
+  {
+    id: 'b3',
+    label: 'Блок 3',
+    title: 'Текущая рутина',
+    sub: 'Расскажите о реальном распределении времени и задачах.',
+    questions: [
+      { id:'q3_1', type:'timesplit', text:'Распределите примерный % рабочего времени (сумма = 100%):', items:[
+        {k:'modeling', l:'Моделирование новых ассетов'}, {k:'texturing', l:'Текстурирование / материалы'},
+        {k:'integration', l:'Сборка / интеграция в Unity'}, {k:'git', l:'Работа с Git'},
+        {k:'references', l:'Поиск референсов'}, {k:'communication', l:'Коммуникация / ревью'},
+        {k:'rework', l:'Переделки и правки'}, {k:'other', l:'Другое'},
+      ]},
+      { id:'q3_2', type:'checkbox', text:'Что отнимает больше всего времени «не по делу» (рутина):', opts:[
+        {v:'git_sync', t:'Синхронизация материалов через Git'}, {v:'rename', t:'Ручное переименование / сортировка файлов'},
+        {v:'refs', t:'Поиск референсов'}, {v:'uv', t:'UV-развёртка'}, {v:'bake', t:'Бейки (normal, AO, curvature)'},
+        {v:'optim', t:'Оптимизация (retopo, LOD, atlasing)'}, {v:'export', t:'Экспорт/импорт между пакетами'},
+        {v:'shaders', t:'Настройка шейдеров под движок'}, {v:'other', t:'Другое'},
+      ]},
+      { id:'q3_3', type:'radio', text:'Сколько раз в неделю возникает merge-конфликт в Git:', opts:[
+        {v:'0', t:'0'}, {v:'1-2', t:'1–2'}, {v:'3-5', t:'3–5'}, {v:'6-10', t:'6–10'}, {v:'10+', t:'10+'},
+      ]},
+      { id:'q3_4', type:'radio', text:'Есть ли тестовое окружение для проверки ассетов перед merge:', opts:[
+        {v:'yes', t:'Да, полноценное'}, {v:'partial', t:'Есть частично, но неудобно'},
+        {v:'no', t:'Нет, тестим сразу в проекте'}, {v:'dk', t:'Не знаю'},
+      ]},
+      { id:'q3_5', type:'likert', text:'Насколько вас устраивает скорость обратной связи от нарратива/геймдизайна:',
+        labelLeft:'Очень медленно', labelRight:'Быстро'},
+      { id:'q3_6', type:'radio', text:'Итераций в среднем от концепта до финального approve:', opts:[
+        {v:'1', t:'1'}, {v:'2-3', t:'2–3'}, {v:'4-6', t:'4–6'}, {v:'7-10', t:'7–10'}, {v:'10+', t:'10+'},
+      ]},
+      { id:'q3_7', type:'checkbox', text:'На каких этапах чаще всего возникают переделки:', opts:[
+        {v:'concept', t:'Концепт/блокаут'}, {v:'hipoly', t:'Хай-поли'}, {v:'retopo', t:'Ретопо / UV'},
+        {v:'textures', t:'Текстуры'}, {v:'integration', t:'Интеграция в сцену'}, {v:'lighting', t:'Лайтинг / финальный лук'},
+        {v:'other', t:'Другое'},
+      ]},
+      { id:'q3_8', type:'radio', text:'Как часто ищете референсы вручную (Pinterest/Google/ArtStation):', opts:[
+        {v:'daily', t:'Ежедневно'}, {v:'weekly_few', t:'Несколько раз в неделю'},
+        {v:'weekly', t:'Раз в неделю'}, {v:'rarely', t:'Реже'},
+      ]},
+      { id:'q3_9', type:'radio', text:'Минут в день уходит только на поиск референсов:', opts:[
+        {v:'<15', t:'< 15 мин'}, {v:'15-30', t:'15–30 мин'}, {v:'30-60', t:'30–60 мин'},
+        {v:'1-2h', t:'1–2 часа'}, {v:'>2h', t:'> 2 часов'},
+      ]},
+      { id:'q3_10', type:'likert', text:'Как часто дублируете работу из-за отсутствия общей библиотеки:',
+        labelLeft:'Никогда', labelRight:'Постоянно'},
+      { id:'q3_11', type:'checkbox', text:'Какие задачи делаете вручную, хотя можно автоматизировать:', opts:[
+        {v:'lod', t:'Генерация LOD'}, {v:'atlas', t:'Пакинг текстур в атласы'}, {v:'rename', t:'Переименование/сортировка'},
+        {v:'variations', t:'Генерация вариаций (цвет, грязь, износ)'}, {v:'convert', t:'Конвертация форматов'},
+        {v:'naming', t:'Проверка naming conventions'}, {v:'preview', t:'Подготовка превью/скриншотов'},
+        {v:'none', t:'Ничего из перечисленного'},
+      ]},
+    ]
+  },
+  {
+    id: 'b4',
+    label: 'Блок 4',
+    title: 'Мини-задачи на логику LLM',
+    sub: 'Реальные сценарии из вашей работы. Выберите лучший промт — не тест, а понимание вашего мышления.',
+    questions: [
+      { id:'q4_1', type:'task',
+        situation: 'Нужно сделать moodboard и референс-подборку для локации «заброшенный рыбацкий посёлок на северном побережье, post-apocalyptic, стилизация в духе нашей игры». Вы хотите попросить ChatGPT помочь описать визуальные ключевые элементы.',
+        question: 'Какой промт даст лучший результат?',
+        correct: 'C',
+        explain: 'C — лучший: задана роль (арт-директор), конкретный стиль, конкретная задача (15 элементов + ключевые слова). Чем больше контекста — тем точнее вывод модели.',
+        opts:[
+          {v:'A', t:'«Дай мне референсы для рыбацкого посёлка»'},
+          {v:'B', t:'«Придумай локацию»'},
+          {v:'C', t:'«Ты — арт-директор пост-апокалиптической стилизованной игры. Опиши 15 визуальных элементов заброшенного рыбацкого посёлка: архитектура, материалы, палитра, силуэты, разрушения. Для каждого — 2–3 ключевых слова для поиска референса»'},
+          {v:'D', t:'«Напиши про рыбаков»'},
+          {v:'E', t:'«Сделай красиво»'},
+        ]
+      },
+      { id:'q4_2', type:'task',
+        situation: 'У вас merge-конфликт в .meta файле Unity после чужого коммита. Вы не понимаете, что конфликтует, и хотите разобраться через Claude.',
+        question: 'Лучший промт:',
+        correct: 'C',
+        explain: 'C — лучший: предоставлен сам файл с маркерами конфликта, задан контекст (Unity), сформулирован конкретный вопрос. Без файла — модель будет гадать.',
+        opts:[
+          {v:'A', t:'«Исправь мне конфликт»'},
+          {v:'B', t:'«Git не работает, помоги»'},
+          {v:'C', t:'«Вот .meta файл с маркерами конфликта <<<, ===, >>>. Объясни какие поля конфликтуют, что они значат в Unity, и какую версию безопаснее оставить чтобы не потерять настройки импорта текстуры. [файл]»'},
+          {v:'D', t:'«Что такое git merge»'},
+          {v:'E', t:'«Удали всё лишнее»'},
+        ]
+      },
+      { id:'q4_3', type:'task',
+        situation: 'Лид просит сделать 5 вариаций одного камня: разный мох, форма скола, цвет. Есть готовая хай-поли. Вы используете AI, чтобы продумать различия.',
+        question: 'Лучший промт:',
+        correct: 'C',
+        explain: 'C — лучший: роль задана, материал конкретный, размер конкретный, задача декомпозирована на 4 параметра, запрошен формат (таблица). Это даёт структурированный вывод, который можно сразу применять.',
+        opts:[
+          {v:'A', t:'«Сделай 5 камней»'},
+          {v:'B', t:'«Помоги с камнями»'},
+          {v:'C', t:'«Ты — environment artist в стилизованной игре. Базовый гранитный валун ~2м. Предложи 5 вариаций: (1) кластеры мха и где, (2) тип износа/сколов, (3) цветовой сдвиг альбедо, (4) что НЕ менять чтобы переиспользовать UV. Формат: таблица»'},
+          {v:'D', t:'«Сделай красивые камни для игры»'},
+          {v:'E', t:'«Не знаю как начать»'},
+        ]
+      },
+      { id:'q4_4', type:'task',
+        situation: 'Хотите попросить LLM написать Python-скрипт для Blender, который переименует все выделенные объекты по шаблону SM_<локация>_<объект>_<номер>.',
+        question: 'Лучший промт:',
+        correct: 'C',
+        explain: 'C — лучший: версия Blender, библиотека (bpy), точный шаблон, переменные, автоинкремент, обработка ошибок, просьба добавить комментарии. Технические задачи требуют максимально точных условий.',
+        opts:[
+          {v:'A', t:'«Напиши скрипт»'},
+          {v:'B', t:'«Переименуй объекты в Blender»'},
+          {v:'C', t:'«Python-скрипт для Blender 4.x, bpy. Переименовать выделенные mesh-объекты по шаблону SM_<location>_<name>_<number>, location и name — переменные, number — автоинкремент 001. Пропускать non-mesh. Обработать ошибку если ничего не выделено. Прокомментировать шаги»'},
+          {v:'D', t:'«Blender Python rename»'},
+          {v:'E', t:'«Сделай как в 3ds Max»'},
+        ]
+      },
+    ]
+  },
+  {
+    id: 'b5',
+    label: 'Блок 5',
+    title: 'AI в работе сейчас',
+    sub: 'Что вы уже используете и как.',
+    questions: [
+      { id:'q5_1', type:'checkbox', text:'Какими AI-инструментами пользовались по работе:', opts:[
+        {v:'chatgpt', t:'ChatGPT'}, {v:'claude', t:'Claude'}, {v:'gemini', t:'Gemini'},
+        {v:'midjourney', t:'Midjourney'}, {v:'sd', t:'Stable Diffusion (ComfyUI / A1111)'},
+        {v:'dalle', t:'DALL·E'}, {v:'meshy', t:'Meshy / Rodin / TripoSR / Luma AI'},
+        {v:'substance_ai', t:'AI-плагины в Substance'}, {v:'firefly', t:'Adobe Firefly'},
+        {v:'copilot', t:'GitHub Copilot'}, {v:'none', t:'Не использую AI'},
+      ]},
+      { id:'q5_2', type:'radio', text:'Как часто используете AI в работе:', opts:[
+        {v:'daily', t:'Ежедневно'}, {v:'few_week', t:'Несколько раз в неделю'},
+        {v:'weekly', t:'Раз в неделю'}, {v:'monthly', t:'Раз в месяц'}, {v:'rarely', t:'Реже / не использую'},
+      ]},
+      { id:'q5_3', type:'checkbox', text:'Для каких задач используете AI:', opts:[
+        {v:'refs', t:'Поиск / генерация референсов'}, {v:'mood', t:'Мудборды и описания локаций'},
+        {v:'tex_gen', t:'Генерация текстур / материалов'}, {v:'maps', t:'Генерация height/normal map'},
+        {v:'scripts', t:'Скрипты для DCC (Blender/Maya)'}, {v:'shaders', t:'Поиск ошибок в шейдерах'},
+        {v:'text', t:'Переводы / переписывание текста'}, {v:'explain', t:'Объяснение технических тем'},
+        {v:'none', t:'Ничего из перечисленного'},
+      ]},
+      { id:'q5_4', type:'likert', text:'Ценность AI-инструментов для вашей текущей работы:', labelLeft:'Бесполезно', labelRight:'Сильно экономит время'},
+      { id:'q5_5', type:'checkbox', text:'Что мешает использовать AI больше:', opts:[
+        {v:'time', t:'Нет времени разбираться'}, {v:'start', t:'Не знаю, с чего начать'},
+        {v:'unstable', t:'Результат нестабильный'}, {v:'style', t:'Не подходит под стилистику игры'},
+        {v:'access', t:'Нет доступа к платным инструментам'}, {v:'nda', t:'Опасения по NDA / утечке данных'},
+        {v:'mgmt', t:'Руководство не поощряет'}, {v:'nothing', t:'Ничего не мешает'},
+      ]},
+      { id:'q5_6', type:'radio', text:'Пробовали генерировать texture maps через AI:', opts:[
+        {v:'regular', t:'Да, использую регулярно'}, {v:'tried', t:'Пробовал(а), не зашло'},
+        {v:'heard', t:'Слышал(а), не пробовал(а)'}, {v:'never', t:'Впервые слышу'},
+      ]},
+      { id:'q5_7', type:'radio', text:'Если пробовали генерацию текстур — результаты:', opts:[
+        {v:'prod', t:'Готовые к продакшену без правок'}, {v:'base', t:'Нужны правки, но база экономит время'},
+        {v:'inspo', t:'Только как референс/вдохновение'}, {v:'no', t:'Не пробовал(а)'},
+      ]},
+      { id:'q5_8', type:'likert', text:'Насколько доверяете результатам AI при работе с визуальным контентом:', labelLeft:'Не доверяю', labelRight:'Полностью доверяю'},
+      { id:'q5_9', type:'radio', text:'Есть ли свой workflow с AI, которым пользуетесь регулярно:', opts:[
+        {v:'yes', t:'Да, устоявшийся'}, {v:'exp', t:'Экспериментирую'}, {v:'no', t:'Нет'},
+      ]},
+      { id:'q5_10', type:'radio', text:'Делитесь найденными AI-трюками с коллегами:', opts:[
+        {v:'reg', t:'Да, регулярно'}, {v:'sometimes', t:'Иногда'}, {v:'rarely', t:'Редко'}, {v:'no', t:'Нет / некому'},
+      ]},
+    ]
+  },
+  {
+    id: 'b6',
+    label: 'Блок 6',
+    title: 'Желания и опасения',
+    sub: 'Что хотелось бы автоматизировать, чего опасаетесь.',
+    questions: [
+      { id:'q6_1', type:'checkbox', text:'Какую рутину хотели бы отдать AI (до 5 вариантов):', opts:[
+        {v:'lod', t:'Генерация LOD / оптимизация геометрии'}, {v:'uv', t:'Авто-UV'},
+        {v:'tex', t:'Генерация базовых текстур по описанию'}, {v:'vars', t:'Вариации модели (грязь, износ, цвет)'},
+        {v:'scripts', t:'Скрипты для DCC'}, {v:'refs', t:'Подбор референсов'},
+        {v:'mood', t:'Описание локаций / мудборд'}, {v:'naming', t:'Проверка naming conventions'},
+        {v:'git', t:'Разбор merge-конфликтов'}, {v:'preview', t:'Подготовка превью ассетов'},
+        {v:'docs', t:'Документация ассетов'},
+      ]},
+      { id:'q6_2', type:'checkbox', text:'Какие задачи НЕ отдали бы AI ни при каких условиях:', opts:[
+        {v:'art', t:'Финальная художественная доводка'}, {v:'comp', t:'Композиция сцены'},
+        {v:'light', t:'Лайтинг'}, {v:'style', t:'Принятие решений по стилистике'},
+        {v:'review', t:'Ревью работы коллег'}, {v:'all', t:'Ничего — всё можно делегировать'},
+      ]},
+      { id:'q6_3', type:'likert', text:'Насколько вас беспокоит, что AI «заменит» художников в ближайшие 3 года:', labelLeft:'Совсем не беспокоит', labelRight:'Сильно беспокоит'},
+      { id:'q6_4', type:'likert', text:'Готовность тратить рабочее время на обучение AI-инструментам:', labelLeft:'Не готов(а)', labelRight:'Готов(а) хоть завтра'},
+      { id:'q6_5', type:'radio', text:'Сколько часов в неделю готовы выделять на обучение:', opts:[
+        {v:'0', t:'0'}, {v:'1-2', t:'1–2 ч'}, {v:'3-5', t:'3–5 ч'}, {v:'6+', t:'6+ ч'},
+      ]},
+      { id:'q6_6', type:'radio', text:'Предпочтительный формат обучения:', opts:[
+        {v:'video', t:'Короткие видео (5–15 мин)'}, {v:'workshop_online', t:'Воркшоп с практикой в Zoom'},
+        {v:'workshop_live', t:'Очный воркшоп'}, {v:'guide', t:'Письменные гайды / чеклисты'},
+        {v:'pair', t:'Парное «смотри, как я делаю»'}, {v:'self', t:'Самостоятельно, если дадут ссылки'},
+      ]},
+      { id:'q6_7', type:'checkbox', text:'Что бы сильнее всего ускорило ваш workflow:', opts:[
+        {v:'prompts', t:'Внутренняя библиотека AI-промтов под наш стиль'}, {v:'plugin', t:'Плагин для Blender/Maya с AI-функциями'},
+        {v:'git_auto', t:'Автоматизация Git-рутины'}, {v:'tex_gen', t:'Генератор текстур под наш style guide'},
+        {v:'asset_check', t:'Система автотестов ассетов перед merge'}, {v:'docs_ai', t:'AI-ассистент по документации проекта'},
+        {v:'other', t:'Другое'},
+      ]},
+      { id:'q6_8', type:'radio', text:'Вас больше мотивирует в освоении AI:', opts:[
+        {v:'boring', t:'Ускорение скучных задач'}, {v:'creative', t:'Новые творческие возможности'},
+        {v:'career', t:'Карьерный рост'}, {v:'fear', t:'Боязнь отстать от индустрии'},
+        {v:'pressure', t:'Давление сверху'}, {v:'none', t:'Ничего — не мотивирует'},
+      ]},
+      { id:'q6_9', type:'likert', text:'Комфортно ли делиться своим workflow с коллегами, если его улучшили с помощью AI:', labelLeft:'Некомфортно', labelRight:'Полностью комфортно'},
+    ]
+  },
+  {
+    id: 'b7',
+    label: 'Блок 7',
+    title: 'Ваши слова',
+    sub: '3 открытых вопроса — отвечайте как хочется, можно кратко.',
+    questions: [
+      { id:'q7_1', type:'textarea', text:'Если бы вы могли устранить одну рутину прямо сейчас — что бы это было?' },
+      { id:'q7_2', type:'textarea', text:'Какой AI-инструмент попробовали бы в ближайший месяц, если бы было 2 свободных часа и доступ?' },
+      { id:'q7_3', type:'textarea', text:'Что хотите сказать команде, которая будет внедрять AI в chilBase — пожелания, опасения, идеи:' },
+    ]
+  }
+];
+
+const BLOCK_NAMES = ['Восприятие изменений','Профиль','Понимание AI','Рутина','LLM Задачи','AI сейчас','Желания','Ваши слова'];
+
+// Психотипы
+const PSYCHOTYPES = {
+  innovator: { name:'Новатор 🚀', desc:'Вы первыми пробуете новое и быстро осваиваете инструменты. Для вас подойдёт углублённый трек с практикой сложных AI-pipelines.' },
+  pragmatist: { name:'Прагматик ⚡', desc:'Вы за инструменты, которые реально работают. Оптимальный формат — практические кейсы с измеримым ROI.' },
+  conservative: { name:'Консерватор 🛡️', desc:'Вы цените стабильность и проверенные решения. Постепенное внедрение с поддержкой — ваш путь.' },
+  skeptic: { name:'Скептик 🔍', desc:'Вы задаёте правильные вопросы и требуете доказательств. Ваша позиция помогает избежать внедрения ради галочки.' },
+};
+
+// ═══════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════
+let currentBlock = 0;
+let answers = {};
+
+function loadSaved() {
+  try {
+    const saved = localStorage.getItem(`chilbase_${DEPT}_${SESSION_ID}`);
+    if (saved) answers = JSON.parse(saved);
+  } catch(e) {}
+}
+function saveProgress() {
+  try {
+    localStorage.setItem(`chilbase_${DEPT}_${SESSION_ID}`, JSON.stringify(answers));
+  } catch(e) {}
+}
+
+// ═══════════════════════════════════════════
+// RENDER
+// ═══════════════════════════════════════════
+function renderProgress() {
+  const steps = document.getElementById('progressSteps');
+  const label = document.getElementById('progressLabel');
+  steps.innerHTML = '';
+  BLOCKS.forEach((b, i) => {
+    if (i > 0) {
+      const line = document.createElement('div');
+      line.className = 'step-line' + (i <= currentBlock ? ' done' : '');
+      steps.appendChild(line);
+    }
+    const dot = document.createElement('div');
+    dot.className = 'step-dot ' + (i < currentBlock ? 'done' : i === currentBlock ? 'active' : 'todo');
+    dot.textContent = i < currentBlock ? '✓' : (i + 1);
+    dot.title = BLOCK_NAMES[i];
+    steps.appendChild(dot);
+  });
+  label.textContent = `${BLOCK_NAMES[currentBlock]} — шаг ${currentBlock + 1} из ${BLOCKS.length}`;
+}
+
+function renderBlock(blockIdx) {
+  const block = BLOCKS[blockIdx];
+  const container = document.getElementById('surveyContainer');
+  container.innerHTML = '';
+
+  const header = document.createElement('div');
+  header.className = 'block-header';
+  header.innerHTML = `<div class="block-label">${block.label}</div><h2 class="block-title">${block.title}</h2><p class="block-sub">${block.sub}</p>`;
+  container.appendChild(header);
+
+  block.questions.forEach((q, qi) => {
+    const card = document.createElement('div');
+    card.className = 'question';
+    card.style.animationDelay = (qi * 0.06) + 's';
+    card.innerHTML = renderQuestion(q, qi);
+    container.appendChild(card);
+  });
+
+  const nav = document.createElement('div');
+  nav.className = 'nav-row';
+  if (blockIdx > 0) {
+    nav.innerHTML += `<button class="btn btn-secondary" onclick="prevBlock()">← Назад</button>`;
+  } else {
+    nav.innerHTML += `<div></div>`;
+  }
+  if (blockIdx < BLOCKS.length - 1) {
+    nav.innerHTML += `<button class="btn btn-primary" onclick="nextBlock()">Далее →</button>`;
+  } else {
+    nav.innerHTML += `<button class="btn btn-submit" onclick="submitSurvey()">Отправить результаты ✓</button>`;
+  }
+  container.appendChild(nav);
+
+  attachListeners(block);
+  window.scrollTo({top: 0, behavior:'smooth'});
+}
+
+function renderQuestion(q, idx) {
+  const num = `<span class="q-num">${idx + 1}</span>`;
+  const label = `<div class="q-label">${num}${q.text}</div>`;
+
+  if (q.type === 'radio') {
+    const opts = q.opts.map(o => `
+      <label class="opt${answers[q.id] === o.v ? ' selected':''}" data-qid="${q.id}" data-val="${o.v}">
+        <input type="radio" name="${q.id}" value="${o.v}" ${answers[q.id]===o.v?'checked':''}>
+        <div class="opt-marker"></div>
+        <span class="opt-text">${o.t}</span>
+      </label>`).join('');
+    return `${label}<div class="options">${opts}</div>`;
+  }
+
+  if (q.type === 'checkbox') {
+    const vals = answers[q.id] || [];
+    const opts = q.opts.map(o => `
+      <label class="opt checkbox-opt${vals.includes(o.v)?' selected':''}" data-qid="${q.id}" data-val="${o.v}" data-multi="1">
+        <input type="checkbox" name="${q.id}" value="${o.v}" ${vals.includes(o.v)?'checked':''}>
+        <div class="opt-marker"></div>
+        <span class="opt-text">${o.t}</span>
+      </label>`).join('');
+    return `${label}<div class="options">${opts}</div>`;
+  }
+
+  if (q.type === 'likert') {
+    const val = answers[q.id] || null;
+    const btns = [1,2,3,4,5].map(n => `<button class="likert-btn${val==n?' selected':''}" data-qid="${q.id}" data-val="${n}" onclick="">${n}</button>`).join('');
+    return `${label}<div class="likert-wrap"><div class="likert-labels"><span>${q.labelLeft}</span><span>${q.labelRight}</span></div><div class="likert-row">${btns}</div></div>`;
+  }
+
+  if (q.type === 'task') {
+    const answered = answers[q.id];
+    const opts = q.opts.map(o => {
+      let cls = 'task-opt';
+      if (answered) {
+        if (o.v === q.correct) cls += ' correct';
+        else if (o.v === answered) cls += ' wrong';
+      } else if (answered === o.v) cls += ' selected';
+      return `<div class="${cls}" data-qid="${q.id}" data-val="${o.v}" data-correct="${q.correct}" data-explain="${q.explain}">
+        <div class="task-letter">${o.v}</div>
+        <div class="task-text">${o.t}</div>
+      </div>`;
+    }).join('');
+    const explainShow = answered ? ' show' : '';
+    return `<div class="task-situation"><div class="sit-label">Ситуация</div><p>${q.situation}</p></div>
+    <div class="task-q">${q.question}</div>
+    <div class="task-options">${opts}</div>
+    <div class="task-explain${explainShow}" id="explain_${q.id}">${answered ? q.explain : ''}</div>`;
+  }
+
+  if (q.type === 'timesplit') {
+    const saved = answers[q.id] || {};
+    const rows = q.items.map(item => `
+      <div class="time-row">
+        <span class="time-label">${item.l}</span>
+        <input class="time-input" type="number" min="0" max="100" data-qid="${q.id}" data-key="${item.k}"
+          value="${saved[item.k]||''}" placeholder="0">
+        <span class="time-unit">%</span>
+      </div>`).join('');
+    return `${label}<div class="time-split">${rows}<div class="time-total" id="total_${q.id}">Итого: <strong id="totalVal_${q.id}">0</strong>%</div></div>`;
+  }
+
+  if (q.type === 'textarea') {
+    return `${label}<div class="open-q"><textarea data-qid="${q.id}" rows="3" placeholder="Ваш ответ...">${answers[q.id]||''}</textarea></div>`;
+  }
+
+  return label;
+}
+
+function attachListeners(block) {
+  // Radio / checkbox
+  document.querySelectorAll('.opt').forEach(el => {
+    el.addEventListener('click', function() {
+      const qid = this.dataset.qid;
+      const val = this.dataset.val;
+      const multi = this.dataset.multi;
+      if (multi) {
+        let arr = answers[qid] || [];
+        if (arr.includes(val)) arr = arr.filter(v => v !== val);
+        else arr.push(val);
+        answers[qid] = arr;
+        document.querySelectorAll(`.opt[data-qid="${qid}"]`).forEach(o => {
+          o.classList.toggle('selected', arr.includes(o.dataset.val));
+        });
+      } else {
+        answers[qid] = val;
+        document.querySelectorAll(`.opt[data-qid="${qid}"]`).forEach(o => {
+          o.classList.toggle('selected', o.dataset.val === val);
+        });
+      }
+      saveProgress();
+    });
+  });
+
+  // Likert
+  document.querySelectorAll('.likert-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+      const qid = this.dataset.qid;
+      const val = parseInt(this.dataset.val);
+      answers[qid] = val;
+      document.querySelectorAll(`.likert-btn[data-qid="${qid}"]`).forEach(b => {
+        b.classList.toggle('selected', parseInt(b.dataset.val) === val);
+      });
+      saveProgress();
+    });
+  });
+
+  // Task
+  document.querySelectorAll('.task-opt').forEach(el => {
+    el.addEventListener('click', function() {
+      const qid = this.dataset.qid;
+      if (answers[qid]) return; // already answered
+      const val = this.dataset.val;
+      const correct = this.dataset.correct;
+      const explain = this.dataset.explain;
+      answers[qid] = val;
+      document.querySelectorAll(`.task-opt[data-qid="${qid}"]`).forEach(o => {
+        if (o.dataset.val === correct) o.classList.add('correct');
+        else if (o.dataset.val === val) o.classList.add('wrong');
+      });
+      const expEl = document.getElementById(`explain_${qid}`);
+      if (expEl) { expEl.textContent = explain; expEl.classList.add('show'); }
+      saveProgress();
+    });
+  });
+
+  // Time split
+  document.querySelectorAll('.time-input').forEach(inp => {
+    inp.addEventListener('input', function() {
+      const qid = this.dataset.qid;
+      const key = this.dataset.key;
+      if (!answers[qid]) answers[qid] = {};
+      answers[qid][key] = parseInt(this.value) || 0;
+      const all = document.querySelectorAll(`.time-input[data-qid="${qid}"]`);
+      let total = 0;
+      all.forEach(i => total += (parseInt(i.value) || 0));
+      const totalEl = document.getElementById(`total_${qid}`);
+      const valEl = document.getElementById(`totalVal_${qid}`);
+      if (valEl) valEl.textContent = total;
+      if (totalEl) totalEl.classList.toggle('over', total > 100);
+      saveProgress();
+    });
+  });
+
+  // Textarea
+  document.querySelectorAll('textarea[data-qid]').forEach(ta => {
+    ta.addEventListener('input', function() {
+      answers[this.dataset.qid] = this.value;
+      saveProgress();
+    });
+  });
+}
+
+// ═══════════════════════════════════════════
+// NAVIGATION
+// ═══════════════════════════════════════════
+function nextBlock() {
+  if (currentBlock < BLOCKS.length - 1) {
+    currentBlock++;
+    renderProgress();
+    renderBlock(currentBlock);
+  }
+}
+function prevBlock() {
+  if (currentBlock > 0) {
+    currentBlock--;
+    renderProgress();
+    renderBlock(currentBlock);
+  }
+}
+
+// ═══════════════════════════════════════════
+// PSYCHOTYPE CALCULATION
+// ═══════════════════════════════════════════
+function calcPsychotype() {
+  const b0 = ['q0_1','q0_2','q0_3','q0_4','q0_5','q0_6'];
+  let counts = {A:0, B:0, C:0, D:0, E:0};
+  b0.forEach(qid => { if (answers[qid]) counts[answers[qid]]++; });
+  const maxKey = Object.keys(counts).reduce((a, b) => counts[a] > counts[b] ? a : b);
+  if (maxKey === 'A') return 'innovator';
+  if (maxKey === 'B') return 'pragmatist';
+  if (maxKey === 'C') return 'conservative';
+  return 'skeptic';
+}
+
+// ═══════════════════════════════════════════
+// SUBMIT
+// ═══════════════════════════════════════════
+function submitSurvey() {
+  const submission = {
+    id: SESSION_ID,
+    dept: DEPT,
+    timestamp: Date.now(),
+    answers: answers,
+    psychotype: calcPsychotype(),
+  };
+
+  // Save to localStorage (for dashboard)
+  try {
+    const all = JSON.parse(localStorage.getItem('chilbase_survey_results') || '[]');
+    all.push(submission);
+    localStorage.setItem('chilbase_survey_results', JSON.stringify(all));
+  } catch(e) {}
+
+  // Send to Google Sheets (if configured)
+  if (SHEETS_WEBHOOK) {
+    fetch(SHEETS_WEBHOOK, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify(submission),
+    }).catch(() => {});
+  }
+
+  // Show thank you
+  document.getElementById('surveyContainer').style.display = 'none';
+  const ty = document.getElementById('thankyou');
+  ty.classList.add('show');
+  const ptype = PSYCHOTYPES[submission.psychotype];
+  document.getElementById('tyType').innerHTML = `
+    <div class="type-label">Ваш профиль восприятия изменений</div>
+    <div class="type-name">${ptype.name}</div>
+    <div class="type-desc">${ptype.desc}</div>`;
+  window.scrollTo({top: 0, behavior:'smooth'});
+}
+
+// ═══════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════
+loadSaved();
+renderProgress();
+renderBlock(0);
+</script>
+</body>
+</html>
