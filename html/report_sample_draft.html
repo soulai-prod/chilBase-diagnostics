@@ -1,0 +1,880 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Диагностика — Пример финального отчёта | chilBase DRAFT</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --deep: #0A2E4D;
+  --mid: #1B6B93;
+  --light: #5DB9C9;
+  --pale: #E8F6F9;
+  --accent: #F39C12;
+  --green: #2ECC71;
+  --red: #E74C3C;
+  --purple: #8E44AD;
+  --white: #fff;
+  --bg: #f0f4f8;
+  --text: #1a2a3a;
+  --muted: #4a6070;
+  --border: #d0e4ef;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); }
+
+/* ── SLIDE ── */
+.slide {
+  width: 297mm;
+  min-height: 210mm;
+  background: var(--white);
+  margin: 0 auto 14px;
+  position: relative;
+  overflow: hidden;
+  page-break-after: always;
+  display: flex;
+  flex-direction: column;
+}
+@page { size: A4 landscape; margin: 0; }
+@media print { body { background: white; } .slide { margin: 0; } }
+
+/* ── DRAFT WATERMARK ── */
+.draft-badge {
+  position: absolute; top: 16px; right: 16px;
+  background: #FFF3CD; border: 1.5px solid #F39C12;
+  color: #856404; font-size: 9px; font-weight: 700;
+  letter-spacing: .12em; text-transform: uppercase;
+  padding: 3px 11px; border-radius: 20px; z-index: 10;
+  font-family: 'Space Grotesk', sans-serif;
+}
+
+/* ── SLIDE PARTS ── */
+.slide-header {
+  padding: 22px 36px 16px;
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; gap: 14px;
+}
+.slide-header h2 { font-family: 'Space Grotesk', sans-serif; font-size: 17px; font-weight: 700; color: var(--deep); }
+.slide-header .sub { font-size: 11px; color: var(--muted); margin-top: 3px; }
+.slide-header .snum { margin-left: auto; font-size: 10px; color: var(--muted); opacity: .5; font-family: 'Space Grotesk', sans-serif; }
+.section-badge {
+  background: var(--deep); color: var(--white);
+  font-family: 'Space Grotesk', sans-serif; font-size: 9px; font-weight: 700;
+  letter-spacing: .12em; text-transform: uppercase;
+  padding: 4px 11px; border-radius: 20px; white-space: nowrap;
+}
+.slide-body { padding: 22px 36px 24px; flex: 1; }
+.slide-footer {
+  padding: 9px 36px; border-top: 1px solid var(--border);
+  display: flex; justify-content: space-between; align-items: center;
+  background: var(--bg);
+}
+.footer-brand { font-size: 9px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); font-family: 'Space Grotesk', sans-serif; }
+.footer-draft { font-size: 9px; color: #856404; font-weight: 600; }
+
+/* ── COVER ── */
+.slide-cover {
+  background: var(--deep); color: var(--white);
+  justify-content: flex-end; padding: 0;
+}
+.cover-left {
+  position: absolute; left: 0; top: 0; bottom: 0; width: 55%;
+  padding: 50px 44px;
+  display: flex; flex-direction: column; justify-content: center;
+}
+.cover-right {
+  position: absolute; right: 0; top: 0; bottom: 0; width: 45%;
+  background: rgba(93,185,201,.07);
+  border-left: 1px solid rgba(93,185,201,.15);
+  padding: 40px 36px;
+  display: flex; flex-direction: column; justify-content: center;
+}
+.cover-eyebrow { font-size: 9px; font-weight: 700; letter-spacing: .2em; text-transform: uppercase; opacity: .45; margin-bottom: 18px; font-family: 'Space Grotesk', sans-serif; }
+.cover-title { font-family: 'Space Grotesk', sans-serif; font-size: 36px; font-weight: 800; line-height: 1.12; margin-bottom: 14px; }
+.cover-title span { color: var(--light); }
+.cover-subtitle { font-size: 13px; opacity: .6; line-height: 1.6; margin-bottom: 32px; }
+.cover-meta-row { display: flex; flex-direction: column; gap: 10px; }
+.cmi { font-size: 11px; }
+.cmi .cl { font-size: 8.5px; opacity: .4; text-transform: uppercase; letter-spacing: .1em; margin-bottom: 2px; font-family: 'Space Grotesk', sans-serif; }
+.cmi .cv { font-weight: 600; }
+.cover-right-title { font-family: 'Space Grotesk', sans-serif; font-size: 11px; font-weight: 700; opacity: .5; text-transform: uppercase; letter-spacing: .12em; margin-bottom: 16px; }
+.cover-toc-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,.07);
+  font-size: 11.5px; opacity: .75;
+}
+.cover-toc-item:last-child { border-bottom: none; }
+.cover-toc-num { font-family: 'Space Grotesk', sans-serif; font-size: 10px; font-weight: 700; opacity: .35; width: 18px; }
+.deco-circle {
+  position: absolute; border-radius: 50%;
+  background: rgba(93,185,201,.05); border: 1px solid rgba(93,185,201,.1);
+}
+
+/* ── KPI TABLE ── */
+.kpi-table { width: 100%; border-collapse: collapse; font-size: 11.5px; }
+.kpi-table th { background: var(--deep); color: var(--white); padding: 7px 10px; text-align: left; font-size: 9.5px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; font-family: 'Space Grotesk', sans-serif; }
+.kpi-table td { padding: 7px 10px; border-bottom: 1px solid var(--border); vertical-align: top; }
+.kpi-table tr:last-child td { border-bottom: none; }
+.kpi-table .dept-name { font-weight: 600; color: var(--deep); }
+.kpi-table .kpi-tag { background: var(--pale); color: var(--mid); border-radius: 4px; padding: 2px 6px; font-size: 9.5px; font-weight: 500; display: inline-block; margin: 1px; }
+.kpi-table .no-link { background: #FFF3CD; color: #856404; }
+.kpi-table .ai-flag { color: var(--green); font-weight: 700; font-size: 10px; }
+
+/* ── METRICS STRIP ── */
+.metrics-strip { display: flex; gap: 12px; margin-bottom: 20px; }
+.metric-card {
+  flex: 1; background: var(--pale); border-radius: 10px; padding: 14px 16px;
+  border: 1px solid var(--border);
+}
+.metric-val { font-family: 'Space Grotesk', sans-serif; font-size: 28px; font-weight: 800; color: var(--deep); line-height: 1; margin-bottom: 4px; }
+.metric-val .unit { font-size: 14px; opacity: .5; }
+.metric-label { font-size: 10px; color: var(--muted); line-height: 1.4; }
+.metric-card.green .metric-val { color: var(--green); }
+.metric-card.orange .metric-val { color: var(--accent); }
+.metric-card.purple .metric-val { color: var(--purple); }
+
+/* ── DEPT BARS ── */
+.dept-bars { display: flex; flex-direction: column; gap: 10px; }
+.dept-bar-row { display: flex; align-items: center; gap: 12px; }
+.dept-bar-label { width: 110px; font-size: 11px; font-weight: 500; flex-shrink: 0; }
+.dept-bar-track { flex: 1; height: 22px; background: var(--pale); border-radius: 5px; overflow: hidden; position: relative; }
+.dept-bar-fill { height: 100%; border-radius: 5px; display: flex; align-items: center; padding-left: 8px; font-size: 10px; font-weight: 700; color: var(--white); font-family: 'Space Grotesk', sans-serif; }
+.dept-bar-val { width: 36px; font-size: 11px; font-weight: 700; text-align: right; color: var(--deep); font-family: 'Space Grotesk', sans-serif; }
+
+/* ── OPPORTUNITY MAP ── */
+.opp-map-wrap { position: relative; }
+.opp-axes {
+  display: grid; grid-template-columns: 40px 1fr; grid-template-rows: 1fr 32px;
+  gap: 0; height: 320px;
+}
+.opp-y-label {
+  writing-mode: vertical-rl; transform: rotate(180deg);
+  font-size: 9.5px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: .1em; color: var(--muted); text-align: center;
+  font-family: 'Space Grotesk', sans-serif;
+}
+.opp-x-label {
+  grid-column: 2; font-size: 9.5px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: .1em; color: var(--muted); text-align: center;
+  font-family: 'Space Grotesk', sans-serif; display: flex; align-items: center; justify-content: center;
+}
+.opp-grid {
+  grid-column: 2; grid-row: 1;
+  display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr;
+  gap: 6px;
+}
+.opp-quadrant {
+  border-radius: 10px; padding: 12px 14px;
+  position: relative;
+}
+.opp-q-label {
+  font-family: 'Space Grotesk', sans-serif; font-size: 9px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: .1em; opacity: .6; margin-bottom: 8px;
+}
+.opp-q1 { background: #E8F5E9; border: 1px solid #A5D6A7; }
+.opp-q1 .opp-q-label { color: #2E7D32; }
+.opp-q2 { background: #E3F2FD; border: 1px solid #90CAF9; }
+.opp-q2 .opp-q-label { color: #1565C0; }
+.opp-q3 { background: #F3F3F3; border: 1px solid #E0E0E0; }
+.opp-q3 .opp-q-label { color: #757575; }
+.opp-q4 { background: #FFF8E1; border: 1px solid #FFE082; }
+.opp-q4 .opp-q-label { color: #F57F17; }
+.opp-item {
+  display: flex; align-items: flex-start; gap: 6px;
+  margin-bottom: 6px; font-size: 10.5px; line-height: 1.4;
+}
+.opp-item .dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; margin-top: 4px; }
+.green-dot { background: var(--green); }
+.blue-dot { background: #2980B9; }
+.gray-dot { background: #9E9E9E; }
+.orange-dot { background: var(--accent); }
+
+/* ── ROADMAP ── */
+.roadmap-cols { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; }
+.roadmap-col {}
+.roadmap-header {
+  border-radius: 8px 8px 0 0; padding: 10px 14px;
+  font-family: 'Space Grotesk', sans-serif; font-size: 11px; font-weight: 700;
+}
+.roadmap-header .horizon { font-size: 9px; opacity: .7; margin-bottom: 2px; text-transform: uppercase; letter-spacing: .08em; }
+.rh-30 { background: var(--deep); color: var(--white); }
+.rh-90 { background: var(--mid); color: var(--white); }
+.rh-180 { background: var(--light); color: var(--deep); }
+.roadmap-body {
+  border: 1px solid var(--border); border-top: none;
+  border-radius: 0 0 8px 8px; padding: 12px 14px;
+}
+.roadmap-item {
+  display: flex; align-items: flex-start; gap: 8px;
+  padding: 7px 0; border-bottom: 1px solid var(--border); font-size: 11px;
+}
+.roadmap-item:last-child { border-bottom: none; padding-bottom: 0; }
+.roadmap-item .ri-dept { font-size: 9px; font-weight: 700; color: var(--mid); min-width: 60px; flex-shrink: 0; font-family: 'Space Grotesk', sans-serif; }
+.roadmap-item .ri-text { line-height: 1.4; color: var(--text); }
+.roadmap-item .ri-roi { margin-left: auto; font-size: 9.5px; font-weight: 700; color: var(--green); font-family: 'Space Grotesk', sans-serif; white-space: nowrap; }
+
+/* ── EXEC SUMMARY ── */
+.exec-cols { display: grid; grid-template-columns: 1.2fr 1fr; gap: 20px; }
+.finding-list { display: flex; flex-direction: column; gap: 10px; }
+.finding {
+  display: flex; align-items: flex-start; gap: 12px;
+  padding: 12px 14px; border-radius: 9px;
+  border: 1px solid var(--border); background: var(--pale);
+}
+.finding .f-icon { font-size: 18px; flex-shrink: 0; }
+.finding .f-text { font-size: 11.5px; line-height: 1.5; }
+.finding .f-text strong { color: var(--deep); }
+.recs { display: flex; flex-direction: column; gap: 10px; }
+.rec {
+  display: flex; align-items: flex-start; gap: 10px;
+  padding: 12px 14px; border-radius: 9px;
+}
+.rec-1 { background: #E8F5E9; border: 1px solid #A5D6A7; }
+.rec-2 { background: #E3F2FD; border: 1px solid #90CAF9; }
+.rec-3 { background: #FFF3E0; border: 1px solid #FFCC80; }
+.rec .rec-num { font-family: 'Space Grotesk', sans-serif; font-size: 20px; font-weight: 800; opacity: .3; line-height: 1; flex-shrink: 0; }
+.rec .rec-text { font-size: 11px; line-height: 1.55; }
+.rec .rec-text strong { display: block; margin-bottom: 3px; font-size: 12px; }
+
+/* ── TRAINING TRACKS ── */
+.tracks-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+.track-card { border-radius: 10px; padding: 14px; border: 1px solid var(--border); }
+.track-type { font-family: 'Space Grotesk', sans-serif; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .1em; margin-bottom: 6px; }
+.track-card.innovator { background: #E3F2FD; border-color: #90CAF9; }
+.track-card.innovator .track-type { color: #1565C0; }
+.track-card.pragmatist { background: #E8F5E9; border-color: #A5D6A7; }
+.track-card.pragmatist .track-type { color: #2E7D32; }
+.track-card.conservative { background: #FFF3E0; border-color: #FFCC80; }
+.track-card.conservative .track-type { color: #E65100; }
+.track-card.skeptic { background: #FCE4EC; border-color: #F48FB1; }
+.track-card.skeptic .track-type { color: #AD1457; }
+.track-share { font-family: 'Space Grotesk', sans-serif; font-size: 24px; font-weight: 800; line-height: 1; margin-bottom: 6px; color: var(--deep); }
+.track-desc { font-size: 10px; color: var(--muted); line-height: 1.5; margin-bottom: 8px; }
+.track-format { font-size: 9.5px; font-weight: 600; color: var(--deep); }
+.track-items { list-style: none; margin-top: 6px; }
+.track-items li { font-size: 10px; color: var(--muted); padding: 2px 0; padding-left: 10px; position: relative; }
+.track-items li::before { content: '→'; position: absolute; left: 0; font-size: 9px; opacity: .5; }
+
+/* ── DEPT PROFILE ── */
+.dept-profile-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.dept-profile-card { border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
+.dp-header { background: var(--deep); color: var(--white); padding: 10px 14px; display: flex; justify-content: space-between; align-items: center; }
+.dp-header .dp-name { font-family: 'Space Grotesk', sans-serif; font-size: 12px; font-weight: 700; }
+.dp-header .dp-score { font-family: 'Space Grotesk', sans-serif; font-size: 11px; font-weight: 700; opacity: .7; }
+.dp-body { padding: 10px 14px; }
+.dp-row { display: flex; justify-content: space-between; padding: 4px 0; border-bottom: 1px solid var(--border); font-size: 10.5px; }
+.dp-row:last-child { border-bottom: none; }
+.dp-row .dp-k { color: var(--muted); }
+.dp-row .dp-v { font-weight: 600; }
+.dp-pain { background: #FFF3CD; border-left: 3px solid var(--accent); padding: 5px 8px; border-radius: 0 5px 5px 0; font-size: 10px; color: #856404; margin-top: 7px; }
+.dp-opp { background: var(--pale); border-left: 3px solid var(--mid); padding: 5px 8px; border-radius: 0 5px 5px 0; font-size: 10px; color: var(--mid); margin-top: 5px; }
+
+/* ── DIVIDER ── */
+.slide-divider {
+  background: var(--pale); justify-content: center; align-items: center;
+  text-align: center; padding: 40px 60px; min-height: 160mm;
+}
+.div-section-num { font-family: 'Space Grotesk', sans-serif; font-size: 80px; font-weight: 800; color: var(--mid); opacity: .12; line-height: 1; }
+.div-title { font-family: 'Space Grotesk', sans-serif; font-size: 26px; font-weight: 700; color: var(--deep); margin-bottom: 8px; }
+.div-sub { font-size: 13px; color: var(--muted); }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════
+     SLIDE 1: COVER
+════════════════════════════════════════════ -->
+<div class="slide slide-cover">
+  <div class="draft-badge">⚠ Черновик · v0.1</div>
+  <div class="deco-circle" style="width:400px;height:400px;right:-100px;top:-100px;"></div>
+  <div class="deco-circle" style="width:200px;height:200px;right:60px;bottom:40px;"></div>
+
+  <div class="cover-left">
+    <div class="cover-eyebrow">chilBase · Финальный отчёт</div>
+    <div class="cover-title">AI-диагностика<br>команды<br><span>chilBase</span></div>
+    <div class="cover-subtitle">Результаты опросников и глубинных интервью.<br>Карта возможностей. Roadmap внедрения.</div>
+    <div class="cover-meta-row">
+      <div class="cmi"><div class="cl">Охват</div><div class="cv">239 сотрудников · 8 отделов · 8 руководителей</div></div>
+      <div class="cmi"><div class="cl">Период</div><div class="cv">Апрель 2026</div></div>
+      <div class="cmi"><div class="cl">Статус документа</div><div class="cv" style="color:#856404">Черновик · Версия для согласования</div></div>
+    </div>
+  </div>
+
+  <div class="cover-right">
+    <div class="cover-right-title">Содержание</div>
+    <div class="cover-toc-item"><div class="cover-toc-num">01</div> Executive Summary</div>
+    <div class="cover-toc-item"><div class="cover-toc-num">02</div> Цели и KPI отделов</div>
+    <div class="cover-toc-item"><div class="cover-toc-num">03</div> AI-профиль компании</div>
+    <div class="cover-toc-item"><div class="cover-toc-num">04</div> Карта процессов и связь с KPI</div>
+    <div class="cover-toc-item"><div class="cover-toc-num">05</div> Где видят AI — команды vs руководители</div>
+    <div class="cover-toc-item"><div class="cover-toc-num">06</div> AI Opportunity Map</div>
+    <div class="cover-toc-item"><div class="cover-toc-num">07</div> Roadmap внедрения</div>
+    <div class="cover-toc-item"><div class="cover-toc-num">08</div> Программа обучения</div>
+    <div class="cover-toc-item"><div class="cover-toc-num">09</div> Риски и следующие шаги</div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     SLIDE 2: EXECUTIVE SUMMARY
+════════════════════════════════════════════ -->
+<div class="slide">
+  <div class="draft-badge">⚠ Черновик · v0.1</div>
+  <div class="slide-header">
+    <div class="section-badge">01 · Executive Summary</div>
+    <div>
+      <h2>Главные находки и топ-3 рекомендации</h2>
+      <div class="sub">Для руководства · 1 страница</div>
+    </div>
+    <div class="snum">2 / 9</div>
+  </div>
+  <div class="slide-body">
+    <div class="exec-cols">
+      <div>
+        <div style="font-family:'Space Grotesk',sans-serif;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:10px;">Ключевые находки</div>
+        <div class="finding-list">
+          <div class="finding">
+            <div class="f-icon">⚡</div>
+            <div class="f-text"><strong>37% сотрудников — ранние последователи.</strong> Готовы внедрять AI прямо сейчас. Достаточно для первой волны пилотов без обязательного обучения всей компании.</div>
+          </div>
+          <div class="finding">
+            <div class="f-icon">🔴</div>
+            <div class="f-text"><strong>QA и Community — критические точки роста.</strong> Регресс занимает 100% команды QA в предрелизную неделю. Community обрабатывает тысячи ответов опросов вручную. Оба процесса не связаны с KPI напрямую.</div>
+          </div>
+          <div class="finding">
+            <div class="f-icon">📊</div>
+            <div class="f-text"><strong>Разрыв между руководителями и командами.</strong> Руководители видят AI в стратегических задачах; команды хотят автоматизировать конкретную рутину. Программа обучения должна учитывать оба запроса.</div>
+          </div>
+          <div class="finding">
+            <div class="f-icon">🏆</div>
+            <div class="f-text"><strong>Marketing и Product — лидеры зрелости.</strong> Уже имеют работающие AI-пайплайны. Могут стать внутренними AI-чемпионами для остальных отделов.</div>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div style="font-family:'Space Grotesk',sans-serif;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:10px;">Топ-3 рекомендации</div>
+        <div class="recs">
+          <div class="rec rec-1">
+            <div class="rec-num">1</div>
+            <div class="rec-text">
+              <strong>Запустить 3 AI-пилота в первые 30 дней</strong>
+              QA: AI-генерация тест-кейсов из спеки. Community: автосводка открытых ответов опросов. Back Office: AI-анализ типовых договоров. Все три — высокий потенциал, низкая сложность.
+            </div>
+          </div>
+          <div class="rec rec-2">
+            <div class="rec-num">2</div>
+            <div class="rec-text">
+              <strong>Сегментировать обучение по психотипам, не по отделам</strong>
+              22% Innovators готовы к продвинутому треку сейчас. 41% Pragmatists нужна практика на рабочих кейсах. Одна лекция для всех снизит adoption в 2–3 раза.
+            </div>
+          </div>
+          <div class="rec rec-3">
+            <div class="rec-num">3</div>
+            <div class="rec-text">
+              <strong>Назначить AI-чемпионов из Marketing и Product</strong>
+              У них уже есть опыт и инструменты. Peer-to-peer передача знаний работает лучше внешнего обучения в технических командах.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="slide-footer">
+    <div class="footer-brand">chilBase · AI Диагностика 2026</div>
+    <div class="footer-draft">ЧЕРНОВИК — не для финального использования</div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     SLIDE 3: KPI + ПРОЦЕССЫ
+════════════════════════════════════════════ -->
+<div class="slide">
+  <div class="draft-badge">⚠ Черновик · v0.1</div>
+  <div class="slide-header">
+    <div class="section-badge">02–03 · KPI и процессы</div>
+    <div>
+      <h2>Какие задачи не связаны с KPI — первые кандидаты на автоматизацию</h2>
+      <div class="sub">Задачи без связи с KPI обязательны, но не создают уникальной ценности → приоритет для AI</div>
+    </div>
+    <div class="snum">3 / 9</div>
+  </div>
+  <div class="slide-body">
+    <table class="kpi-table">
+      <thead>
+        <tr>
+          <th>Отдел</th>
+          <th>KPI отдела</th>
+          <th>Задачи БЕЗ прямой связи с KPI</th>
+          <th>AI-потенциал</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="dept-name">QA</td>
+          <td><span class="kpi-tag">% багов до релиза</span><span class="kpi-tag">Cycle time</span></td>
+          <td>Ручное написание тест-кейсов из спеки, заполнение TestRail</td>
+          <td class="ai-flag">▲ Высокий</td>
+        </tr>
+        <tr>
+          <td class="dept-name">Community</td>
+          <td><span class="kpi-tag">Retention</span><span class="kpi-tag">Модерация SLA</span></td>
+          <td>Ручная обработка тысяч открытых ответов опросов</td>
+          <td class="ai-flag">▲ Высокий</td>
+        </tr>
+        <tr>
+          <td class="dept-name">HR</td>
+          <td><span class="kpi-tag">Time-to-hire</span><span class="kpi-tag">Текучка</span></td>
+          <td>Ручной скрининг резюме, составление шаблонных писем, кадровые документы</td>
+          <td class="ai-flag">▲ Высокий</td>
+        </tr>
+        <tr>
+          <td class="dept-name">Legal</td>
+          <td><span class="kpi-tag no-link">KPI не определены явно</span></td>
+          <td>Разбор типовых договоров, переводы, дайджест изменений в законодательстве</td>
+          <td class="ai-flag">▲ Высокий</td>
+        </tr>
+        <tr>
+          <td class="dept-name">Finance</td>
+          <td><span class="kpi-tag">Accuracy отчётности</span><span class="kpi-tag">Cash flow</span></td>
+          <td>Ручная сборка P&L из разных источников, форматирование отчётов</td>
+          <td style="color:var(--accent);font-weight:700;font-size:10px;">▲ Средний</td>
+        </tr>
+        <tr>
+          <td class="dept-name">Production</td>
+          <td><span class="kpi-tag">Velocity</span><span class="kpi-tag">Дефекты на релиз</span></td>
+          <td>Code review шаблонных паттернов, заполнение документации</td>
+          <td style="color:var(--accent);font-weight:700;font-size:10px;">▲ Средний</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="slide-footer">
+    <div class="footer-brand">chilBase · AI Диагностика 2026</div>
+    <div class="footer-draft">ЧЕРНОВИК — не для финального использования</div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     SLIDE 4: AI-ПРОФИЛЬ КОМПАНИИ
+════════════════════════════════════════════ -->
+<div class="slide">
+  <div class="draft-badge">⚠ Черновик · v0.1</div>
+  <div class="slide-header">
+    <div class="section-badge">03 · AI-профиль</div>
+    <div>
+      <h2>AI-профиль компании</h2>
+      <div class="sub">239 сотрудников · данные опросников</div>
+    </div>
+    <div class="snum">4 / 9</div>
+  </div>
+  <div class="slide-body">
+    <div class="metrics-strip">
+      <div class="metric-card"><div class="metric-val">239</div><div class="metric-label">сотрудников прошли опросник</div></div>
+      <div class="metric-card"><div class="metric-val">3.4<span class="unit">/5</span></div><div class="metric-label">средний уровень AI-грамотности</div></div>
+      <div class="metric-card green"><div class="metric-val">37<span class="unit">%</span></div><div class="metric-label">ранних последователей — готовы внедрять сейчас</div></div>
+      <div class="metric-card orange"><div class="metric-val">28<span class="unit">%</span></div><div class="metric-label">используют AI регулярно уже сейчас</div></div>
+      <div class="metric-card purple"><div class="metric-val">71<span class="unit">%</span></div><div class="metric-label">готовы учиться работать с AI</div></div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1.4fr;gap:20px;">
+      <div>
+        <div style="font-family:'Space Grotesk',sans-serif;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:10px;">Уровень AI-грамотности по отделам</div>
+        <div class="dept-bars">
+          <div class="dept-bar-row"><div class="dept-bar-label">Marketing</div><div class="dept-bar-track"><div class="dept-bar-fill" style="width:84%;background:var(--green);">84%</div></div></div>
+          <div class="dept-bar-row"><div class="dept-bar-label">Product</div><div class="dept-bar-track"><div class="dept-bar-fill" style="width:79%;background:var(--green);">79%</div></div></div>
+          <div class="dept-bar-row"><div class="dept-bar-label">Production</div><div class="dept-bar-track"><div class="dept-bar-fill" style="width:62%;background:var(--mid);">62%</div></div></div>
+          <div class="dept-bar-row"><div class="dept-bar-label">Environment</div><div class="dept-bar-track"><div class="dept-bar-fill" style="width:55%;background:var(--mid);">55%</div></div></div>
+          <div class="dept-bar-row"><div class="dept-bar-label">QA</div><div class="dept-bar-track"><div class="dept-bar-fill" style="width:51%;background:var(--accent);">51%</div></div></div>
+          <div class="dept-bar-row"><div class="dept-bar-label">2D Art</div><div class="dept-bar-track"><div class="dept-bar-fill" style="width:48%;background:var(--accent);">48%</div></div></div>
+          <div class="dept-bar-row"><div class="dept-bar-label">Community</div><div class="dept-bar-track"><div class="dept-bar-fill" style="width:42%;background:var(--accent);">42%</div></div></div>
+          <div class="dept-bar-row"><div class="dept-bar-label">Back Office</div><div class="dept-bar-track"><div class="dept-bar-fill" style="width:38%;background:var(--red);">38%</div></div></div>
+        </div>
+      </div>
+      <div>
+        <div style="font-family:'Space Grotesk',sans-serif;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:10px;">Распределение психотипов</div>
+        <div class="tracks-grid" style="grid-template-columns:1fr 1fr;">
+          <div class="track-card innovator">
+            <div class="track-type">Innovator</div>
+            <div class="track-share">22%</div>
+            <div class="track-desc">Готовы экспериментировать без гарантий. Лидеры принятия.</div>
+          </div>
+          <div class="track-card pragmatist">
+            <div class="track-type">Pragmatist</div>
+            <div class="track-share">41%</div>
+            <div class="track-desc">Примут при наличии рабочих кейсов внутри компании.</div>
+          </div>
+          <div class="track-card conservative">
+            <div class="track-type">Conservative</div>
+            <div class="track-share">27%</div>
+            <div class="track-desc">Нужны доказательства безопасности и стабильности.</div>
+          </div>
+          <div class="track-card skeptic">
+            <div class="track-type">Skeptic</div>
+            <div class="track-share">10%</div>
+            <div class="track-desc">Воспринимают AI как угрозу. Требуют отдельного подхода.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="slide-footer">
+    <div class="footer-brand">chilBase · AI Диагностика 2026</div>
+    <div class="footer-draft">ЧЕРНОВИК — не для финального использования</div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     SLIDE 5: AI OPPORTUNITY MAP
+════════════════════════════════════════════ -->
+<div class="slide">
+  <div class="draft-badge">⚠ Черновик · v0.1</div>
+  <div class="slide-header">
+    <div class="section-badge">05 · AI Opportunity Map</div>
+    <div>
+      <h2>Матрица AI-возможностей</h2>
+      <div class="sub">Потенциал автоматизации × Сложность внедрения · приоритизация по ROI</div>
+    </div>
+    <div class="snum">5 / 9</div>
+  </div>
+  <div class="slide-body">
+    <div class="opp-axes">
+      <div class="opp-y-label">← Высокий потенциал — — — Низкий →</div>
+      <div class="opp-grid">
+        <div class="opp-quadrant opp-q1">
+          <div class="opp-q-label">★ Быстрые победы — делать сейчас</div>
+          <div class="opp-item"><div class="dot green-dot"></div>QA: генерация тест-кейсов из спеки</div>
+          <div class="opp-item"><div class="dot green-dot"></div>Community: AI-сводка ответов опросов</div>
+          <div class="opp-item"><div class="dot green-dot"></div>HR: скрининг резюме + саммари</div>
+          <div class="opp-item"><div class="dot green-dot"></div>Legal: анализ типовых договоров</div>
+          <div class="opp-item"><div class="dot green-dot"></div>Marketing: AI тренд-дайджест</div>
+        </div>
+        <div class="opp-quadrant opp-q2">
+          <div class="opp-q-label">▲ Стратегические — планировать</div>
+          <div class="opp-item"><div class="dot blue-dot"></div>Production: AI code review assist</div>
+          <div class="opp-item"><div class="dot blue-dot"></div>Finance: автосборка P&L из источников</div>
+          <div class="opp-item"><div class="dot blue-dot"></div>Community: Helpshift AI автоответы</div>
+          <div class="opp-item"><div class="dot blue-dot"></div>Product: перезапуск ML-комбинатора</div>
+          <div class="opp-item"><div class="dot blue-dot"></div>Marketing: AI bid management</div>
+        </div>
+        <div class="opp-quadrant opp-q3">
+          <div class="opp-q-label">— Низкий приоритет</div>
+          <div class="opp-item"><div class="dot gray-dot"></div>2D: AI-генерация финальных ассетов</div>
+          <div class="opp-item"><div class="dot gray-dot"></div>Полная замена ручной модерации</div>
+        </div>
+        <div class="opp-quadrant opp-q4">
+          <div class="opp-q-label">? Исследовать — нужны данные</div>
+          <div class="opp-item"><div class="dot orange-dot"></div>Environment: AI texture generation</div>
+          <div class="opp-item"><div class="dot orange-dot"></div>Finance: аномалии в cash flow</div>
+          <div class="opp-item"><div class="dot orange-dot"></div>QA: автоматизация регресса</div>
+        </div>
+      </div>
+      <div class="opp-x-label">← Низкая сложность внедрения — — — Высокая →</div>
+    </div>
+  </div>
+  <div class="slide-footer">
+    <div class="footer-brand">chilBase · AI Диагностика 2026</div>
+    <div class="footer-draft">ЧЕРНОВИК — не для финального использования</div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     SLIDE 6: ROADMAP
+════════════════════════════════════════════ -->
+<div class="slide">
+  <div class="draft-badge">⚠ Черновик · v0.1</div>
+  <div class="slide-header">
+    <div class="section-badge">06 · Roadmap</div>
+    <div>
+      <h2>Roadmap внедрения</h2>
+      <div class="sub">30 дней · 90 дней · 6 месяцев — конкретные шаги с метриками успеха</div>
+    </div>
+    <div class="snum">6 / 9</div>
+  </div>
+  <div class="slide-body">
+    <div class="roadmap-cols">
+      <div class="roadmap-col">
+        <div class="roadmap-header rh-30">
+          <div class="horizon">Горизонт 1</div>
+          30 дней · Quick Wins
+        </div>
+        <div class="roadmap-body">
+          <div class="roadmap-item">
+            <div class="ri-dept">QA</div>
+            <div class="ri-text">AI-генерация тест-кейсов из спеки (ChatGPT/Claude)</div>
+            <div class="ri-roi">−40% времени</div>
+          </div>
+          <div class="roadmap-item">
+            <div class="ri-dept">Community</div>
+            <div class="ri-text">Автосводка открытых ответов опросов</div>
+            <div class="ri-roi">−3 дня/цикл</div>
+          </div>
+          <div class="roadmap-item">
+            <div class="ri-dept">HR</div>
+            <div class="ri-text">AI-скрининг резюме + саммари кандидата</div>
+            <div class="ri-roi">−50% времени</div>
+          </div>
+          <div class="roadmap-item">
+            <div class="ri-dept">Legal</div>
+            <div class="ri-text">AI-первичный анализ типовых договоров</div>
+            <div class="ri-roi">−30% времени</div>
+          </div>
+          <div class="roadmap-item">
+            <div class="ri-dept">Все</div>
+            <div class="ri-text">Запуск обучения Innovators (22% команды)</div>
+            <div class="ri-roi">Трек 1</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="roadmap-col">
+        <div class="roadmap-header rh-90">
+          <div class="horizon">Горизонт 2</div>
+          90 дней · Пилоты
+        </div>
+        <div class="roadmap-body">
+          <div class="roadmap-item">
+            <div class="ri-dept">Production</div>
+            <div class="ri-text">Пилот AI code review на 1 команде</div>
+            <div class="ri-roi">−20% лид-время</div>
+          </div>
+          <div class="roadmap-item">
+            <div class="ri-dept">Finance</div>
+            <div class="ri-text">Автосборка P&L — интеграция источников</div>
+            <div class="ri-roi">−2 дня/месяц</div>
+          </div>
+          <div class="roadmap-item">
+            <div class="ri-dept">Community</div>
+            <div class="ri-text">Helpshift AI для типовых тикетов</div>
+            <div class="ri-roi">−35% тикетов</div>
+          </div>
+          <div class="roadmap-item">
+            <div class="ri-dept">Marketing</div>
+            <div class="ri-text">AI bid management — первый тест</div>
+            <div class="ri-roi">CPI −15%</div>
+          </div>
+          <div class="roadmap-item">
+            <div class="ri-dept">Все</div>
+            <div class="ri-text">Обучение Pragmatists (41%) на рабочих кейсах</div>
+            <div class="ri-roi">Трек 2</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="roadmap-col">
+        <div class="roadmap-header rh-180">
+          <div class="horizon">Горизонт 3</div>
+          6 месяцев · Системные изменения
+        </div>
+        <div class="roadmap-body">
+          <div class="roadmap-item">
+            <div class="ri-dept">Product</div>
+            <div class="ri-text">Перезапуск ML LiveOps Combinator на LLM</div>
+            <div class="ri-roi">+ROI LiveOps</div>
+          </div>
+          <div class="roadmap-item">
+            <div class="ri-dept">QA</div>
+            <div class="ri-text">Частичная автоматизация регрессионного тестирования</div>
+            <div class="ri-roi">−3 дня/релиз</div>
+          </div>
+          <div class="roadmap-item">
+            <div class="ri-dept">Environment</div>
+            <div class="ri-text">AI texture maps pipeline — пилот</div>
+            <div class="ri-roi">TBD</div>
+          </div>
+          <div class="roadmap-item">
+            <div class="ri-dept">Finance</div>
+            <div class="ri-text">Автоалерты при отклонении от плана</div>
+            <div class="ri-roi">Реакция −2 дня</div>
+          </div>
+          <div class="roadmap-item">
+            <div class="ri-dept">Все</div>
+            <div class="ri-text">Программа AI-чемпионов в каждом отделе</div>
+            <div class="ri-roi">Adoption +40%</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="slide-footer">
+    <div class="footer-brand">chilBase · AI Диагностика 2026</div>
+    <div class="footer-draft">ЧЕРНОВИК — не для финального использования</div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     SLIDE 7: ПРОФИЛИ ОТДЕЛОВ (пример)
+════════════════════════════════════════════ -->
+<div class="slide">
+  <div class="draft-badge">⚠ Черновик · v0.1</div>
+  <div class="slide-header">
+    <div class="section-badge">04 · Профили отделов</div>
+    <div>
+      <h2>Профили отделов — пример формата</h2>
+      <div class="sub">Каждый отдел: метрики, боли, возможности · в финале 8 разворотов</div>
+    </div>
+    <div class="snum">7 / 9</div>
+  </div>
+  <div class="slide-body">
+    <div class="dept-profile-grid">
+      <div class="dept-profile-card">
+        <div class="dp-header"><div class="dp-name">QA · 22 человека</div><div class="dp-score">AI-грамотность: 51%</div></div>
+        <div class="dp-body">
+          <div class="dp-row"><div class="dp-k">% ранних последователей</div><div class="dp-v">29%</div></div>
+          <div class="dp-row"><div class="dp-k">Используют AI регулярно</div><div class="dp-v">18%</div></div>
+          <div class="dp-row"><div class="dp-k">Готовы учиться</div><div class="dp-v">68%</div></div>
+          <div class="dp-row"><div class="dp-k">Доминирующий психотип</div><div class="dp-v">Pragmatist (48%)</div></div>
+          <div class="dp-pain">⚡ Главная боль: регресс занимает 100% команды в предрелизную неделю</div>
+          <div class="dp-opp">→ AI-возможность: генерация тест-кейсов из спеки, анализ crash-логов</div>
+        </div>
+      </div>
+      <div class="dept-profile-card">
+        <div class="dp-header"><div class="dp-name">Community · 27 человек</div><div class="dp-score">AI-грамотность: 42%</div></div>
+        <div class="dp-body">
+          <div class="dp-row"><div class="dp-k">% ранних последователей</div><div class="dp-v">33%</div></div>
+          <div class="dp-row"><div class="dp-k">Используют AI регулярно</div><div class="dp-v">41%</div></div>
+          <div class="dp-row"><div class="dp-k">Готовы учиться</div><div class="dp-v">78%</div></div>
+          <div class="dp-row"><div class="dp-k">Доминирующий психотип</div><div class="dp-v">Pragmatist (44%)</div></div>
+          <div class="dp-pain">⚡ Главная боль: тысячи открытых ответов опросов обрабатываются вручную несколько дней</div>
+          <div class="dp-opp">→ AI-возможность: автосводка ответов, Helpshift AI для тикетов, AppFollow AI</div>
+        </div>
+      </div>
+      <div class="dept-profile-card">
+        <div class="dp-header"><div class="dp-name">Marketing · 25 человек</div><div class="dp-score">AI-грамотность: 84%</div></div>
+        <div class="dp-body">
+          <div class="dp-row"><div class="dp-k">% ранних последователей</div><div class="dp-v">64%</div></div>
+          <div class="dp-row"><div class="dp-k">Используют AI регулярно</div><div class="dp-v">72%</div></div>
+          <div class="dp-row"><div class="dp-k">Готовы учиться</div><div class="dp-v">88%</div></div>
+          <div class="dp-row"><div class="dp-k">Доминирующий психотип</div><div class="dp-v">Innovator (51%)</div></div>
+          <div class="dp-pain">⚡ Главная боль: качество ТЗ для AI creative pipeline, AI blacklist на платформах</div>
+          <div class="dp-opp">→ AI-возможность: bid management, тренд-вотчинг, локализация через AI + QA</div>
+        </div>
+      </div>
+      <div class="dept-profile-card">
+        <div class="dp-header"><div class="dp-name">Back Office · 48 человек</div><div class="dp-score">AI-грамотность: 38%</div></div>
+        <div class="dp-body">
+          <div class="dp-row"><div class="dp-k">% ранних последователей</div><div class="dp-v">21%</div></div>
+          <div class="dp-row"><div class="dp-k">Используют AI регулярно</div><div class="dp-v">24%</div></div>
+          <div class="dp-row"><div class="dp-k">Готовы учиться</div><div class="dp-v">61%</div></div>
+          <div class="dp-row"><div class="dp-k">Доминирующий психотип</div><div class="dp-v">Conservative (39%)</div></div>
+          <div class="dp-pain">⚡ Главная боль: нет единого источника правды, данные разбросаны между Finance/HR/Legal</div>
+          <div class="dp-opp">→ AI-возможность: HR скрининг, Legal анализ договоров, Finance P&L автосборка</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="slide-footer">
+    <div class="footer-brand">chilBase · AI Диагностика 2026</div>
+    <div class="footer-draft">ЧЕРНОВИК — не для финального использования</div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     SLIDE 8: ПРОГРАММА ОБУЧЕНИЯ
+════════════════════════════════════════════ -->
+<div class="slide">
+  <div class="draft-badge">⚠ Черновик · v0.1</div>
+  <div class="slide-header">
+    <div class="section-badge">07 · Обучение</div>
+    <div>
+      <h2>Сегментированная программа обучения</h2>
+      <div class="sub">4 трека под 4 психотипа — не одна лекция для всех</div>
+    </div>
+    <div class="snum">8 / 9</div>
+  </div>
+  <div class="slide-body">
+    <div class="tracks-grid">
+      <div class="track-card innovator">
+        <div class="track-type">Innovator · 22%</div>
+        <div class="track-share">53 чел.</div>
+        <div class="track-desc">Уже готовы. Нужна глубина и автономия, не базовые объяснения.</div>
+        <div class="track-format">Формат: воркшопы + peer-learning</div>
+        <ul class="track-items">
+          <li>Продвинутый промптинг и агенты</li>
+          <li>Автоматизация пайплайнов</li>
+          <li>Роль AI-чемпиона в отделе</li>
+        </ul>
+      </div>
+      <div class="track-card pragmatist">
+        <div class="track-type">Pragmatist · 41%</div>
+        <div class="track-share">98 чел.</div>
+        <div class="track-desc">Примут после доказательства ценности на реальных кейсах.</div>
+        <div class="track-format">Формат: кейсы на рабочих задачах</div>
+        <ul class="track-items">
+          <li>AI на конкретных задачах отдела</li>
+          <li>Практика с реальными промтами</li>
+          <li>Измеримые результаты пилотов</li>
+        </ul>
+      </div>
+      <div class="track-card conservative">
+        <div class="track-type">Conservative · 27%</div>
+        <div class="track-share">65 чел.</div>
+        <div class="track-desc">Нужна безопасность, контроль и постепенность.</div>
+        <div class="track-format">Формат: пошаговые инструкции</div>
+        <ul class="track-items">
+          <li>Что AI может, а что нет (границы)</li>
+          <li>Безопасность данных и риски</li>
+          <li>Простые сценарии с низким риском</li>
+        </ul>
+      </div>
+      <div class="track-card skeptic">
+        <div class="track-type">Skeptic · 10%</div>
+        <div class="track-share">24 чел.</div>
+        <div class="track-desc">Воспринимают как угрозу. Давление не работает.</div>
+        <div class="track-format">Формат: индивидуально + через чемпионов</div>
+        <ul class="track-items">
+          <li>AI как помощник, не замена</li>
+          <li>Истории от коллег, не от HR</li>
+          <li>Минимальное давление, максимум выбора</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="slide-footer">
+    <div class="footer-brand">chilBase · AI Диагностика 2026</div>
+    <div class="footer-draft">ЧЕРНОВИК — не для финального использования</div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     SLIDE 9: СЛЕДУЮЩИЕ ШАГИ
+════════════════════════════════════════════ -->
+<div class="slide">
+  <div class="draft-badge">⚠ Черновик · v0.1</div>
+  <div class="slide-header">
+    <div class="section-badge">08 · Следующие шаги</div>
+    <div>
+      <h2>Что дальше</h2>
+      <div class="sub">После согласования черновика</div>
+    </div>
+    <div class="snum">9 / 9</div>
+  </div>
+  <div class="slide-body" style="display:flex;flex-direction:column;justify-content:center;">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;max-width:700px;margin:0 auto;">
+      <div style="border:1px solid var(--border);border-radius:10px;padding:16px 18px;">
+        <div style="font-family:'Space Grotesk',sans-serif;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--mid);margin-bottom:10px;">Ваши правки</div>
+        <div style="font-size:11.5px;line-height:1.7;color:var(--text);">
+          Структура финального отчёта согласована? Добавить блок AI-возможностей от команд? Что из структуры изменить до начала финальной обработки данных.
+        </div>
+      </div>
+      <div style="border:1px solid var(--border);border-radius:10px;padding:16px 18px;">
+        <div style="font-family:'Space Grotesk',sans-serif;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--mid);margin-bottom:10px;">После правок</div>
+        <div style="font-size:11.5px;line-height:1.7;color:var(--text);">
+          Сбор данных опросников → Обработка → Интервью с руководителями → Синтез → Финальный отчёт с реальными данными.
+        </div>
+      </div>
+      <div style="grid-column:1/-1;background:var(--pale);border-radius:10px;padding:16px 18px;border:1px solid var(--border);">
+        <div style="font-family:'Space Grotesk',sans-serif;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--deep);margin-bottom:8px;">Примечание по данным</div>
+        <div style="font-size:11px;color:var(--muted);line-height:1.6;">
+          Все цифры в этом черновике — иллюстративные. Финальный отчёт будет содержать реальные данные из опросников (239 сотрудников) и интервью с 8 руководителями. Структура разделов может быть скорректирована после согласования.
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="slide-footer">
+    <div class="footer-brand">chilBase · AI Диагностика 2026</div>
+    <div class="footer-draft">ЧЕРНОВИК — не для финального использования</div>
+  </div>
+</div>
+
+</body>
+</html>
