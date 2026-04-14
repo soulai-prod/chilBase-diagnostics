@@ -1,0 +1,931 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Диагностика — Продуктовый дивизион · Тинькофф Банк · Образец</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --deep: #1C1F2A;
+  --mid: #2B3A5C;
+  --light: #FFDD2D;
+  --pale: #FFFBE6;
+  --pale2: #F0F4F8;
+  --accent: #FF6B00;
+  --green: #1DA050;
+  --red: #D93025;
+  --purple: #6B48C8;
+  --white: #fff;
+  --bg: #F2F4F7;
+  --text: #1C1F2A;
+  --muted: #52637A;
+  --border: #DDE3EC;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); }
+
+/* ── SLIDE ── */
+.slide {
+  width: 297mm;
+  min-height: 210mm;
+  background: var(--white);
+  margin: 0 auto 14px;
+  position: relative;
+  overflow: hidden;
+  page-break-after: always;
+  display: flex;
+  flex-direction: column;
+}
+@page { size: A4 landscape; margin: 0; }
+@media print { body { background: white; } .slide { margin: 0; } }
+
+/* ── DRAFT BADGE ── */
+.draft-badge {
+  position: absolute; top: 16px; right: 16px;
+  background: #FFF3CD; border: 1.5px solid #F39C12;
+  color: #856404; font-size: 9px; font-weight: 700;
+  letter-spacing: .12em; text-transform: uppercase;
+  padding: 3px 11px; border-radius: 20px; z-index: 10;
+  font-family: 'Space Grotesk', sans-serif;
+}
+
+/* ── SLIDE PARTS ── */
+.slide-header {
+  padding: 22px 36px 16px;
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; gap: 14px;
+}
+.slide-header h2 { font-family: 'Space Grotesk', sans-serif; font-size: 17px; font-weight: 700; color: var(--deep); }
+.slide-header .sub { font-size: 11px; color: var(--muted); margin-top: 3px; }
+.slide-header .snum { margin-left: auto; font-size: 10px; color: var(--muted); opacity: .5; font-family: 'Space Grotesk', sans-serif; }
+.section-badge {
+  background: var(--deep); color: var(--light);
+  font-family: 'Space Grotesk', sans-serif; font-size: 9px; font-weight: 700;
+  letter-spacing: .12em; text-transform: uppercase;
+  padding: 4px 11px; border-radius: 20px; white-space: nowrap;
+}
+.slide-body { padding: 22px 36px 24px; flex: 1; }
+.slide-footer {
+  padding: 9px 36px; border-top: 1px solid var(--border);
+  display: flex; justify-content: space-between; align-items: center;
+  background: var(--bg);
+}
+.footer-brand { font-size: 9px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); font-family: 'Space Grotesk', sans-serif; }
+.footer-draft { font-size: 9px; color: #856404; font-weight: 600; }
+
+/* ── COVER ── */
+.slide-cover {
+  background: var(--deep); color: var(--white);
+  justify-content: flex-end; padding: 0;
+}
+.cover-left {
+  position: absolute; left: 0; top: 0; bottom: 0; width: 55%;
+  padding: 50px 44px;
+  display: flex; flex-direction: column; justify-content: center;
+}
+.cover-right {
+  position: absolute; right: 0; top: 0; bottom: 0; width: 45%;
+  background: rgba(255,221,45,.04);
+  border-left: 1px solid rgba(255,221,45,.12);
+  padding: 40px 36px;
+  display: flex; flex-direction: column; justify-content: center;
+}
+.cover-eyebrow { font-size: 9px; font-weight: 700; letter-spacing: .2em; text-transform: uppercase; opacity: .4; margin-bottom: 18px; font-family: 'Space Grotesk', sans-serif; }
+.cover-title { font-family: 'Space Grotesk', sans-serif; font-size: 34px; font-weight: 800; line-height: 1.12; margin-bottom: 14px; }
+.cover-title span { color: var(--light); }
+.cover-subtitle { font-size: 13px; opacity: .55; line-height: 1.6; margin-bottom: 32px; }
+.cover-meta-row { display: flex; flex-direction: column; gap: 10px; }
+.cmi { font-size: 11px; }
+.cmi .cl { font-size: 8.5px; opacity: .4; text-transform: uppercase; letter-spacing: .1em; margin-bottom: 2px; font-family: 'Space Grotesk', sans-serif; }
+.cmi .cv { font-weight: 600; }
+.cover-right-title { font-family: 'Space Grotesk', sans-serif; font-size: 11px; font-weight: 700; opacity: .5; text-transform: uppercase; letter-spacing: .12em; margin-bottom: 16px; color: var(--light); }
+.cover-toc-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,.06);
+  font-size: 11.5px; opacity: .75;
+}
+.cover-toc-item:last-child { border-bottom: none; }
+.cover-toc-num { font-family: 'Space Grotesk', sans-serif; font-size: 10px; font-weight: 700; color: var(--light); opacity: .6; width: 18px; }
+.deco-circle {
+  position: absolute; border-radius: 50%;
+  background: rgba(255,221,45,.03); border: 1px solid rgba(255,221,45,.07);
+}
+
+/* ── KPI TABLE ── */
+.kpi-table { width: 100%; border-collapse: collapse; font-size: 11.5px; }
+.kpi-table th { background: var(--deep); color: var(--light); padding: 7px 10px; text-align: left; font-size: 9.5px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; font-family: 'Space Grotesk', sans-serif; }
+.kpi-table td { padding: 7px 10px; border-bottom: 1px solid var(--border); vertical-align: top; }
+.kpi-table tr:last-child td { border-bottom: none; }
+.kpi-table .dept-name { font-weight: 600; color: var(--deep); }
+.kpi-table .kpi-tag { background: var(--pale2); color: var(--mid); border-radius: 4px; padding: 2px 6px; font-size: 9.5px; font-weight: 500; display: inline-block; margin: 1px; }
+.kpi-table .no-link { background: #FFF3CD; color: #856404; }
+.kpi-table .ai-flag { color: var(--green); font-weight: 700; font-size: 10px; }
+
+/* ── METRICS STRIP ── */
+.metrics-strip { display: flex; gap: 12px; margin-bottom: 20px; }
+.metric-card {
+  flex: 1; background: var(--pale2); border-radius: 10px; padding: 14px 16px;
+  border: 1px solid var(--border);
+}
+.metric-val { font-family: 'Space Grotesk', sans-serif; font-size: 28px; font-weight: 800; color: var(--deep); line-height: 1; margin-bottom: 4px; }
+.metric-val .unit { font-size: 14px; opacity: .5; }
+.metric-label { font-size: 10px; color: var(--muted); line-height: 1.4; }
+.metric-card.green .metric-val { color: var(--green); }
+.metric-card.orange .metric-val { color: var(--accent); }
+.metric-card.purple .metric-val { color: var(--purple); }
+.metric-card.yellow .metric-val { color: #C8A800; }
+
+/* ── DEPT BARS ── */
+.dept-bars { display: flex; flex-direction: column; gap: 10px; }
+.dept-bar-row { display: flex; align-items: center; gap: 12px; }
+.dept-bar-label { width: 130px; font-size: 11px; font-weight: 500; flex-shrink: 0; }
+.dept-bar-track { flex: 1; height: 22px; background: var(--pale2); border-radius: 5px; overflow: hidden; position: relative; }
+.dept-bar-fill { height: 100%; border-radius: 5px; display: flex; align-items: center; padding-left: 8px; font-size: 10px; font-weight: 700; color: var(--white); font-family: 'Space Grotesk', sans-serif; }
+.dept-bar-fill.dark { color: var(--deep); }
+.dept-bar-val { width: 36px; font-size: 11px; font-weight: 700; text-align: right; color: var(--deep); font-family: 'Space Grotesk', sans-serif; }
+
+/* ── OPPORTUNITY MAP ── */
+.opp-axes {
+  display: grid; grid-template-columns: 40px 1fr; grid-template-rows: 1fr 32px;
+  gap: 0; height: 310px;
+}
+.opp-y-label {
+  writing-mode: vertical-rl; transform: rotate(180deg);
+  font-size: 9.5px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: .1em; color: var(--muted); text-align: center;
+  font-family: 'Space Grotesk', sans-serif;
+}
+.opp-x-label {
+  grid-column: 2; font-size: 9.5px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: .1em; color: var(--muted); text-align: center;
+  font-family: 'Space Grotesk', sans-serif; display: flex; align-items: center; justify-content: center;
+}
+.opp-grid {
+  grid-column: 2; grid-row: 1;
+  display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr;
+  gap: 6px;
+}
+.opp-quadrant {
+  border-radius: 10px; padding: 12px 14px;
+  position: relative;
+}
+.opp-q-label {
+  font-family: 'Space Grotesk', sans-serif; font-size: 9px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: .1em; opacity: .6; margin-bottom: 8px;
+}
+.opp-q1 { background: #E8F5E9; border: 1px solid #A5D6A7; }
+.opp-q1 .opp-q-label { color: #2E7D32; }
+.opp-q2 { background: #EEF2FF; border: 1px solid #BACBFF; }
+.opp-q2 .opp-q-label { color: #2B3A8C; }
+.opp-q3 { background: #F3F3F3; border: 1px solid #E0E0E0; }
+.opp-q3 .opp-q-label { color: #757575; }
+.opp-q4 { background: #FFF8E1; border: 1px solid #FFE082; }
+.opp-q4 .opp-q-label { color: #C07000; }
+.opp-item {
+  display: flex; align-items: flex-start; gap: 6px;
+  margin-bottom: 6px; font-size: 10.5px; line-height: 1.4;
+}
+.opp-item .dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; margin-top: 4px; }
+.green-dot { background: var(--green); }
+.blue-dot { background: #3D5AFE; }
+.gray-dot { background: #9E9E9E; }
+.orange-dot { background: var(--accent); }
+
+/* ── ROADMAP ── */
+.roadmap-cols { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; }
+.roadmap-header {
+  border-radius: 8px 8px 0 0; padding: 10px 14px;
+  font-family: 'Space Grotesk', sans-serif; font-size: 11px; font-weight: 700;
+}
+.roadmap-header .horizon { font-size: 9px; opacity: .7; margin-bottom: 2px; text-transform: uppercase; letter-spacing: .08em; }
+.rh-30 { background: var(--deep); color: var(--light); }
+.rh-90 { background: var(--mid); color: var(--white); }
+.rh-180 { background: var(--light); color: var(--deep); }
+.roadmap-body {
+  border: 1px solid var(--border); border-top: none;
+  border-radius: 0 0 8px 8px; padding: 12px 14px;
+}
+.roadmap-item {
+  display: flex; align-items: flex-start; gap: 8px;
+  padding: 7px 0; border-bottom: 1px solid var(--border); font-size: 11px;
+}
+.roadmap-item:last-child { border-bottom: none; padding-bottom: 0; }
+.roadmap-item .ri-dept { font-size: 9px; font-weight: 700; color: var(--mid); min-width: 70px; flex-shrink: 0; font-family: 'Space Grotesk', sans-serif; }
+.roadmap-item .ri-text { line-height: 1.4; color: var(--text); }
+.roadmap-item .ri-roi { margin-left: auto; font-size: 9.5px; font-weight: 700; color: var(--green); font-family: 'Space Grotesk', sans-serif; white-space: nowrap; }
+
+/* ── EXEC SUMMARY ── */
+.exec-cols { display: grid; grid-template-columns: 1.2fr 1fr; gap: 20px; }
+.finding-list { display: flex; flex-direction: column; gap: 10px; }
+.finding {
+  display: flex; align-items: flex-start; gap: 12px;
+  padding: 12px 14px; border-radius: 9px;
+  border: 1px solid var(--border); background: var(--pale2);
+}
+.f-marker {
+  font-family: 'Space Grotesk', sans-serif; font-size: 11px; font-weight: 800;
+  color: var(--deep); opacity: .2; flex-shrink: 0; width: 22px; padding-top: 1px;
+}
+.finding .f-text { font-size: 11.5px; line-height: 1.5; }
+.finding .f-text strong { color: var(--deep); }
+.recs { display: flex; flex-direction: column; gap: 10px; }
+.rec {
+  display: flex; align-items: flex-start; gap: 10px;
+  padding: 12px 14px; border-radius: 9px;
+}
+.rec-1 { background: #E8F5E9; border: 1px solid #A5D6A7; }
+.rec-2 { background: #EEF2FF; border: 1px solid #BACBFF; }
+.rec-3 { background: #FFFBE6; border: 1px solid #FFE082; }
+.rec .rec-num { font-family: 'Space Grotesk', sans-serif; font-size: 20px; font-weight: 800; opacity: .25; line-height: 1; flex-shrink: 0; }
+.rec .rec-text { font-size: 11px; line-height: 1.55; }
+.rec .rec-text strong { display: block; margin-bottom: 3px; font-size: 12px; }
+
+/* ── TRAINING TRACKS ── */
+.tracks-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+.track-card { border-radius: 10px; padding: 14px; border: 1px solid var(--border); }
+.track-type { font-family: 'Space Grotesk', sans-serif; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .1em; margin-bottom: 6px; }
+.track-card.innovator { background: #EEF2FF; border-color: #BACBFF; }
+.track-card.innovator .track-type { color: #2B3A8C; }
+.track-card.pragmatist { background: #E8F5E9; border-color: #A5D6A7; }
+.track-card.pragmatist .track-type { color: #1B6E3C; }
+.track-card.conservative { background: #FFFBE6; border-color: #FFE082; }
+.track-card.conservative .track-type { color: #A06000; }
+.track-card.skeptic { background: #FFF0F0; border-color: #FFBDBD; }
+.track-card.skeptic .track-type { color: #B71C1C; }
+.track-share { font-family: 'Space Grotesk', sans-serif; font-size: 24px; font-weight: 800; line-height: 1; margin-bottom: 6px; color: var(--deep); }
+.track-desc { font-size: 10px; color: var(--muted); line-height: 1.5; margin-bottom: 8px; }
+.track-format { font-size: 9.5px; font-weight: 600; color: var(--deep); }
+.track-items { list-style: none; margin-top: 6px; }
+.track-items li { font-size: 10px; color: var(--muted); padding: 2px 0; padding-left: 12px; position: relative; }
+.track-items li::before { content: '→'; position: absolute; left: 0; font-size: 9px; opacity: .4; }
+
+/* ── DEPT PROFILE ── */
+.dept-profile-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.dept-profile-card { border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
+.dp-header { background: var(--deep); color: var(--white); padding: 10px 14px; display: flex; justify-content: space-between; align-items: center; }
+.dp-header .dp-name { font-family: 'Space Grotesk', sans-serif; font-size: 12px; font-weight: 700; }
+.dp-header .dp-score { font-family: 'Space Grotesk', sans-serif; font-size: 11px; font-weight: 600; color: var(--light); }
+.dp-body { padding: 10px 14px; }
+.dp-row { display: flex; justify-content: space-between; padding: 4px 0; border-bottom: 1px solid var(--border); font-size: 10.5px; }
+.dp-row:last-child { border-bottom: none; }
+.dp-row .dp-k { color: var(--muted); }
+.dp-row .dp-v { font-weight: 600; }
+.dp-pain { background: #FFF3CD; border-left: 3px solid var(--accent); padding: 5px 8px; border-radius: 0 5px 5px 0; font-size: 10px; color: #7A4000; margin-top: 7px; }
+.dp-opp { background: var(--pale2); border-left: 3px solid var(--mid); padding: 5px 8px; border-radius: 0 5px 5px 0; font-size: 10px; color: var(--mid); margin-top: 5px; }
+
+/* ── DIVIDER ── */
+.slide-divider {
+  background: var(--pale2); justify-content: center; align-items: center;
+  text-align: center; padding: 40px 60px; min-height: 160mm;
+}
+
+/* ── RISK TABLE ── */
+.risk-table { width: 100%; border-collapse: collapse; font-size: 11px; }
+.risk-table th { background: var(--deep); color: var(--light); padding: 7px 10px; text-align: left; font-size: 9px; font-weight: 700; letter-spacing: .07em; text-transform: uppercase; font-family: 'Space Grotesk', sans-serif; }
+.risk-table td { padding: 8px 10px; border-bottom: 1px solid var(--border); vertical-align: top; line-height: 1.45; }
+.risk-table tr:last-child td { border-bottom: none; }
+.risk-tag { display: inline-block; border-radius: 4px; padding: 2px 7px; font-size: 9px; font-weight: 700; font-family: 'Space Grotesk', sans-serif; }
+.risk-high { background: #FFEBEE; color: #B71C1C; }
+.risk-med { background: #FFF3E0; color: #BF360C; }
+.risk-low { background: #E8F5E9; color: #1B5E20; }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════
+     SLIDE 1: COVER
+════════════════════════════════════════ -->
+<div class="slide slide-cover">
+  <div class="draft-badge">Образец · v0.1</div>
+  <div class="deco-circle" style="width:420px;height:420px;right:-90px;top:-110px;"></div>
+  <div class="deco-circle" style="width:180px;height:180px;right:80px;bottom:50px;"></div>
+
+  <div class="cover-left">
+    <div class="cover-eyebrow">Тинькофф Банк · Продуктовый дивизион · Финальный отчёт</div>
+    <div class="cover-title">AI-диагностика<br>Продуктового<br><span>дивизиона</span></div>
+    <div class="cover-subtitle">Результаты опросников и глубинных интервью.<br>Карта AI-возможностей. Roadmap внедрения.</div>
+    <div class="cover-meta-row">
+      <div class="cmi"><div class="cl">Охват</div><div class="cv">183 сотрудника · 7 продуктовых команд · 7 руководителей</div></div>
+      <div class="cmi"><div class="cl">Период</div><div class="cv">Апрель 2026</div></div>
+      <div class="cmi"><div class="cl">Статус</div><div class="cv" style="color:#C8A800">Образец — все данные иллюстративные</div></div>
+    </div>
+  </div>
+
+  <div class="cover-right">
+    <div class="cover-right-title">Содержание</div>
+    <div class="cover-toc-item"><div class="cover-toc-num">01</div> Executive Summary</div>
+    <div class="cover-toc-item"><div class="cover-toc-num">02</div> KPI команд и связь с процессами</div>
+    <div class="cover-toc-item"><div class="cover-toc-num">03</div> AI-профиль дивизиона</div>
+    <div class="cover-toc-item"><div class="cover-toc-num">04</div> Где видят AI — команды vs руководители</div>
+    <div class="cover-toc-item"><div class="cover-toc-num">05</div> AI Opportunity Map</div>
+    <div class="cover-toc-item"><div class="cover-toc-num">06</div> Roadmap внедрения</div>
+    <div class="cover-toc-item"><div class="cover-toc-num">07</div> Профили команд</div>
+    <div class="cover-toc-item"><div class="cover-toc-num">08</div> Программа обучения</div>
+    <div class="cover-toc-item"><div class="cover-toc-num">09</div> Риски и следующие шаги</div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     SLIDE 2: EXECUTIVE SUMMARY
+════════════════════════════════════════ -->
+<div class="slide">
+  <div class="draft-badge">Образец · v0.1</div>
+  <div class="slide-header">
+    <div class="section-badge">01 · Executive Summary</div>
+    <div>
+      <h2>Главные находки и топ-3 рекомендации</h2>
+      <div class="sub">Для руководства · 1 страница</div>
+    </div>
+    <div class="snum">2 / 9</div>
+  </div>
+  <div class="slide-body">
+    <div class="exec-cols">
+      <div>
+        <div style="font-family:'Space Grotesk',sans-serif;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:10px;">Ключевые находки</div>
+        <div class="finding-list">
+          <div class="finding">
+            <div class="f-marker">01</div>
+            <div class="f-text"><strong>Analytics & Data — лидеры, но работают в изоляции.</strong> AI-зрелость 81%, однако инструменты и пайплайны не переиспользуются другими командами. Нет внутренней культуры передачи экспертизы.</div>
+          </div>
+          <div class="finding">
+            <div class="f-marker">02</div>
+            <div class="f-text"><strong>Growth: A/B-тесты — узкое горлышко при масштабировании.</strong> 40+ одновременных экспериментов, интерпретация результатов — полностью ручная. При удвоении объёма эта точка перестанет справляться первой.</div>
+          </div>
+          <div class="finding">
+            <div class="f-marker">03</div>
+            <div class="f-text"><strong>UX & Research: тысячи интервью без AI-синтеза.</strong> Команда проводит 60–80 интервью за спринт. Обработка занимает до недели. Прямой кандидат на автоматизацию без риска по данным клиентов.</div>
+          </div>
+          <div class="finding">
+            <div class="f-marker">04</div>
+            <div class="f-text"><strong>Данные клиентов блокируют внешние LLM.</strong> 68% руководителей назвали это главным барьером. Без внутренней private deployment большинство AI-инициатив застрянет на этапе пилота.</div>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div style="font-family:'Space Grotesk',sans-serif;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:10px;">Топ-3 рекомендации</div>
+        <div class="recs">
+          <div class="rec rec-1">
+            <div class="rec-num">1</div>
+            <div class="rec-text">
+              <strong>AI-синтез UX-ресёрча — запустить за 30 дней</strong>
+              Транскрипты интервью не содержат данных клиентов. Внешний LLM допустим. Потенциал: с 5 дней до 4 часов на обработку спринта. Готовый кейс для демонстрации ROI всему дивизиону.
+            </div>
+          </div>
+          <div class="rec rec-2">
+            <div class="rec-num">2</div>
+            <div class="rec-text">
+              <strong>Создать AI-инструментарий для Growth</strong>
+              Унифицировать анализ A/B-результатов через шаблонные промты + автосводку. Без интеграции с клиентскими данными, на агрегированных метриках. Сокращение ручного времени аналитика на 40–50%.
+            </div>
+          </div>
+          <div class="rec rec-3">
+            <div class="rec-num">3</div>
+            <div class="rec-text">
+              <strong>Дорожная карта private LLM — принять решение сейчас</strong>
+              Это разблокирует 70% стратегических AI-возможностей, которые сейчас заблокированы из-за ограничений на передачу данных. Решение по архитектуре нужно до Q3 2026.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="slide-footer">
+    <div class="footer-brand">Тинькофф Банк · AI Диагностика 2026</div>
+    <div class="footer-draft">ОБРАЗЕЦ — все данные иллюстративные</div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     SLIDE 3: KPI + ПРОЦЕССЫ
+════════════════════════════════════════ -->
+<div class="slide">
+  <div class="draft-badge">Образец · v0.1</div>
+  <div class="slide-header">
+    <div class="section-badge">02 · KPI и процессы</div>
+    <div>
+      <h2>Задачи без прямой связи с KPI — первые кандидаты на автоматизацию</h2>
+      <div class="sub">Задача обязательна, но на результат не влияет напрямую → приоритет для AI</div>
+    </div>
+    <div class="snum">3 / 9</div>
+  </div>
+  <div class="slide-body">
+    <table class="kpi-table">
+      <thead>
+        <tr>
+          <th>Команда</th>
+          <th>KPI команды</th>
+          <th>Задачи БЕЗ прямой связи с KPI</th>
+          <th>AI-потенциал</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="dept-name">UX &amp; Research</td>
+          <td><span class="kpi-tag">SUS</span><span class="kpi-tag">CSAT</span><span class="kpi-tag">Retention</span></td>
+          <td>Ручная транскрипция и тематический анализ 60–80 интервью за спринт</td>
+          <td class="ai-flag">▲ Высокий</td>
+        </tr>
+        <tr>
+          <td class="dept-name">Growth</td>
+          <td><span class="kpi-tag">CPA</span><span class="kpi-tag">Conversion</span><span class="kpi-tag">LTV/CAC</span></td>
+          <td>Ручная интерпретация 40+ одновременных A/B-тестов, подготовка сводок для стейкхолдеров</td>
+          <td class="ai-flag">▲ Высокий</td>
+        </tr>
+        <tr>
+          <td class="dept-name">Core Banking</td>
+          <td><span class="kpi-tag">MAU</span><span class="kpi-tag">Feature Adoption</span><span class="kpi-tag">NPS</span></td>
+          <td>Написание product specs, acceptance criteria, changelog вручную после каждого релиза</td>
+          <td class="ai-flag">▲ Высокий</td>
+        </tr>
+        <tr>
+          <td class="dept-name">Credit Products</td>
+          <td><span class="kpi-tag">Approval Rate</span><span class="kpi-tag">Default Rate</span></td>
+          <td>Документация кредитных моделей, compliance-чеклисты для регулятора</td>
+          <td style="color:var(--accent);font-weight:700;font-size:10px;">▲ Средний</td>
+        </tr>
+        <tr>
+          <td class="dept-name">Analytics &amp; Data</td>
+          <td><span class="kpi-tag">Data Freshness</span><span class="kpi-tag">Decision Latency</span></td>
+          <td>Подготовка ad-hoc отчётов для смежных команд — повторяющиеся запросы вручную</td>
+          <td style="color:var(--accent);font-weight:700;font-size:10px;">▲ Средний</td>
+        </tr>
+        <tr>
+          <td class="dept-name">Platform</td>
+          <td><span class="kpi-tag">Uptime 99.9%</span><span class="kpi-tag">P95 Latency</span></td>
+          <td>Написание API-документации и инкрементальных changelog после каждого релиза</td>
+          <td style="color:var(--accent);font-weight:700;font-size:10px;">▲ Средний</td>
+        </tr>
+        <tr>
+          <td class="dept-name">Ecosystem</td>
+          <td><span class="kpi-tag no-link">KPI не унифицированы</span></td>
+          <td>Ручная сборка P&amp;L-отчётности по 8 продуктам экосистемы из разных источников</td>
+          <td class="ai-flag">▲ Высокий</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="slide-footer">
+    <div class="footer-brand">Тинькофф Банк · AI Диагностика 2026</div>
+    <div class="footer-draft">ОБРАЗЕЦ — все данные иллюстративные</div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     SLIDE 4: AI-ПРОФИЛЬ
+════════════════════════════════════════ -->
+<div class="slide">
+  <div class="draft-badge">Образец · v0.1</div>
+  <div class="slide-header">
+    <div class="section-badge">03 · AI-профиль</div>
+    <div>
+      <h2>AI-профиль дивизиона</h2>
+      <div class="sub">183 сотрудника · данные опросников</div>
+    </div>
+    <div class="snum">4 / 9</div>
+  </div>
+  <div class="slide-body">
+    <div class="metrics-strip">
+      <div class="metric-card"><div class="metric-val">183</div><div class="metric-label">сотрудников прошли опросник</div></div>
+      <div class="metric-card yellow"><div class="metric-val">3.7<span class="unit">/5</span></div><div class="metric-label">средний уровень AI-грамотности</div></div>
+      <div class="metric-card green"><div class="metric-val">44<span class="unit">%</span></div><div class="metric-label">ранних последователей — готовы применять сейчас</div></div>
+      <div class="metric-card orange"><div class="metric-val">34<span class="unit">%</span></div><div class="metric-label">используют AI в рабочих задачах регулярно</div></div>
+      <div class="metric-card purple"><div class="metric-val">68<span class="unit">%</span></div><div class="metric-label">назвали данные клиентов главным барьером</div></div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1.4fr;gap:20px;">
+      <div>
+        <div style="font-family:'Space Grotesk',sans-serif;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:10px;">Уровень AI-грамотности по командам</div>
+        <div class="dept-bars">
+          <div class="dept-bar-row"><div class="dept-bar-label">Analytics &amp; Data</div><div class="dept-bar-track"><div class="dept-bar-fill" style="width:81%;background:var(--green);">81%</div></div></div>
+          <div class="dept-bar-row"><div class="dept-bar-label">Growth</div><div class="dept-bar-track"><div class="dept-bar-fill" style="width:74%;background:var(--green);">74%</div></div></div>
+          <div class="dept-bar-row"><div class="dept-bar-label">Platform</div><div class="dept-bar-track"><div class="dept-bar-fill" style="width:68%;background:var(--mid);">68%</div></div></div>
+          <div class="dept-bar-row"><div class="dept-bar-label">UX &amp; Research</div><div class="dept-bar-track"><div class="dept-bar-fill" style="width:59%;background:var(--mid);">59%</div></div></div>
+          <div class="dept-bar-row"><div class="dept-bar-label">Core Banking</div><div class="dept-bar-track"><div class="dept-bar-fill" style="width:53%;background:var(--accent);">53%</div></div></div>
+          <div class="dept-bar-row"><div class="dept-bar-label">Ecosystem</div><div class="dept-bar-track"><div class="dept-bar-fill" style="width:47%;background:var(--accent);">47%</div></div></div>
+          <div class="dept-bar-row"><div class="dept-bar-label">Credit Products</div><div class="dept-bar-track"><div class="dept-bar-fill" style="width:41%;background:var(--red);">41%</div></div></div>
+        </div>
+      </div>
+      <div>
+        <div style="font-family:'Space Grotesk',sans-serif;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:10px;">Распределение психотипов по Rogers</div>
+        <div class="tracks-grid" style="grid-template-columns:1fr 1fr;">
+          <div class="track-card innovator">
+            <div class="track-type">Innovator</div>
+            <div class="track-share">26%</div>
+            <div class="track-desc">Готовы экспериментировать без гарантий. Концентрация в Analytics и Growth.</div>
+          </div>
+          <div class="track-card pragmatist">
+            <div class="track-type">Pragmatist</div>
+            <div class="track-share">44%</div>
+            <div class="track-desc">Примут при наличии внутреннего кейса с измеримым ROI.</div>
+          </div>
+          <div class="track-card conservative">
+            <div class="track-type">Conservative</div>
+            <div class="track-share">22%</div>
+            <div class="track-desc">Нужна безопасность и соответствие требованиям регулятора.</div>
+          </div>
+          <div class="track-card skeptic">
+            <div class="track-type">Skeptic</div>
+            <div class="track-share">8%</div>
+            <div class="track-desc">Воспринимают AI как угрозу или инструмент надзора. Credit Products.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="slide-footer">
+    <div class="footer-brand">Тинькофф Банк · AI Диагностика 2026</div>
+    <div class="footer-draft">ОБРАЗЕЦ — все данные иллюстративные</div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     SLIDE 5: AI OPPORTUNITY MAP
+════════════════════════════════════════ -->
+<div class="slide">
+  <div class="draft-badge">Образец · v0.1</div>
+  <div class="slide-header">
+    <div class="section-badge">05 · AI Opportunity Map</div>
+    <div>
+      <h2>Матрица AI-возможностей</h2>
+      <div class="sub">Потенциал автоматизации × Сложность внедрения · приоритизация по ROI и скорости</div>
+    </div>
+    <div class="snum">5 / 9</div>
+  </div>
+  <div class="slide-body">
+    <div class="opp-axes">
+      <div class="opp-y-label">← Высокий потенциал — — — Низкий →</div>
+      <div class="opp-grid">
+        <div class="opp-quadrant opp-q1">
+          <div class="opp-q-label">Быстрые победы — делать сейчас</div>
+          <div class="opp-item"><div class="dot green-dot"></div>UX: AI-синтез транскриптов интервью</div>
+          <div class="opp-item"><div class="dot green-dot"></div>Growth: автосводка A/B-результатов</div>
+          <div class="opp-item"><div class="dot green-dot"></div>Core Banking: AI-драфт product specs</div>
+          <div class="opp-item"><div class="dot green-dot"></div>Platform: AI-генерация API changelog</div>
+          <div class="opp-item"><div class="dot green-dot"></div>Analytics: шаблонные ad-hoc отчёты → AI</div>
+        </div>
+        <div class="opp-quadrant opp-q2">
+          <div class="opp-q-label">▲ Стратегические — планировать</div>
+          <div class="opp-item"><div class="dot blue-dot"></div>Analytics: внутренний AI-ассистент для команд</div>
+          <div class="opp-item"><div class="dot blue-dot"></div>Ecosystem: автосборка P&amp;L по 8 продуктам</div>
+          <div class="opp-item"><div class="dot blue-dot"></div>Growth: предиктивная сегментация аудиторий</div>
+          <div class="opp-item"><div class="dot blue-dot"></div>Core Banking: AI-анализ drop-off в онбординге</div>
+          <div class="opp-item"><div class="dot blue-dot"></div>Private LLM — разблокировка клиентских данных</div>
+        </div>
+        <div class="opp-quadrant opp-q3">
+          <div class="opp-q-label">— Низкий приоритет</div>
+          <div class="opp-item"><div class="dot gray-dot"></div>Полная автоматизация кредитных решений</div>
+          <div class="opp-item"><div class="dot gray-dot"></div>AI-замена ручной модерации контента</div>
+        </div>
+        <div class="opp-quadrant opp-q4">
+          <div class="opp-q-label">? Исследовать — нужны данные</div>
+          <div class="opp-item"><div class="dot orange-dot"></div>Credit: AI-ассистент compliance-документации</div>
+          <div class="opp-item"><div class="dot orange-dot"></div>UX: предиктивный анализ пользовательских путей</div>
+          <div class="opp-item"><div class="dot orange-dot"></div>Platform: AI-детекция аномалий в API-трафике</div>
+        </div>
+      </div>
+      <div class="opp-x-label">← Низкая сложность внедрения — — — Высокая →</div>
+    </div>
+  </div>
+  <div class="slide-footer">
+    <div class="footer-brand">Тинькофф Банк · AI Диагностика 2026</div>
+    <div class="footer-draft">ОБРАЗЕЦ — все данные иллюстративные</div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     SLIDE 6: ROADMAP
+════════════════════════════════════════ -->
+<div class="slide">
+  <div class="draft-badge">Образец · v0.1</div>
+  <div class="slide-header">
+    <div class="section-badge">06 · Roadmap</div>
+    <div>
+      <h2>Roadmap внедрения</h2>
+      <div class="sub">30 дней · 90 дней · 6 месяцев — конкретные шаги с метриками успеха</div>
+    </div>
+    <div class="snum">6 / 9</div>
+  </div>
+  <div class="slide-body">
+    <div class="roadmap-cols">
+      <div class="roadmap-col">
+        <div class="roadmap-header rh-30">
+          <div class="horizon">Горизонт 1</div>
+          30 дней · Quick Wins
+        </div>
+        <div class="roadmap-body">
+          <div class="roadmap-item">
+            <div class="ri-dept">UX</div>
+            <div class="ri-text">AI-синтез транскриптов: с 5 дней → 4 часа за спринт</div>
+            <div class="ri-roi">−90% времени</div>
+          </div>
+          <div class="roadmap-item">
+            <div class="ri-dept">Growth</div>
+            <div class="ri-text">Шаблонные промты для анализа A/B-результатов</div>
+            <div class="ri-roi">−40% аналит.</div>
+          </div>
+          <div class="roadmap-item">
+            <div class="ri-dept">Core Banking</div>
+            <div class="ri-text">AI-драфт acceptance criteria из user story</div>
+            <div class="ri-roi">−30% PM-врем.</div>
+          </div>
+          <div class="roadmap-item">
+            <div class="ri-dept">Platform</div>
+            <div class="ri-text">AI-генерация API changelog по diff</div>
+            <div class="ri-roi">−60% времени</div>
+          </div>
+          <div class="roadmap-item">
+            <div class="ri-dept">Все</div>
+            <div class="ri-text">Запуск обучения Innovators (26% — 48 чел.)</div>
+            <div class="ri-roi">Трек 1</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="roadmap-col">
+        <div class="roadmap-header rh-90">
+          <div class="horizon">Горизонт 2</div>
+          90 дней · Пилоты
+        </div>
+        <div class="roadmap-body">
+          <div class="roadmap-item">
+            <div class="ri-dept">Analytics</div>
+            <div class="ri-text">AI-ассистент для ad-hoc запросов смежных команд</div>
+            <div class="ri-roi">−50% запросов</div>
+          </div>
+          <div class="roadmap-item">
+            <div class="ri-dept">Ecosystem</div>
+            <div class="ri-text">Автосборка P&amp;L-отчётности по всем продуктам</div>
+            <div class="ri-roi">−3 дня/мес.</div>
+          </div>
+          <div class="roadmap-item">
+            <div class="ri-dept">Growth</div>
+            <div class="ri-text">Первый пилот предиктивной сегментации аудиторий</div>
+            <div class="ri-roi">CPA −10–15%</div>
+          </div>
+          <div class="roadmap-item">
+            <div class="ri-dept">Credit</div>
+            <div class="ri-text">AI-драфт compliance-документации для моделей</div>
+            <div class="ri-roi">−40% времени</div>
+          </div>
+          <div class="roadmap-item">
+            <div class="ri-dept">Все</div>
+            <div class="ri-text">Обучение Pragmatists (44%) на внутренних кейсах</div>
+            <div class="ri-roi">Трек 2</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="roadmap-col">
+        <div class="roadmap-header rh-180">
+          <div class="horizon">Горизонт 3</div>
+          6 месяцев · Системные изменения
+        </div>
+        <div class="roadmap-body">
+          <div class="roadmap-item">
+            <div class="ri-dept">Инфра</div>
+            <div class="ri-text">Private LLM deployment — разблокировка данных клиентов</div>
+            <div class="ri-roi">70% возможн.</div>
+          </div>
+          <div class="roadmap-item">
+            <div class="ri-dept">Analytics</div>
+            <div class="ri-text">Внутренняя AI-база знаний по продуктовой аналитике</div>
+            <div class="ri-roi">×2 скорость</div>
+          </div>
+          <div class="roadmap-item">
+            <div class="ri-dept">Core Banking</div>
+            <div class="ri-text">AI-анализ drop-off в онбординге в реальном времени</div>
+            <div class="ri-roi">Conv. +5–8%</div>
+          </div>
+          <div class="roadmap-item">
+            <div class="ri-dept">Platform</div>
+            <div class="ri-text">AI-детекция аномалий в API-трафике</div>
+            <div class="ri-roi">MTTD −50%</div>
+          </div>
+          <div class="roadmap-item">
+            <div class="ri-dept">Все</div>
+            <div class="ri-text">Программа AI-чемпионов в каждой команде</div>
+            <div class="ri-roi">Adoption +40%</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="slide-footer">
+    <div class="footer-brand">Тинькофф Банк · AI Диагностика 2026</div>
+    <div class="footer-draft">ОБРАЗЕЦ — все данные иллюстративные</div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     SLIDE 7: ПРОФИЛИ КОМАНД
+════════════════════════════════════════ -->
+<div class="slide">
+  <div class="draft-badge">Образец · v0.1</div>
+  <div class="slide-header">
+    <div class="section-badge">07 · Профили команд</div>
+    <div>
+      <h2>Профили команд — пример формата</h2>
+      <div class="sub">Каждая команда: метрики, боли, возможности · в финальном отчёте 7 разворотов</div>
+    </div>
+    <div class="snum">7 / 9</div>
+  </div>
+  <div class="slide-body">
+    <div class="dept-profile-grid">
+      <div class="dept-profile-card">
+        <div class="dp-header"><div class="dp-name">Analytics &amp; Data · 24 человека</div><div class="dp-score">AI-грамотность: 81%</div></div>
+        <div class="dp-body">
+          <div class="dp-row"><div class="dp-k">% ранних последователей</div><div class="dp-v">61%</div></div>
+          <div class="dp-row"><div class="dp-k">Используют AI регулярно</div><div class="dp-v">58%</div></div>
+          <div class="dp-row"><div class="dp-k">Готовы учиться</div><div class="dp-v">83%</div></div>
+          <div class="dp-row"><div class="dp-k">Доминирующий психотип</div><div class="dp-v">Innovator (52%)</div></div>
+          <div class="dp-pain">Главная боль: экспертиза и пайплайны не переиспользуются — каждая команда «изобретает заново»</div>
+          <div class="dp-opp">→ AI-возможность: создать внутреннюю базу знаний и AI-ассистент для смежных команд</div>
+        </div>
+      </div>
+      <div class="dept-profile-card">
+        <div class="dp-header"><div class="dp-name">UX &amp; Research · 31 человек</div><div class="dp-score">AI-грамотность: 59%</div></div>
+        <div class="dp-body">
+          <div class="dp-row"><div class="dp-k">% ранних последователей</div><div class="dp-v">42%</div></div>
+          <div class="dp-row"><div class="dp-k">Используют AI регулярно</div><div class="dp-v">29%</div></div>
+          <div class="dp-row"><div class="dp-k">Готовы учиться</div><div class="dp-v">81%</div></div>
+          <div class="dp-row"><div class="dp-k">Доминирующий психотип</div><div class="dp-v">Pragmatist (47%)</div></div>
+          <div class="dp-pain">Главная боль: 60–80 интервью за спринт обрабатываются вручную до 5 рабочих дней</div>
+          <div class="dp-opp">→ AI-возможность: синтез транскриптов, тематический анализ, автоматические паттерны поведения</div>
+        </div>
+      </div>
+      <div class="dept-profile-card">
+        <div class="dp-header"><div class="dp-name">Growth · 28 человек</div><div class="dp-score">AI-грамотность: 74%</div></div>
+        <div class="dp-body">
+          <div class="dp-row"><div class="dp-k">% ранних последователей</div><div class="dp-v">57%</div></div>
+          <div class="dp-row"><div class="dp-k">Используют AI регулярно</div><div class="dp-v">46%</div></div>
+          <div class="dp-row"><div class="dp-k">Готовы учиться</div><div class="dp-v">89%</div></div>
+          <div class="dp-row"><div class="dp-k">Доминирующий психотип</div><div class="dp-v">Innovator (44%)</div></div>
+          <div class="dp-pain">Главная боль: 40+ A/B-тестов параллельно — аналитики не справляются с интерпретацией в срок</div>
+          <div class="dp-opp">→ AI-возможность: автосводка результатов, предиктивная сегментация, AI-рекомендации по гипотезам</div>
+        </div>
+      </div>
+      <div class="dept-profile-card">
+        <div class="dp-header"><div class="dp-name">Credit Products · 22 человека</div><div class="dp-score">AI-грамотность: 41%</div></div>
+        <div class="dp-body">
+          <div class="dp-row"><div class="dp-k">% ранних последователей</div><div class="dp-v">18%</div></div>
+          <div class="dp-row"><div class="dp-k">Используют AI регулярно</div><div class="dp-v">14%</div></div>
+          <div class="dp-row"><div class="dp-k">Готовы учиться</div><div class="dp-v">55%</div></div>
+          <div class="dp-row"><div class="dp-k">Доминирующий психотип</div><div class="dp-v">Conservative (45%)</div></div>
+          <div class="dp-pain">Главная боль: документация кредитных моделей для регулятора — ручная, занимает до 2 недель на модель</div>
+          <div class="dp-opp">→ AI-возможность: AI-драфт compliance-документации без доступа к данным клиентов</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="slide-footer">
+    <div class="footer-brand">Тинькофф Банк · AI Диагностика 2026</div>
+    <div class="footer-draft">ОБРАЗЕЦ — все данные иллюстративные</div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     SLIDE 8: ПРОГРАММА ОБУЧЕНИЯ
+════════════════════════════════════════ -->
+<div class="slide">
+  <div class="draft-badge">Образец · v0.1</div>
+  <div class="slide-header">
+    <div class="section-badge">08 · Обучение</div>
+    <div>
+      <h2>Сегментированная программа обучения</h2>
+      <div class="sub">4 трека под 4 психотипа — не одна лекция для всех</div>
+    </div>
+    <div class="snum">8 / 9</div>
+  </div>
+  <div class="slide-body">
+    <div class="tracks-grid">
+      <div class="track-card innovator">
+        <div class="track-type">Innovator · 26%</div>
+        <div class="track-share">48 чел.</div>
+        <div class="track-desc">Уже применяют AI. Нужна глубина, автономия и роль AI-чемпиона.</div>
+        <div class="track-format">Формат: воркшопы + peer-learning</div>
+        <ul class="track-items">
+          <li>Продвинутый промптинг и агенты</li>
+          <li>Финтех-специфика: данные и compliance</li>
+          <li>Передача знаний внутри команды</li>
+        </ul>
+      </div>
+      <div class="track-card pragmatist">
+        <div class="track-type">Pragmatist · 44%</div>
+        <div class="track-share">81 чел.</div>
+        <div class="track-desc">Примут после доказательства ценности на реальных рабочих кейсах.</div>
+        <div class="track-format">Формат: кейсы на задачах команды</div>
+        <ul class="track-items">
+          <li>AI на конкретных задачах (UX, Growth, PM)</li>
+          <li>Практика с реальными промтами</li>
+          <li>До и после: измеримый результат</li>
+        </ul>
+      </div>
+      <div class="track-card conservative">
+        <div class="track-type">Conservative · 22%</div>
+        <div class="track-share">40 чел.</div>
+        <div class="track-desc">Нужна безопасность, соответствие требованиям, постепенность.</div>
+        <div class="track-format">Формат: пошаговые инструкции</div>
+        <ul class="track-items">
+          <li>Что разрешено с данными, что — нет</li>
+          <li>Безопасные сценарии без клиентских данных</li>
+          <li>Compliance и регуляторные границы AI</li>
+        </ul>
+      </div>
+      <div class="track-card skeptic">
+        <div class="track-type">Skeptic · 8%</div>
+        <div class="track-share">14 чел.</div>
+        <div class="track-desc">Воспринимают AI как угрозу или инструмент надзора. Давление не работает.</div>
+        <div class="track-format">Формат: индивидуально + через чемпионов</div>
+        <ul class="track-items">
+          <li>AI как усилитель, не замена специалиста</li>
+          <li>Истории от коллег — не от менеджмента</li>
+          <li>Минимальное давление, максимум выбора</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="slide-footer">
+    <div class="footer-brand">Тинькофф Банк · AI Диагностика 2026</div>
+    <div class="footer-draft">ОБРАЗЕЦ — все данные иллюстративные</div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     SLIDE 9: РИСКИ И СЛЕДУЮЩИЕ ШАГИ
+════════════════════════════════════════ -->
+<div class="slide">
+  <div class="draft-badge">Образец · v0.1</div>
+  <div class="slide-header">
+    <div class="section-badge">09 · Риски и следующие шаги</div>
+    <div>
+      <h2>Ключевые риски и что дальше</h2>
+      <div class="sub">Специфика финтех-контекста — регуляторные и инфраструктурные ограничения</div>
+    </div>
+    <div class="snum">9 / 9</div>
+  </div>
+  <div class="slide-body">
+    <div style="display:grid;grid-template-columns:1.4fr 1fr;gap:18px;">
+      <div>
+        <div style="font-family:'Space Grotesk',sans-serif;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:10px;">Риски внедрения</div>
+        <table class="risk-table">
+          <thead>
+            <tr><th>Риск</th><th>Уровень</th><th>Митигация</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Данные клиентов → внешние LLM: утечка / нарушение ФЗ-152</td>
+              <td><span class="risk-tag risk-high">Высокий</span></td>
+              <td>Внедрять только на обезличенных данных до private deployment</td>
+            </tr>
+            <tr>
+              <td>Разрыв в принятии между командами (81% vs 41% AI-грамотности)</td>
+              <td><span class="risk-tag risk-med">Средний</span></td>
+              <td>Segmented-обучение, чемпионы внутри каждой команды</td>
+            </tr>
+            <tr>
+              <td>AI-результаты в кредитных решениях без explainability для ЦБ</td>
+              <td><span class="risk-tag risk-high">Высокий</span></td>
+              <td>AI только для документации и черновиков — не для итоговых решений</td>
+            </tr>
+            <tr>
+              <td>Shadow AI: команды уже используют неавторизованные инструменты</td>
+              <td><span class="risk-tag risk-med">Средний</span></td>
+              <td>Быстро дать санкционированные инструменты для Quick Wins</td>
+            </tr>
+            <tr>
+              <td>Изоляция экспертизы Analytics — не масштабируется на дивизион</td>
+              <td><span class="risk-tag risk-low">Низкий</span></td>
+              <td>Программа AI-чемпионов + внутренняя база знаний в Горизонте 3</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:12px;">
+        <div style="border:1px solid var(--border);border-radius:10px;padding:14px 16px;">
+          <div style="font-family:'Space Grotesk',sans-serif;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--mid);margin-bottom:8px;">Ваши правки</div>
+          <div style="font-size:11px;line-height:1.7;color:var(--text);">
+            Структура отчёта согласована? Нужно ли добавить блок «AI-возможности глазами команд»? Какие разделы приоритизировать.
+          </div>
+        </div>
+        <div style="border:1px solid var(--border);border-radius:10px;padding:14px 16px;">
+          <div style="font-family:'Space Grotesk',sans-serif;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--mid);margin-bottom:8px;">После правок</div>
+          <div style="font-size:11px;line-height:1.7;color:var(--text);">
+            Сбор данных → Обработка → Интервью с руководителями → Синтез → Финальный отчёт с реальными данными и конкретными цифрами по каждой команде.
+          </div>
+        </div>
+        <div style="background:var(--pale);border-radius:10px;padding:12px 14px;border:1px solid #FFE082;">
+          <div style="font-size:10px;font-weight:600;color:#A06000;margin-bottom:4px;font-family:'Space Grotesk',sans-serif;">Примечание по данным</div>
+          <div style="font-size:10px;color:var(--muted);line-height:1.55;">Все цифры — иллюстративные. Финальный отчёт содержит реальные данные опросников и интервью. Структура разделов корректируется после согласования.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="slide-footer">
+    <div class="footer-brand">Тинькофф Банк · AI Диагностика 2026</div>
+    <div class="footer-draft">ОБРАЗЕЦ — все данные иллюстративные</div>
+  </div>
+</div>
+
+</body>
+</html>
