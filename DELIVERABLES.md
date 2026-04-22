@@ -1,4 +1,4 @@
-# Что сделано: AI-диагностика chilBase
+# Что сделано: AI-диагностика ChillBase
 ## Полный список deliverables
 
 ---
@@ -11,14 +11,14 @@
 
 | Отдел | Ссылка | Сотрудников |
 |-------|--------|-------------|
-| Environment | `https://soulai-prod.github.io/chilBase-diagnostics/html/survey_environment.html` | 38 |
-| 2D Art / UI-UX | `https://soulai-prod.github.io/chilBase-diagnostics/html/survey_2d.html` | 23 |
-| Production | `https://soulai-prod.github.io/chilBase-diagnostics/html/survey_production.html` | 36 |
-| QA | `https://soulai-prod.github.io/chilBase-diagnostics/html/survey_qa.html` | 22 |
-| Back Office | `https://soulai-prod.github.io/chilBase-diagnostics/html/survey_back_office.html` | 48 |
-| Community | `https://soulai-prod.github.io/chilBase-diagnostics/html/survey_community.html` | 27 |
-| Marketing | `https://soulai-prod.github.io/chilBase-diagnostics/html/survey_marketing.html` | 25 |
-| Product | `https://soulai-prod.github.io/chilBase-diagnostics/html/survey_product.html` | ~20 |
+| Environment | `https://soulai-prod.github.io/ChillBase-diagnostics/html/survey_environment.html` | 38 |
+| 2D Art / UI-UX | `https://soulai-prod.github.io/ChillBase-diagnostics/html/survey_2d.html` | 23 |
+| Production | `https://soulai-prod.github.io/ChillBase-diagnostics/html/survey_production.html` | 36 |
+| QA | `https://soulai-prod.github.io/ChillBase-diagnostics/html/survey_qa.html` | 22 |
+| Back Office | `https://soulai-prod.github.io/ChillBase-diagnostics/html/survey_back_office.html` | 48 |
+| Community | `https://soulai-prod.github.io/ChillBase-diagnostics/html/survey_community.html` | 27 |
+| Marketing | `https://soulai-prod.github.io/ChillBase-diagnostics/html/survey_marketing.html` | 25 |
+| Product | `https://soulai-prod.github.io/ChillBase-diagnostics/html/survey_product.html` | ~20 |
 
 ---
 
@@ -60,7 +60,7 @@
 
 ## 2. Аналитический дашборд
 
-**Ссылка:** `https://soulai-prod.github.io/chilBase-diagnostics/html/dashboard.html`
+**Ссылка:** `https://soulai-prod.github.io/ChillBase-diagnostics/html/dashboard.html`
 
 Дашборд агрегирует ответы всех сотрудников в реальном времени и показывает:
 
@@ -116,4 +116,4 @@
 - Все опросники работают в браузере, без установки и регистрации
 - Данные сохраняются локально (в браузере сотрудника) и отправляются на сервер при наличии подключения Google Sheets (настраивается отдельно)
 - Дашборд обновляется автоматически
-- Все материалы размещены на GitHub: `https://github.com/soulai-prod/chilBase-diagnostics`
+- Все материалы размещены на GitHub: `https://github.com/soulai-prod/ChillBase-diagnostics`
