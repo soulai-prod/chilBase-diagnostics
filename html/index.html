@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>chilBase AI Диагностика — Портал</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --ocean-deep: #0A2E4D;
+  --ocean-mid: #1B6B93;
+  --ocean-light: #5DB9C9;
+  --ocean-pale: #E8F6F9;
+  --text-dark: #1a2a3a;
+  --text-mid: #4a6070;
+  --white: #ffffff;
+  --bg: #f4f8fb;
+  --border: #d0e4ef;
+  --ok: #1a7a4a;
+  --ok-bg: #e6f7ee;
+  --warn-bg: #fff8e1;
+  --warn: #856404;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text-dark); min-height: 100vh; }
+
+.hero {
+  background: var(--ocean-deep);
+  color: var(--white);
+  padding: 3rem 2rem 2.5rem;
+  text-align: center;
+}
+.hero .label { font-size: .72rem; font-weight: 700; letter-spacing: .18em; text-transform: uppercase; opacity: .5; margin-bottom: .7rem; }
+.hero h1 { font-family: 'Space Grotesk', sans-serif; font-size: 2rem; font-weight: 700; margin-bottom: .6rem; }
+.hero .sub { font-size: .92rem; opacity: .7; max-width: 520px; margin: 0 auto; line-height: 1.7; }
+
+.container { max-width: 960px; margin: 0 auto; padding: 2.5rem 1.5rem; }
+
+.section-title {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: .72rem;
+  font-weight: 700;
+  letter-spacing: .15em;
+  text-transform: uppercase;
+  color: var(--ocean-mid);
+  margin-bottom: 1rem;
+  margin-top: 2rem;
+  padding-bottom: .5rem;
+  border-bottom: 1px solid var(--border);
+}
+
+/* PRIORITY CARDS */
+.priority-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem; margin-bottom: .5rem; }
+.priority-card {
+  background: var(--white);
+  border: 2px solid var(--ocean-light);
+  border-radius: 12px;
+  padding: 1.25rem 1.5rem;
+  text-decoration: none;
+  color: var(--text-dark);
+  display: block;
+  transition: all .2s;
+  position: relative;
+}
+.priority-card:hover { border-color: var(--ocean-mid); box-shadow: 0 4px 16px rgba(10,46,77,.12); transform: translateY(-2px); }
+.priority-card .tag { font-size: .68rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--ocean-mid); margin-bottom: .5rem; }
+.priority-card h3 { font-family: 'Space Grotesk', sans-serif; font-size: 1rem; font-weight: 700; margin-bottom: .4rem; }
+.priority-card p { font-size: .82rem; color: var(--text-mid); line-height: 1.6; }
+.pilot-pill { position: absolute; top: 1rem; right: 1rem; background: var(--ok); color: #fff; font-size: .62rem; font-weight: 700; padding: .2rem .5rem; border-radius: 20px; letter-spacing: .06em; }
+
+/* INTERVIEW GRID */
+.interview-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: .85rem; }
+.interview-card {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 1rem 1.25rem;
+  text-decoration: none;
+  color: var(--text-dark);
+  display: block;
+  transition: all .18s;
+}
+.interview-card:hover { border-color: var(--ocean-light); box-shadow: 0 3px 10px rgba(10,46,77,.08); }
+.interview-card .num { font-size: .68rem; font-weight: 700; color: var(--ocean-mid); opacity: .6; margin-bottom: .3rem; }
+.interview-card .name { font-family: 'Space Grotesk', sans-serif; font-size: .92rem; font-weight: 700; margin-bottom: .25rem; }
+.interview-card .meta { font-size: .75rem; color: var(--text-mid); }
+.interview-card .ai-badge { display: inline-block; margin-top: .5rem; font-size: .65rem; font-weight: 700; padding: .15rem .4rem; border-radius: 4px; }
+.ai-high { background: var(--ok-bg); color: var(--ok); }
+.ai-med { background: var(--warn-bg); color: var(--warn); }
+.ai-low { background: #fdecea; color: #b71c1c; }
+.ai-unk { background: var(--ocean-pale); color: var(--ocean-mid); }
+
+/* SURVEY GRID */
+.survey-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(175px, 1fr)); gap: .75rem; }
+.survey-card {
+  background: var(--white);
+  border: 1px dashed var(--border);
+  border-radius: 8px;
+  padding: .85rem 1rem;
+  text-decoration: none;
+  color: var(--text-mid);
+  display: block;
+  font-size: .82rem;
+  transition: all .15s;
+}
+.survey-card:hover { border-color: var(--ocean-light); color: var(--text-dark); }
+.survey-card .sname { font-weight: 600; color: var(--text-dark); margin-bottom: .2rem; }
+
+.footnote { margin-top: 3rem; padding-top: 1.5rem; border-top: 1px solid var(--border); font-size: .78rem; color: var(--text-mid); text-align: center; line-height: 1.8; }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="label">sfer.ai · Конфиденциально</div>
+  <h1>chilBase AI Диагностика</h1>
+  <p class="sub">Портал материалов аудита: гайды интервью, опросники, сверка с таблицей коллег</p>
+</div>
+
+<div class="container">
+
+  <!-- BLOCK 1: КЛЮЧЕВЫЕ ДОКУМЕНТЫ -->
+  <div class="section-title">Ключевые документы</div>
+  <div class="priority-grid">
+
+    <a class="priority-card" href="audit_table_vs_interviews.html">
+      <div class="tag">Сверка</div>
+      <h3>Таблица коллег ↔ Гайды интервью</h3>
+      <p>Построчное сравнение: что коллеги написали в таблице vs что заложено в каждый гайд интервью. Все расхождения отмечены.</p>
+    </a>
+
+    <a class="priority-card" href="interview_opening_questions.html">
+      <div class="tag">Карта вопросов</div>
+      <h3>Открывающие вопросы — все 8 отделов</h3>
+      <p>Единая карта: как начинается каждое интервью, зачем именно этот вопрос и ссылка на полный гайд.</p>
+    </a>
+
+  </div>
+
+  <!-- BLOCK 2: ГАЙДЫ ИНТЕРВЬЮ -->
+  <div class="section-title">Гайды интервью (v2)</div>
+  <div class="interview-grid">
+
+    <a class="interview-card" href="interview_environment_v2.html">
+      <div class="num">01</div>
+      <div class="name">Environment</div>
+      <div class="meta">38 чел. · Прокопцов</div>
+      <div class="ai-badge ai-low">AI: LOW-MED</div>
+    </a>
+
+    <a class="interview-card" href="interview_2d_v2.html">
+      <div class="num">02</div>
+      <div class="name">2D (UI/UX)</div>
+      <div class="meta">23 чел. · Дмитриев</div>
+      <div class="ai-badge ai-unk">AI: UNKNOWN</div>
+    </a>
+
+    <a class="interview-card" href="interview_production_v2.html">
+      <div class="num">03</div>
+      <div class="name">Production</div>
+      <div class="meta">36 чел. · Лысак</div>
+      <div class="ai-badge ai-low">AI: LOW-MED</div>
+    </a>
+
+    <a class="interview-card" href="interview_qa_v2.html">
+      <div class="num">04</div>
+      <div class="name">QA</div>
+      <div class="meta">22 чел. · Кротов</div>
+      <div class="ai-badge ai-low">AI: LOW-MED</div>
+    </a>
+
+    <a class="interview-card" href="interview_back_office_v2.html">
+      <div class="num">05</div>
+      <div class="name">Back Office</div>
+      <div class="meta">48 чел. · Finance+Legal+HR+Biz</div>
+      <div class="ai-badge ai-med">AI: MEDIUM</div>
+    </a>
+
+    <a class="interview-card" href="interview_community_v2.html">
+      <div class="num">06</div>
+      <div class="name">Community</div>
+      <div class="meta">27 чел. · Бернандес</div>
+      <div class="ai-badge ai-med">AI: MEDIUM</div>
+    </a>
+
+    <a class="interview-card" href="interview_marketing_v2.html" style="border-color: #1a7a4a; border-width: 2px;">
+      <div class="num">07</div>
+      <div class="name">Marketing</div>
+      <div class="meta">25 чел. · Performance + Media</div>
+      <div class="ai-badge ai-high">AI: HIGH</div>
+      <span style="display:block; margin-top:.5rem; font-size:.65rem; font-weight:700; color:#1a7a4a;">▶ ПИЛОТНОЕ ИНТЕРВЬЮ</span>
+    </a>
+
+    <a class="interview-card" href="interview_product_v2.html">
+      <div class="num">08</div>
+      <div class="name">Product</div>
+      <div class="meta">? чел. · Станкевич и др.</div>
+      <div class="ai-badge ai-high">AI: HIGH</div>
+    </a>
+
+  </div>
+
+  <!-- BLOCK 3: ОПРОСНИКИ -->
+  <div class="section-title">Опросники для сотрудников</div>
+  <div class="survey-grid">
+    <a class="survey-card" href="survey_environment.html"><div class="sname">Environment</div>опросник · 38 чел.</a>
+    <a class="survey-card" href="survey_2d.html"><div class="sname">2D (UI/UX)</div>опросник · 23 чел.</a>
+    <a class="survey-card" href="survey_production.html"><div class="sname">Production</div>опросник · 36 чел.</a>
+    <a class="survey-card" href="survey_qa.html"><div class="sname">QA</div>опросник · 22 чел.</a>
+    <a class="survey-card" href="survey_back_office.html"><div class="sname">Back Office</div>опросник · 48 чел.</a>
+    <a class="survey-card" href="survey_community.html"><div class="sname">Community</div>опросник · 27 чел.</a>
+    <a class="survey-card" href="survey_marketing.html"><div class="sname">Marketing</div>опросник · 25 чел.</a>
+    <a class="survey-card" href="survey_product.html"><div class="sname">Product</div>опросник · ? чел.</a>
+  </div>
+
+  <div class="footnote">
+    chilBase AI Диагностика · sfer.ai · Конфиденциально<br>
+    Итоговые артефакты: бэклог AI-инициатив · C-level презентация · Карта AI-зрелости
+  </div>
+
+</div>
+</body>
+</html>

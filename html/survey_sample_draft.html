@@ -1,0 +1,786 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Диагностика — Пример опросника | chilBase DRAFT</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --ocean-deep: #0A2E4D;
+  --ocean-mid: #1B6B93;
+  --ocean-light: #5DB9C9;
+  --ocean-pale: #E8F6F9;
+  --accent: #F39C12;
+  --success: #2ECC71;
+  --white: #ffffff;
+  --bg: #f0f4f8;
+  --text: #1a2a3a;
+  --text-mid: #4a6070;
+  --border: #d0e4ef;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Inter', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+}
+
+/* ── SLIDE ── */
+.slide {
+  width: 210mm;
+  min-height: 148mm;
+  background: var(--white);
+  margin: 0 auto 12px;
+  position: relative;
+  overflow: hidden;
+  page-break-after: always;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── DRAFT WATERMARK ── */
+.draft-badge {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  background: #FFF3CD;
+  border: 1.5px solid #F39C12;
+  color: #856404;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  padding: 3px 10px;
+  border-radius: 20px;
+  z-index: 10;
+  font-family: 'Space Grotesk', sans-serif;
+}
+
+/* ── COVER ── */
+.slide-cover {
+  background: var(--ocean-deep);
+  color: var(--white);
+  justify-content: center;
+  padding: 40px 48px;
+}
+.cover-eyebrow {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  opacity: .5;
+  margin-bottom: 20px;
+  font-family: 'Space Grotesk', sans-serif;
+}
+.cover-title {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 32px;
+  font-weight: 800;
+  line-height: 1.15;
+  margin-bottom: 10px;
+}
+.cover-title span { color: var(--ocean-light); }
+.cover-sub {
+  font-size: 13px;
+  opacity: .65;
+  margin-bottom: 28px;
+  line-height: 1.6;
+}
+.cover-meta {
+  display: flex;
+  gap: 28px;
+  margin-top: auto;
+  padding-top: 24px;
+  border-top: 1px solid rgba(255,255,255,.12);
+}
+.cover-meta-item { font-size: 11px; }
+.cover-meta-item .label { opacity: .45; text-transform: uppercase; font-size: 8.5px; letter-spacing: .1em; margin-bottom: 3px; font-family: 'Space Grotesk', sans-serif; }
+.cover-meta-item .val { font-weight: 600; }
+.cover-deco {
+  position: absolute;
+  right: -20px;
+  bottom: -30px;
+  width: 220px;
+  height: 220px;
+  border-radius: 50%;
+  background: rgba(93,185,201,.08);
+  border: 1px solid rgba(93,185,201,.12);
+}
+.cover-deco2 {
+  position: absolute;
+  right: 30px;
+  bottom: 10px;
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  background: rgba(93,185,201,.06);
+}
+
+/* ── SLIDE HEADER ── */
+.slide-header {
+  padding: 22px 32px 16px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.slide-header .block-badge {
+  background: var(--ocean-deep);
+  color: var(--white);
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  padding: 4px 10px;
+  border-radius: 20px;
+  white-space: nowrap;
+}
+.slide-header h2 {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--ocean-deep);
+}
+.slide-header .sub {
+  font-size: 10.5px;
+  color: var(--text-mid);
+  margin-top: 2px;
+}
+.slide-header .slide-num {
+  margin-left: auto;
+  font-size: 10px;
+  color: var(--text-mid);
+  opacity: .5;
+  font-family: 'Space Grotesk', sans-serif;
+}
+
+/* ── SLIDE BODY ── */
+.slide-body {
+  padding: 20px 32px 24px;
+  flex: 1;
+}
+
+/* ── QUESTION ── */
+.question { margin-bottom: 18px; }
+.question:last-child { margin-bottom: 0; }
+.q-label {
+  font-size: 9.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .1em;
+  color: var(--ocean-mid);
+  margin-bottom: 6px;
+  font-family: 'Space Grotesk', sans-serif;
+}
+.q-text {
+  font-size: 12.5px;
+  font-weight: 500;
+  line-height: 1.5;
+  margin-bottom: 10px;
+  color: var(--text);
+}
+.q-hint {
+  font-size: 10px;
+  color: var(--text-mid);
+  margin-bottom: 8px;
+  font-style: italic;
+}
+
+/* Radio options */
+.options { display: flex; flex-direction: column; gap: 5px; }
+.option {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  padding: 7px 10px;
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  font-size: 11.5px;
+  line-height: 1.45;
+  color: var(--text);
+}
+.option .dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 1.5px solid var(--ocean-mid);
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+.option.correct { background: #E8F5E9; border-color: #A5D6A7; }
+.option.correct .dot { background: var(--success); border-color: var(--success); }
+
+/* Likert */
+.likert {
+  display: flex;
+  gap: 6px;
+  margin-top: 4px;
+  align-items: center;
+}
+.likert-label { font-size: 9.5px; color: var(--text-mid); flex: 1; }
+.likert-label.right { text-align: right; }
+.likert-cells { display: flex; gap: 4px; }
+.likert-cell {
+  width: 30px;
+  height: 28px;
+  border: 1.5px solid var(--border);
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--text-mid);
+  font-family: 'Space Grotesk', sans-serif;
+}
+
+/* Timesplit */
+.timesplit { display: grid; grid-template-columns: 1fr auto; gap: 0; }
+.ts-row {
+  display: contents;
+}
+.ts-label {
+  font-size: 11px;
+  padding: 5px 8px 5px 0;
+  border-bottom: 1px solid var(--border);
+  color: var(--text);
+}
+.ts-input {
+  width: 54px;
+  height: 26px;
+  border: 1.5px solid var(--border);
+  border-radius: 5px;
+  background: var(--ocean-pale);
+  margin: 3px 0;
+  font-size: 11px;
+  text-align: center;
+  color: var(--text-mid);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.ts-total {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--ocean-mid);
+  text-align: right;
+  padding-top: 5px;
+  grid-column: 1 / -1;
+  font-family: 'Space Grotesk', sans-serif;
+}
+
+/* Textarea */
+.fake-textarea {
+  width: 100%;
+  min-height: 40px;
+  border: 1.5px dashed var(--border);
+  border-radius: 7px;
+  padding: 8px 10px;
+  font-size: 11px;
+  color: var(--text-mid);
+  font-style: italic;
+  background: var(--ocean-pale);
+}
+
+/* ── METHODOLOGY SLIDE ── */
+.method-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 12px;
+  margin-top: 4px;
+}
+.method-card {
+  background: var(--ocean-pale);
+  border-radius: 10px;
+  padding: 14px;
+}
+.method-num {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--ocean-mid);
+  opacity: .4;
+  margin-bottom: 6px;
+}
+.method-title {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 11.5px;
+  font-weight: 700;
+  margin-bottom: 5px;
+  color: var(--ocean-deep);
+}
+.method-desc { font-size: 10.5px; line-height: 1.55; color: var(--text-mid); }
+
+/* ── BLOCKS OVERVIEW SLIDE ── */
+.blocks-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+.block-card {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px 11px;
+  position: relative;
+}
+.block-card .bnum {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--ocean-light);
+  opacity: .5;
+  line-height: 1;
+  margin-bottom: 5px;
+}
+.block-card .bname {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--ocean-deep);
+  margin-bottom: 4px;
+}
+.block-card .bdesc { font-size: 9.5px; color: var(--text-mid); line-height: 1.45; }
+.block-card.highlight { border-color: var(--ocean-mid); background: var(--ocean-pale); }
+.block-card .bkey {
+  display: inline-block;
+  background: var(--ocean-mid);
+  color: var(--white);
+  font-size: 8px;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 10px;
+  margin-bottom: 4px;
+  font-family: 'Space Grotesk', sans-serif;
+  letter-spacing: .06em;
+}
+
+/* ── OUTPUT SLIDE ── */
+.output-row {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+.output-card {
+  flex: 1;
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  padding: 12px 14px;
+}
+.output-card .oc-icon { font-size: 18px; margin-bottom: 6px; }
+.output-card .oc-title {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--ocean-deep);
+  margin-bottom: 4px;
+}
+.output-card .oc-desc { font-size: 10px; color: var(--text-mid); line-height: 1.5; }
+
+/* ── FOOTER ── */
+.slide-footer {
+  padding: 8px 32px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--bg);
+}
+.footer-brand { font-size: 9px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--text-mid); font-family: 'Space Grotesk', sans-serif; }
+.footer-draft { font-size: 9px; color: #856404; font-weight: 600; }
+
+/* ── SECTION DIVIDER SLIDE ── */
+.slide-divider {
+  background: var(--ocean-pale);
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding: 32px 48px;
+  min-height: 80mm;
+}
+.divider-block-num {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 64px;
+  font-weight: 800;
+  color: var(--ocean-mid);
+  opacity: .15;
+  line-height: 1;
+  margin-bottom: 8px;
+}
+.divider-title {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--ocean-deep);
+  margin-bottom: 8px;
+}
+.divider-sub { font-size: 12px; color: var(--text-mid); }
+
+/* ── PRINT ── */
+@media print {
+  body { background: white; }
+  .slide { margin: 0; box-shadow: none; }
+}
+@page { size: A5 landscape; margin: 0; }
+</style>
+</head>
+<body>
+
+<!-- ════════════════════════════════════════
+     SLIDE 1: COVER
+═════════════════════════════════════════ -->
+<div class="slide slide-cover">
+  <div class="draft-badge">⚠ Черновик · v0.1</div>
+  <div class="cover-deco"></div>
+  <div class="cover-deco2"></div>
+  <div class="cover-eyebrow">chilBase · AI Диагностика 2026</div>
+  <div class="cover-title">Опросник для<br>сотрудников<br><span>— пример наполнения</span></div>
+  <div class="cover-sub">Иллюстрация структуры и логики вопросов.<br>Финальная версия дорабатывается совместно.</div>
+  <div class="cover-meta">
+    <div class="cover-meta-item"><div class="label">Формат</div><div class="val">Веб-браузер, без установки</div></div>
+    <div class="cover-meta-item"><div class="label">Время заполнения</div><div class="val">12–20 минут</div></div>
+    <div class="cover-meta-item"><div class="label">Блоков</div><div class="val">8</div></div>
+    <div class="cover-meta-item"><div class="label">Вопросов</div><div class="val">50–65</div></div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════
+     SLIDE 2: МЕТОДОЛОГИЯ
+═════════════════════════════════════════ -->
+<div class="slide">
+  <div class="draft-badge">⚠ Черновик · v0.1</div>
+  <div class="slide-header">
+    <div>
+      <h2>Три основания методологии</h2>
+      <div class="sub">Почему опросник устроен именно так</div>
+    </div>
+    <div class="slide-num">2 / 10</div>
+  </div>
+  <div class="slide-body">
+    <div class="method-grid">
+      <div class="method-card">
+        <div class="method-num">01</div>
+        <div class="method-title">Психотип + принятие изменений</div>
+        <div class="method-desc">Классификация сотрудников по готовности к новым технологиям (логика диффузии инноваций). Нужна, чтобы не делать одну программу для всех: Innovator и Conservative обучаются принципиально по-разному.</div>
+      </div>
+      <div class="method-card">
+        <div class="method-num">02</div>
+        <div class="method-title">Поведенческая оценка, не самооценка</div>
+        <div class="method-desc">Ключевой блок: вместо «умеете ли вы пользоваться AI?» — реальный рабочий сценарий и выбор лучшего промта. Измеряет фактический уровень AI-грамотности, а не декларируемый.</div>
+      </div>
+      <div class="method-card">
+        <div class="method-num">03</div>
+        <div class="method-title">Карта бизнес-процессов</div>
+        <div class="method-desc">Распределение рабочего времени по задачам + узкие места. Формирует основу для карты автоматизаций: что делается вручную, как часто, сколько человек задействовано.</div>
+      </div>
+    </div>
+  </div>
+  <div class="slide-footer">
+    <div class="footer-brand">chilBase · AI Диагностика</div>
+    <div class="footer-draft">ЧЕРНОВИК — не для финального использования</div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════
+     SLIDE 3: ОБЗОР БЛОКОВ
+═════════════════════════════════════════ -->
+<div class="slide">
+  <div class="draft-badge">⚠ Черновик · v0.1</div>
+  <div class="slide-header">
+    <div>
+      <h2>Структура опросника — 8 блоков</h2>
+      <div class="sub">Логика движения от профиля к конкретным AI-возможностям</div>
+    </div>
+    <div class="slide-num">3 / 10</div>
+  </div>
+  <div class="slide-body">
+    <div class="blocks-grid">
+      <div class="block-card highlight">
+        <div class="bkey">Психотип</div>
+        <div class="bnum">0</div>
+        <div class="bname">Профиль восприятия изменений</div>
+        <div class="bdesc">Innovator / Pragmatist / Conservative / Skeptic — определяет трек обучения</div>
+      </div>
+      <div class="block-card">
+        <div class="bnum">1</div>
+        <div class="bname">Личный профиль</div>
+        <div class="bdesc">Роль, опыт, основные инструменты</div>
+      </div>
+      <div class="block-card">
+        <div class="bnum">2</div>
+        <div class="bname">AI-грамотность</div>
+        <div class="bdesc">7–10 вопросов: LLM, промпт, RAG, галлюцинации — под специфику отдела</div>
+      </div>
+      <div class="block-card highlight">
+        <div class="bkey">Карта процессов</div>
+        <div class="bnum">3</div>
+        <div class="bname">Текущая рутина</div>
+        <div class="bdesc">Распределение времени, узкие места, что делается вручную</div>
+      </div>
+      <div class="block-card highlight">
+        <div class="bkey">Ключевой</div>
+        <div class="bnum">4</div>
+        <div class="bname">Мини-задачи на LLM</div>
+        <div class="bdesc">Реальный сценарий → выбор лучшего промта. Поведенческая оценка грамотности</div>
+      </div>
+      <div class="block-card">
+        <div class="bnum">5</div>
+        <div class="bname">AI в работе сейчас</div>
+        <div class="bdesc">Инструменты, частота, что мешает использовать больше</div>
+      </div>
+      <div class="block-card">
+        <div class="bnum">6</div>
+        <div class="bname">Желания и опасения</div>
+        <div class="bdesc">Что хотят автоматизировать, что не отдадут AI, формат обучения</div>
+      </div>
+      <div class="block-card">
+        <div class="bnum">7</div>
+        <div class="bname">Открытые вопросы</div>
+        <div class="bdesc">«Если бы можно было устранить одну рутину прямо сейчас — что бы это было?»</div>
+      </div>
+    </div>
+  </div>
+  <div class="slide-footer">
+    <div class="footer-brand">chilBase · AI Диагностика</div>
+    <div class="footer-draft">ЧЕРНОВИК — не для финального использования</div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════
+     SLIDE 4: DIVIDER — БЛОК 0
+═════════════════════════════════════════ -->
+<div class="slide slide-divider">
+  <div class="draft-badge">⚠ Черновик · v0.1</div>
+  <div class="divider-block-num">0</div>
+  <div class="divider-title">Профиль восприятия изменений</div>
+  <div class="divider-sub">Психотипирование — определяет трек обучения</div>
+</div>
+
+<!-- ════════════════════════════════════════
+     SLIDE 5: БЛОК 0 — ПРИМЕР ВОПРОСОВ
+═════════════════════════════════════════ -->
+<div class="slide">
+  <div class="draft-badge">⚠ Черновик · v0.1</div>
+  <div class="slide-header">
+    <div class="block-badge">Блок 0 · Психотип</div>
+    <div>
+      <h2>Пример вопросов</h2>
+      <div class="sub">5 вопросов · одиночный выбор · результат не показывается сотруднику</div>
+    </div>
+    <div class="slide-num">5 / 10</div>
+  </div>
+  <div class="slide-body">
+    <div class="question">
+      <div class="q-label">Вопрос 1 из 5</div>
+      <div class="q-text">Коллега предлагает попробовать новый AI-инструмент для вашей работы. Что вы скорее всего сделаете?</div>
+      <div class="options">
+        <div class="option"><div class="dot"></div>Сразу попробую — интересно, что он умеет</div>
+        <div class="option"><div class="dot"></div>Сначала узнаю, как его используют другие, потом попробую</div>
+        <div class="option"><div class="dot"></div>Подожду, пока станет понятно, что это реально работает</div>
+        <div class="option"><div class="dot"></div>Буду использовать только если это станет обязательным</div>
+      </div>
+    </div>
+  </div>
+  <div class="slide-footer">
+    <div class="footer-brand">chilBase · AI Диагностика</div>
+    <div class="footer-draft">ЧЕРНОВИК — не для финального использования</div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════
+     SLIDE 6: БЛОК 3 — КАРТА ПРОЦЕССОВ
+═════════════════════════════════════════ -->
+<div class="slide">
+  <div class="draft-badge">⚠ Черновик · v0.1</div>
+  <div class="slide-header">
+    <div class="block-badge">Блок 3 · Рутина</div>
+    <div>
+      <h2>Карта рабочего времени</h2>
+      <div class="sub">Распределение по задачам в % · сумма должна быть 100</div>
+    </div>
+    <div class="slide-num">6 / 10</div>
+  </div>
+  <div class="slide-body">
+    <div class="question">
+      <div class="q-label">Примерное распределение рабочего времени</div>
+      <div class="q-text">Оцените, как распределяется ваше типичное рабочее время по направлениям (в %). Сумма — 100%.</div>
+      <div class="timesplit">
+        <div class="ts-label">Моделинг / создание ассетов</div><div class="ts-input">___%</div>
+        <div class="ts-label">Текстуринг и материалы</div><div class="ts-input">___%</div>
+        <div class="ts-label">Ревью и обратная связь</div><div class="ts-input">___%</div>
+        <div class="ts-label">Синхронизация и передача файлов</div><div class="ts-input">___%</div>
+        <div class="ts-label">Коммуникация / митинги</div><div class="ts-input">___%</div>
+        <div class="ts-label">Документация и задачи в трекере</div><div class="ts-input">___%</div>
+        <div class="ts-total">Итого: 100%</div>
+      </div>
+    </div>
+  </div>
+  <div class="slide-footer">
+    <div class="footer-brand">chilBase · AI Диагностика</div>
+    <div class="footer-draft">ЧЕРНОВИК — не для финального использования</div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════
+     SLIDE 7: БЛОК 4 — MINI-TASK (ключевой)
+═════════════════════════════════════════ -->
+<div class="slide">
+  <div class="draft-badge">⚠ Черновик · v0.1</div>
+  <div class="slide-header">
+    <div class="block-badge">Блок 4 · LLM-задача ★</div>
+    <div>
+      <h2>Поведенческая оценка AI-грамотности</h2>
+      <div class="sub">Реальный рабочий сценарий — нужно выбрать лучший промт</div>
+    </div>
+    <div class="slide-num">7 / 10</div>
+  </div>
+  <div class="slide-body">
+    <div class="question">
+      <div class="q-label">Мини-задача · Environment</div>
+      <div class="q-text">Вы хотите попросить ChatGPT помочь написать скрипт для автоматической генерации roughness maps из color texture. Какой промт даст лучший результат?</div>
+      <div class="options">
+        <div class="option"><div class="dot"></div>«Напиши скрипт»</div>
+        <div class="option"><div class="dot"></div>«Напиши Python-скрипт для генерации roughness maps из color texture»</div>
+        <div class="option correct"><div class="dot"></div>«Напиши Python-скрипт с использованием Pillow, который читает color texture (PNG, sRGB), конвертирует в grayscale, инвертирует яркость и сохраняет как roughness map. Добавь комментарии к коду»</div>
+        <div class="option"><div class="dot"></div>«Сделай инструмент для текстур в Blender»</div>
+        <div class="option"><div class="dot"></div>«Объясни, как работают roughness maps, и потом напиши скрипт»</div>
+      </div>
+    </div>
+  </div>
+  <div class="slide-footer">
+    <div class="footer-brand">chilBase · AI Диагностика</div>
+    <div class="footer-draft">ЧЕРНОВИК — не для финального использования</div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════
+     SLIDE 8: БЛОК 6 — ЖЕЛАНИЯ
+═════════════════════════════════════════ -->
+<div class="slide">
+  <div class="draft-badge">⚠ Черновик · v0.1</div>
+  <div class="slide-header">
+    <div class="block-badge">Блок 6 · Желания и опасения</div>
+    <div>
+      <h2>Отношение к AI в работе</h2>
+      <div class="sub">Готовность, мотивация, красные линии</div>
+    </div>
+    <div class="slide-num">8 / 10</div>
+  </div>
+  <div class="slide-body">
+    <div class="question">
+      <div class="q-label">Вопрос 6.1 · Шкала</div>
+      <div class="q-text">Насколько вы готовы начать использовать AI-инструменты в работе прямо сейчас?</div>
+      <div class="likert">
+        <div class="likert-label">Совсем не готов</div>
+        <div class="likert-cells">
+          <div class="likert-cell">1</div>
+          <div class="likert-cell">2</div>
+          <div class="likert-cell">3</div>
+          <div class="likert-cell">4</div>
+          <div class="likert-cell">5</div>
+        </div>
+        <div class="likert-label right">Готов прямо сейчас</div>
+      </div>
+    </div>
+    <div style="height:12px"></div>
+    <div class="question">
+      <div class="q-label">Вопрос 6.3 · Несколько вариантов</div>
+      <div class="q-text">Какие задачи вы точно НЕ хотели бы передавать AI? Выберите все подходящие.</div>
+      <div class="options" style="flex-direction:row; flex-wrap:wrap; gap:5px;">
+        <div class="option" style="flex:none; padding:5px 10px;"><div class="dot" style="border-radius:3px"></div>Принятие ключевых решений</div>
+        <div class="option" style="flex:none; padding:5px 10px;"><div class="dot" style="border-radius:3px"></div>Коммуникация с командой</div>
+        <div class="option" style="flex:none; padding:5px 10px;"><div class="dot" style="border-radius:3px"></div>Оценка качества работы</div>
+        <div class="option" style="flex:none; padding:5px 10px;"><div class="dot" style="border-radius:3px"></div>Творческий поиск</div>
+        <div class="option" style="flex:none; padding:5px 10px;"><div class="dot" style="border-radius:3px"></div>Ничего — готов пробовать всё</div>
+      </div>
+    </div>
+  </div>
+  <div class="slide-footer">
+    <div class="footer-brand">chilBase · AI Диагностика</div>
+    <div class="footer-draft">ЧЕРНОВИК — не для финального использования</div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════
+     SLIDE 9: БЛОК 7 — ОТКРЫТЫЙ ВОПРОС
+═════════════════════════════════════════ -->
+<div class="slide">
+  <div class="draft-badge">⚠ Черновик · v0.1</div>
+  <div class="slide-header">
+    <div class="block-badge">Блок 7 · Открытые вопросы</div>
+    <div>
+      <h2>Свободные ответы</h2>
+      <div class="sub">3 вопроса · текстовые поля · необязательные</div>
+    </div>
+    <div class="slide-num">9 / 10</div>
+  </div>
+  <div class="slide-body">
+    <div class="question">
+      <div class="q-label">Главный вопрос</div>
+      <div class="q-text">Если бы вы могли устранить одну рутинную задачу прямо сейчас — что бы это было?</div>
+      <div class="fake-textarea">Свободный ответ...</div>
+    </div>
+    <div style="height:10px"></div>
+    <div class="question">
+      <div class="q-label">Дополнительно</div>
+      <div class="q-text">Есть ли что-то важное о вашей работе, что не вошло в этот опросник?</div>
+      <div class="fake-textarea">Свободный ответ...</div>
+    </div>
+  </div>
+  <div class="slide-footer">
+    <div class="footer-brand">chilBase · AI Диагностика</div>
+    <div class="footer-draft">ЧЕРНОВИК — не для финального использования</div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════
+     SLIDE 10: ЧТО НА ВЫХОДЕ
+═════════════════════════════════════════ -->
+<div class="slide">
+  <div class="draft-badge">⚠ Черновик · v0.1</div>
+  <div class="slide-header">
+    <div>
+      <h2>Что получается на выходе</h2>
+      <div class="sub">Данные опросников + интервью → четыре артефакта</div>
+    </div>
+    <div class="slide-num">10 / 10</div>
+  </div>
+  <div class="slide-body">
+    <div class="output-row">
+      <div class="output-card">
+        <div class="oc-icon">🗺</div>
+        <div class="oc-title">AI Opportunity Map</div>
+        <div class="oc-desc">Матрица процессов: потенциал автоматизации × сложность внедрения. По каждому — отдел, тип, связь с KPI, ожидаемый эффект.</div>
+      </div>
+      <div class="output-card">
+        <div class="oc-icon">🎓</div>
+        <div class="oc-title">Программа обучения</div>
+        <div class="oc-desc">4 трека под 4 психотипа. Не одна лекция для всех — форматы, темы и глубина под готовность каждой группы.</div>
+      </div>
+    </div>
+    <div class="output-row">
+      <div class="output-card">
+        <div class="oc-icon">🛣</div>
+        <div class="oc-title">Roadmap автоматизаций</div>
+        <div class="oc-desc">30 дней / 90 дней / 6 месяцев. Конкретные инструменты, ответственные и метрики успеха для каждого шага.</div>
+      </div>
+      <div class="output-card">
+        <div class="oc-icon">📄</div>
+        <div class="oc-title">Executive Summary</div>
+        <div class="oc-desc">Одна страница с главными находками и топ‑3 рекомендациями для руководства. Без перегруза деталями.</div>
+      </div>
+    </div>
+  </div>
+  <div class="slide-footer">
+    <div class="footer-brand">chilBase · AI Диагностика</div>
+    <div class="footer-draft">ЧЕРНОВИК — не для финального использования</div>
+  </div>
+</div>
+
+<script>
+// Auto-set date on cover if needed
+</script>
+</body>
+</html>

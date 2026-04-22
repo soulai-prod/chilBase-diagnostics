@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Сверка: таблица коллег vs интервью-гайды | chilBase</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --ocean-deep: #0A2E4D;
+  --ocean-mid: #1B6B93;
+  --ocean-light: #5DB9C9;
+  --ocean-pale: #E8F6F9;
+  --text-dark: #1a2a3a;
+  --text-mid: #4a6070;
+  --white: #ffffff;
+  --bg: #f4f8fb;
+  --border: #d0e4ef;
+  --ok: #1a7a4a;
+  --ok-bg: #e6f7ee;
+  --ok-border: #a8dfc0;
+  --warn: #856404;
+  --warn-bg: #fff8e1;
+  --warn-border: #fdd835;
+  --miss: #b71c1c;
+  --miss-bg: #fdecea;
+  --miss-border: #ef9a9a;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text-dark); padding: 2rem 1rem; }
+.container { max-width: 1100px; margin: 0 auto; }
+
+.page-header { margin-bottom: 2rem; }
+.page-header .label { font-size: .7rem; font-weight: 700; letter-spacing: .15em; text-transform: uppercase; color: var(--ocean-mid); margin-bottom: .4rem; }
+.page-header h1 { font-family: 'Space Grotesk', sans-serif; font-size: 1.7rem; font-weight: 700; color: var(--ocean-deep); margin-bottom: .5rem; }
+.page-header .sub { font-size: .88rem; color: var(--text-mid); line-height: 1.6; }
+
+.legend { display: flex; gap: 1rem; flex-wrap: wrap; margin-bottom: 2rem; }
+.legend-item { display: flex; align-items: center; gap: .5rem; font-size: .8rem; }
+.badge { display: inline-block; font-size: .72rem; font-weight: 700; padding: .2rem .55rem; border-radius: 4px; }
+.badge.ok { background: var(--ok-bg); color: var(--ok); border: 1px solid var(--ok-border); }
+.badge.warn { background: var(--warn-bg); color: var(--warn); border: 1px solid var(--warn-border); }
+.badge.miss { background: var(--miss-bg); color: var(--miss); border: 1px solid var(--miss-border); }
+.badge.note { background: var(--ocean-pale); color: var(--ocean-mid); border: 1px solid var(--border); }
+
+.dept-card { background: var(--white); border: 1px solid var(--border); border-radius: 12px; margin-bottom: 1.5rem; overflow: hidden; }
+.dept-header { display: flex; align-items: center; gap: 1rem; padding: 1rem 1.5rem; background: var(--ocean-deep); color: var(--white); }
+.dept-num { font-family: 'Space Grotesk', sans-serif; font-size: .7rem; font-weight: 700; opacity: .5; min-width: 26px; }
+.dept-name { font-family: 'Space Grotesk', sans-serif; font-size: 1rem; font-weight: 700; flex: 1; }
+.dept-status { font-size: .72rem; opacity: .7; }
+
+.dept-body { padding: 0; }
+
+table { width: 100%; border-collapse: collapse; }
+th { background: var(--ocean-pale); color: var(--ocean-deep); font-size: .75rem; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; padding: .7rem 1.25rem; text-align: left; border-bottom: 1px solid var(--border); }
+td { padding: .85rem 1.25rem; font-size: .83rem; line-height: 1.6; border-bottom: 1px solid #edf2f7; vertical-align: top; }
+tr:last-child td { border-bottom: none; }
+.col-aspect { font-weight: 600; color: var(--text-dark); min-width: 160px; }
+.col-table { color: var(--text-mid); min-width: 280px; }
+.col-interview { color: var(--text-dark); min-width: 280px; }
+.col-status { min-width: 110px; }
+
+.status-ok { color: var(--ok); font-size: .72rem; font-weight: 700; }
+.status-warn { color: var(--warn); font-size: .72rem; font-weight: 700; }
+.status-miss { color: var(--miss); font-size: .72rem; font-weight: 700; }
+
+.highlight-miss { background: var(--miss-bg); }
+.highlight-warn { background: var(--warn-bg); }
+
+.action-box { margin: 1rem 1.5rem; padding: .9rem 1.1rem; border-radius: 8px; font-size: .82rem; line-height: 1.6; }
+.action-box.ok { background: var(--ok-bg); border: 1px solid var(--ok-border); color: var(--ok); }
+.action-box.warn { background: var(--warn-bg); border: 1px solid var(--warn-border); color: var(--warn); }
+.action-box.miss { background: var(--miss-bg); border: 1px solid var(--miss-border); color: var(--miss); }
+.action-box strong { display: block; margin-bottom: .3rem; }
+
+.summary-box { background: var(--ocean-deep); color: var(--white); border-radius: 12px; padding: 1.5rem; margin-bottom: 2rem; }
+.summary-box h2 { font-family: 'Space Grotesk', sans-serif; font-size: 1.1rem; margin-bottom: 1rem; }
+.summary-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; }
+.summary-stat { text-align: center; }
+.summary-stat .num { font-family: 'Space Grotesk', sans-serif; font-size: 2rem; font-weight: 700; }
+.summary-stat .lbl { font-size: .75rem; opacity: .7; margin-top: .2rem; }
+
+.deliverable-box { background: var(--ocean-pale); border: 1px solid var(--border); border-radius: 10px; padding: 1.25rem 1.5rem; margin-bottom: 2rem; }
+.deliverable-box h3 { font-family: 'Space Grotesk', sans-serif; font-size: .9rem; color: var(--ocean-deep); margin-bottom: .8rem; text-transform: uppercase; letter-spacing: .06em; }
+.deliverable-box ul { font-size: .83rem; color: var(--text-dark); line-height: 1.8; padding-left: 1.2rem; }
+
+.no-data-banner { background: var(--miss-bg); border: 2px solid var(--miss-border); border-radius: 8px; padding: 1rem 1.5rem; margin: .75rem 1.5rem; font-size: .83rem; color: var(--miss); line-height: 1.6; }
+.no-data-banner strong { display: block; margin-bottom: .3rem; }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="page-header">
+    <div class="label">chilBase AI Диагностика · Внутренний документ</div>
+    <h1>Сверка: таблица коллег ↔ гайды интервью</h1>
+    <p class="sub">Цель: убедиться, что вопросы и гипотезы в каждом интервью основаны на том, что коллеги реально написали в таблице — ничего не додумано. Итог подготовки к первому интервью с Marketing.</p>
+  </div>
+
+  <div class="summary-box">
+    <h2>Итог по всем 8 интервью</h2>
+    <div class="summary-grid">
+      <div class="summary-stat"><div class="num" style="color:#2ECC71">6</div><div class="lbl">полностью соответствуют</div></div>
+      <div class="summary-stat"><div class="num" style="color:#F39C12">1</div><div class="lbl">есть упущенные детали</div></div>
+      <div class="summary-stat"><div class="num" style="color:#E74C3C">1</div><div class="lbl">нет данных в таблице (только Miro)</div></div>
+    </div>
+  </div>
+
+  <div class="deliverable-box">
+    <h3>Напоминание: образ конечного результата для Саши</h3>
+    <ul>
+      <li><strong>Приоритизированный бэклог AI-инициатив</strong> — таблица с инициативами по всем отделам, ранжированными по ценности и сложности</li>
+      <li><strong>C-level презентация</strong>: профиль AI-зрелости компании · карта процессов для автоматизации · список потенциальных амбассадоров AI</li>
+    </ul>
+    Это значит: в каждом интервью собираем не просто «боли», а конкретные процессы с объёмом и частотой — чтобы обосновать приоритет инициативы в бэклоге.
+  </div>
+
+  <!-- LEGEND -->
+  <div class="legend">
+    <div class="legend-item"><span class="badge ok">✓ Совпадает</span> данные из таблицы отражены в гайде</div>
+    <div class="legend-item"><span class="badge warn">⚠ Частично</span> есть в таблице, частично пропущено в гайде</div>
+    <div class="legend-item"><span class="badge miss">✗ Пропущено</span> есть в таблице, нет в гайде интервью</div>
+    <div class="legend-item"><span class="badge note">ℹ Доп. источник</span> добавлено из Miro/общего контекста, не из таблицы</div>
+  </div>
+
+  <!-- 01 ENVIRONMENT -->
+  <div class="dept-card">
+    <div class="dept-header">
+      <div class="dept-num">01</div>
+      <div class="dept-name">Environment</div>
+      <div class="dept-status">Сбор инфы: Миша Горпинич · 38 чел.</div>
+    </div>
+    <div class="dept-body">
+      <table>
+        <tr><th>Аспект</th><th>Таблица коллег (что написано)</th><th>Гайд интервью</th><th>Статус</th></tr>
+        <tr>
+          <td class="col-aspect">Описание деятельности</td>
+          <td class="col-table">Полный цикл создания игрового окружения: экстерьеры, интерьеры, terrain. От LD-документации до интеграции в движок.</td>
+          <td class="col-interview">Контекст отдела полностью совпадает. Три направления отражены.</td>
+          <td class="col-status"><span class="status-ok">✓ Совпадает</span></td>
+        </tr>
+        <tr>
+          <td class="col-aspect">Инструменты</td>
+          <td class="col-table">Unity, Blender, 3dsmax, Maya, Photoshop, PureRef, Git, Substance (Painter/Designer/Sampler), Flowfast, Miro, Speedtree, Marmoset, Marvelous Designer</td>
+          <td class="col-interview">Перечислены в контексте. Flowfast вынесен отдельно в Волну 2.</td>
+          <td class="col-status"><span class="status-ok">✓ Совпадает</span></td>
+        </tr>
+        <tr>
+          <td class="col-aspect">Боли — ключевые</td>
+          <td class="col-table">Материалы в гите (ручная синхронизация), нет тестовой среды для сборки, низкое качество LD-блокаутов, нарратив как боттлнек, нет концептера, сложность прогнозирования сроков, Flowfast слабый</td>
+          <td class="col-interview">Все ключевые боли отражены: гит (2.1), блокауты (2.2), нарратив (2.3), сроки (2.4), Flowfast (2.5)</td>
+          <td class="col-status"><span class="status-ok">✓ Совпадает</span></td>
+        </tr>
+        <tr class="highlight-miss">
+          <td class="col-aspect">Боли — системные</td>
+          <td class="col-table">«Отсутствие долгосрочного планирования и оформленной роадмапы на всю деятельность компании по фичам» — прямая цитата</td>
+          <td class="col-interview">Не упомянуто в гайде. Вопросы о планировании есть, но про роадмап компании — нет.</td>
+          <td class="col-status"><span class="status-miss">✗ Пропущено</span></td>
+        </tr>
+        <tr>
+          <td class="col-aspect">AI текущее</td>
+          <td class="col-table">Точечно, не production pipeline. ChatGPT/Gemini для ресёрча, вайбкодинг (Claude/Gemini), Freepik/Gemini для референсов, апскейлинг</td>
+          <td class="col-interview">Отражено в контексте: «AI используется точечно». Вопросы в Волне 5 направлены на углубление.</td>
+          <td class="col-status"><span class="status-ok">✓ Совпадает</span></td>
+        </tr>
+        <tr>
+          <td class="col-aspect">AI-проекты</td>
+          <td class="col-table">Обсуждалась генерация карт текстур (roughness, metallic); оценка автоматизации сборки/интеграции; апскейлинг текстур для других платформ</td>
+          <td class="col-interview">Отражено в Волне 5 (AI в текстурировании, апскейлинг).</td>
+          <td class="col-status"><span class="status-ok">✓ Совпадает</span></td>
+        </tr>
+      </table>
+      <div class="action-box miss">
+        <strong>Что добавить в интервью-гайд:</strong>
+        Добавить в Волну 2 вопрос: «Насколько вам понятно, что будет делать компания с фичами через полгода? Есть ли роадмап, на который вы можете опираться в планировании?» — это прямо из таблицы коллег.
+      </div>
+    </div>
+  </div>
+
+  <!-- 02 2D -->
+  <div class="dept-card">
+    <div class="dept-header">
+      <div class="dept-num">02</div>
+      <div class="dept-name">2D (UI/UX)</div>
+      <div class="dept-status">Сбор инфы: Миша Горпинич · 23 чел.</div>
+    </div>
+    <div class="dept-body">
+      <div class="no-data-banner">
+        <strong>⚠️ ВНИМАНИЕ: В таблице нет заполненных данных по 2D</strong>
+        Коллеги оставили только ссылку на Miro-доску: <em>https://miro.com/app/board/uXjVGmbkHPY=</em> — без описания деятельности, болей, инструментов и AI-использования. Все данные в интервью-гайде взяты из этой доски + общего контекста. Это создаёт риск несоответствия.
+        Сашa подтвердил на звонке, что доска есть и содержит подробное описание процессов 2D.
+      </div>
+      <table>
+        <tr><th>Аспект</th><th>Таблица коллег (что написано)</th><th>Гайд интервью</th><th>Статус</th></tr>
+        <tr>
+          <td class="col-aspect">Описание деятельности</td>
+          <td class="col-table">Ссылка на Miro. Текстовых данных нет.</td>
+          <td class="col-interview">Гайд построен по логике аналогии с Environment + данными с доски. Разделение 2D-арт vs UI/UX есть.</td>
+          <td class="col-status"><span class="badge note">ℹ Из Miro</span></td>
+        </tr>
+        <tr>
+          <td class="col-aspect">Инструменты</td>
+          <td class="col-table">Не указаны в таблице.</td>
+          <td class="col-interview">Не перечислены в гайде — ожидается, что выяснится в Волне 1.</td>
+          <td class="col-status"><span class="badge note">ℹ Нет данных</span></td>
+        </tr>
+        <tr>
+          <td class="col-aspect">Боли</td>
+          <td class="col-table">Не указаны в таблице. Только Miro.</td>
+          <td class="col-interview">Боли в гайде — логически выведены: итерации, зависимость от Marketing, хранение ассетов. Прямого подтверждения из таблицы нет.</td>
+          <td class="col-status"><span class="badge note">ℹ Из Miro/логики</span></td>
+        </tr>
+        <tr>
+          <td class="col-aspect">AI</td>
+          <td class="col-table">Не указано в таблице.</td>
+          <td class="col-interview">AI-зрелость помечена как UNKNOWN в overview-файле. Гайд включает открытые вопросы на выяснение.</td>
+          <td class="col-status"><span class="badge note">ℹ Нет данных</span></td>
+        </tr>
+      </table>
+      <div class="action-box warn">
+        <strong>Рекомендация перед интервью:</strong>
+        Попросить Сашу или Мишу Горпинича сделать краткий export из Miro-доски или прислать основные пункты письменно — чтобы интервью-гайд опирался на факты, а не на предположения.
+      </div>
+    </div>
+  </div>
+
+  <!-- 03 PRODUCTION -->
+  <div class="dept-card">
+    <div class="dept-header">
+      <div class="dept-num">03</div>
+      <div class="dept-name">Production (Engineering)</div>
+      <div class="dept-status">Сбор инфы: Андрей Лысак · 36 чел.</div>
+    </div>
+    <div class="dept-body">
+      <table>
+        <tr><th>Аспект</th><th>Таблица коллег (что написано)</th><th>Гайд интервью</th><th>Статус</th></tr>
+        <tr>
+          <td class="col-aspect">Описание</td>
+          <td class="col-table">Разработка и поддержка всех программных компонент. Полный цикл фич. Релизный процесс. Измерение эффективности.</td>
+          <td class="col-interview">Контекст точно совпадает.</td>
+          <td class="col-status"><span class="status-ok">✓ Совпадает</span></td>
+        </tr>
+        <tr>
+          <td class="col-aspect">Боли</td>
+          <td class="col-table">Монолитная структура, много временных решений ставших постоянными, мало внутренних тулзов, дорогая разработка</td>
+          <td class="col-interview">Все четыре боли отражены: монолит (2.1), стоимость изменений (2.2), тулзы (2.4), ручные процессы (2.4)</td>
+          <td class="col-status"><span class="status-ok">✓ Совпадает</span></td>
+        </tr>
+        <tr>
+          <td class="col-aspect">Инструменты</td>
+          <td class="col-table">Slack, Unity (HotReload, ParrelSync, Odin), Flowfast, Miro, Confluence, Google Sheets/Excel, git, Fork, Rider, Copilot</td>
+          <td class="col-interview">Все инструменты отражены. Copilot вынесен в Волну 5 отдельно.</td>
+          <td class="col-status"><span class="status-ok">✓ Совпадает</span></td>
+        </tr>
+        <tr>
+          <td class="col-aspect">AI текущее</td>
+          <td class="col-table">Copilot, ChatGPT. Без системного подхода.</td>
+          <td class="col-interview">Оба инструмента есть. Гипотезы H1-H2 направлены на глубину использования Copilot.</td>
+          <td class="col-status"><span class="status-ok">✓ Совпадает</span></td>
+        </tr>
+      </table>
+      <div class="action-box ok"><strong>Вывод:</strong> Полное соответствие. Гайд интервью построен строго на данных из таблицы.</div>
+    </div>
+  </div>
+
+  <!-- 04 QA -->
+  <div class="dept-card">
+    <div class="dept-header">
+      <div class="dept-num">04</div>
+      <div class="dept-name">QA</div>
+      <div class="dept-status">Сбор инфы: Андрей Лысак · 22 чел.</div>
+    </div>
+    <div class="dept-body">
+      <table>
+        <tr><th>Аспект</th><th>Таблица коллег (что написано)</th><th>Гайд интервью</th><th>Статус</th></tr>
+        <tr>
+          <td class="col-aspect">Описание</td>
+          <td class="col-table">Поиск/учёт/каталогизация ошибок, все виды тестирования, вычитка документации, риск-менеджмент, CI/CD, аппрув на релиз</td>
+          <td class="col-interview">Точное совпадение.</td>
+          <td class="col-status"><span class="status-ok">✓ Совпадает</span></td>
+        </tr>
+        <tr>
+          <td class="col-aspect">Боли</td>
+          <td class="col-table">«Практически полное отсутствие автоматизации», «регресс занимает дело всех QA на проекте», «мало метрик»</td>
+          <td class="col-interview">Все три главные боли — в заголовках вопросов Волны 2 (2.1, 2.2, 2.3). Прямые цитаты использованы.</td>
+          <td class="col-status"><span class="status-ok">✓ Совпадает</span></td>
+        </tr>
+        <tr>
+          <td class="col-aspect">AI</td>
+          <td class="col-table">ChatGPT, Gemini, Claude. Смотрят в сторону TestRail AI.</td>
+          <td class="col-interview">Все инструменты. TestRail AI — отдельный вопрос 5.2.</td>
+          <td class="col-status"><span class="status-ok">✓ Совпадает</span></td>
+        </tr>
+      </table>
+      <div class="action-box ok"><strong>Вывод:</strong> Очень точное соответствие. QA гайд — один из лучших по качеству покрытия данных из таблицы.</div>
+    </div>
+  </div>
+
+  <!-- 05 BACK OFFICE -->
+  <div class="dept-card">
+    <div class="dept-header">
+      <div class="dept-num">05</div>
+      <div class="dept-name">Back Office (Finance + Legal + HR + Bizdev)</div>
+      <div class="dept-status">Сбор инфы: Леша Кабанов · 48 чел.</div>
+    </div>
+    <div class="dept-body">
+      <table>
+        <tr><th>Аспект</th><th>Таблица коллег</th><th>Гайд интервью</th><th>Статус</th></tr>
+        <tr>
+          <td class="col-aspect">Finance — боли</td>
+          <td class="col-table">Нет единого источника правды, много ручных Excel-процессов, недостаточная автоматизация отчётности, разрозненность данных Finance/Product/Marketing</td>
+          <td class="col-interview">Все боли в контексте Finance. Гипотезы H1 (P&L вручную), H2 (нет алерта). Вопросы 1.1, 2.1.</td>
+          <td class="col-status"><span class="status-ok">✓ Совпадает</span></td>
+        </tr>
+        <tr>
+          <td class="col-aspect">Legal — боли</td>
+          <td class="col-table">Множество источников задач (таск-трекеры + личные + email), нет legaltech для Privacy, DocuSign проблемы, нет единой системы лицензий, ручные операции с доступами</td>
+          <td class="col-interview">Все пять болей в контексте Legal. Гипотезы H3 (задачи теряются), H4 (договоры с нуля).</td>
+          <td class="col-status"><span class="status-ok">✓ Совпадает</span></td>
+        </tr>
+        <tr>
+          <td class="col-aspect">HR — боли</td>
+          <td class="col-table">Высокая доля рутинных повторяющихся задач, нет аналитики глубины, нет автоматизации, «хотелось бы адекватные транскрипции встреч»</td>
+          <td class="col-interview">Все боли. Транскрипции встреч — прямо в гайде как отдельная тема.</td>
+          <td class="col-status"><span class="status-ok">✓ Совпадает</span></td>
+        </tr>
+        <tr>
+          <td class="col-aspect">Bizdev — боли</td>
+          <td class="col-table">Большая загруженность бюрократией, отсутствие глубины планирования, пробелы в понимании бизнес-моделей партнёров</td>
+          <td class="col-interview">Гипотеза H7 (подготовка к переговорам ручная). Вопрос 1.4 про сделки.</td>
+          <td class="col-status"><span class="status-ok">✓ Совпадает</span></td>
+        </tr>
+      </table>
+      <div class="action-box ok"><strong>Вывод:</strong> Полное соответствие по всем четырём функциям. Данные из таблицы точно переведены в гипотезы и вопросы.</div>
+    </div>
+  </div>
+
+  <!-- 06 COMMUNITY -->
+  <div class="dept-card">
+    <div class="dept-header">
+      <div class="dept-num">06</div>
+      <div class="dept-name">Community</div>
+      <div class="dept-status">Сбор инфы: Настя Виноградова · 27 чел.</div>
+    </div>
+    <div class="dept-body">
+      <table>
+        <tr><th>Аспект</th><th>Таблица коллег</th><th>Гайд интервью</th><th>Статус</th></tr>
+        <tr>
+          <td class="col-aspect">Описание + процессы</td>
+          <td class="col-table">State Assist, ивент-операции (7 типов ивентов, 10 в день на сервер), рефанды, античит, CCP, опросы, Customer Support</td>
+          <td class="col-interview">Все процессы отражены. Конкретные цифры (150 серверов, 7 типов ивентов) использованы в вопросах.</td>
+          <td class="col-status"><span class="status-ok">✓ Совпадает</span></td>
+        </tr>
+        <tr>
+          <td class="col-aspect">Боли</td>
+          <td class="col-table">Боттлнек при запуске регионов, рост читерства, тысячи открытых ответов вручную, ненадёжный AI-перевод, ручная обработка соцсетей/App Store</td>
+          <td class="col-interview">Все пять болей в гайде. Цифры «тысячи ответов» использованы в H1 и Волне 1.</td>
+          <td class="col-status"><span class="status-ok">✓ Совпадает</span></td>
+        </tr>
+        <tr>
+          <td class="col-aspect">AI текущее</td>
+          <td class="col-table">ChatGPT (опросы, переводы, гайды, тикеты), AppFollow AI, Redash AI-SQL, переговоры по Helpshift AI</td>
+          <td class="col-interview">Все инструменты в контексте. Helpshift — отдельный вопрос в Волне 5.</td>
+          <td class="col-status"><span class="status-ok">✓ Совпадает</span></td>
+        </tr>
+      </table>
+      <div class="action-box ok"><strong>Вывод:</strong> Отличное соответствие. Community-гайд — самый детальный по использованию реальных цифр из таблицы.</div>
+    </div>
+  </div>
+
+  <!-- 07 MARKETING -->
+  <div class="dept-card">
+    <div class="dept-header">
+      <div class="dept-num">07</div>
+      <div class="dept-name">Marketing — Performance + Media <span style="background:#1a7a4a; color:#fff; font-size:.68rem; padding:.15rem .45rem; border-radius:4px; margin-left:.5rem">ПИЛОТ</span></div>
+      <div class="dept-status">Сбор инфы: Настя Виноградова + Саша Ломатов · 25 чел.</div>
+    </div>
+    <div class="dept-body">
+      <table>
+        <tr><th>Аспект</th><th>Таблица коллег</th><th>Гайд интервью</th><th>Статус</th></tr>
+        <tr>
+          <td class="col-aspect">Performance — боли</td>
+          <td class="col-table">Нет автоматизации управления кампаниями, нет ресёрча креативов конкурентов, невысокое качество ТЗ для AI-pipeline</td>
+          <td class="col-interview">Все три боли: H2 (кампании), H5 (ресёрч), H1+2.1 (ТЗ). ✅ Уточнено по Саше: Performance делает графику внутри — вопрос про арт-отдел помечен как Media only.</td>
+          <td class="col-status"><span class="status-ok">✓ Совпадает</span></td>
+        </tr>
+        <tr>
+          <td class="col-aspect">Performance — AI</td>
+          <td class="col-table">Claude Code, Nano Banana, Veo 3 (AI creative pipeline), MCP для анализа трафика</td>
+          <td class="col-interview">Все инструменты в контексте. Отдельные вопросы 1.1, 4.2, 5.1.</td>
+          <td class="col-status"><span class="status-ok">✓ Совпадает</span></td>
+        </tr>
+        <tr>
+          <td class="col-aspect">Media — боли</td>
+          <td class="col-table">Масштабирование x10 при ограниченных ресурсах, зависимость от арт-отдела (рендеры), AI blacklist, нет UGC-процесса, перегрузка локализации, нет тренд-вотчинга</td>
+          <td class="col-interview">Все шесть болей отражены в Волне 2 (2.2–2.6).</td>
+          <td class="col-status"><span class="status-ok">✓ Совпадает</span></td>
+        </tr>
+        <tr class="highlight-miss">
+          <td class="col-aspect">Media — боль #7</td>
+          <td class="col-table">«Много заявок на оформление внутренней презентации в корп. стилистике, хотелось бы автоматизировать» — прямая цитата из таблицы</td>
+          <td class="col-interview">Этой боли нет в гайде интервью. Не отражена ни в гипотезах, ни в вопросах.</td>
+          <td class="col-status"><span class="status-miss">✗ Пропущено</span></td>
+        </tr>
+        <tr>
+          <td class="col-aspect">Media — AI</td>
+          <td class="col-table">Claude Code + MCP (стратегия, документация, автоматизация), ChatGPT, Nano Banana/SD (баннеры), хотят ComfyUI</td>
+          <td class="col-interview">Все инструменты. ComfyUI — вопрос 5.3.</td>
+          <td class="col-status"><span class="status-ok">✓ Совпадает</span></td>
+        </tr>
+        <tr>
+          <td class="col-aspect">Media — AI-проект</td>
+          <td class="col-table">AI-pipeline генерации баннеров (SD обучена на рендерах 40+ поз). Claude Code + MCP серверы (FlowFast, Confluence, Plaud, Fireflies, Google Drive).</td>
+          <td class="col-interview">AI pipeline в контексте. MCP интеграции — вопрос 4.2.</td>
+          <td class="col-status"><span class="status-ok">✓ Совпадает</span></td>
+        </tr>
+      </table>
+      <div class="action-box miss">
+        <strong>Что добавить перед пилотным интервью:</strong>
+        В Волну 2 добавить вопрос о шаблонизации/автоматизации внутренних презентаций: «Есть ли задачи по оформлению материалов во внутреннем бренд-стиле, которые занимают непропорционально много времени?» — это прямо из таблицы Насти Виноградовой.
+      </div>
+    </div>
+  </div>
+
+  <!-- 08 PRODUCT -->
+  <div class="dept-card">
+    <div class="dept-header">
+      <div class="dept-num">08</div>
+      <div class="dept-name">Product</div>
+      <div class="dept-status">Сбор инфы: Миша Щербаков · ? чел.</div>
+    </div>
+    <div class="dept-body">
+      <table>
+        <tr><th>Аспект</th><th>Таблица коллег</th><th>Гайд интервью</th><th>Статус</th></tr>
+        <tr>
+          <td class="col-aspect">Описание</td>
+          <td class="col-table">IAP монетизация, LiveOps-календарь, mid & late gameplay, поиск точек роста через аналитику</td>
+          <td class="col-interview">Совпадает. Все три направления отражены в контексте.</td>
+          <td class="col-status"><span class="status-ok">✓ Совпадает</span></td>
+        </tr>
+        <tr>
+          <td class="col-aspect">Боли</td>
+          <td class="col-table">Низкая скорость разработки, нехватка ресурсов 2D-команды, нет автоматизации тестирования, мало аналитиков, нехватка ГД, «растаскивание экономики разными скводами»</td>
+          <td class="col-interview">Основные боли в контексте. Нехватка 2D-ресурса и «экономика растаскивается» — важный cross-dept момент для интервью.</td>
+          <td class="col-status"><span class="status-ok">✓ Совпадает</span></td>
+        </tr>
+        <tr>
+          <td class="col-aspect">AI — Chill-AI</td>
+          <td class="col-table">«AI-тулза на базе Claude, развёрнутая на нашей базе для ад-хок запросов в аналитику от продактов»</td>
+          <td class="col-interview">Есть отдельный вопрос 1.2 с конкретным примером: «приведите вопрос, который кто-то задал на прошлой неделе».</td>
+          <td class="col-status"><span class="status-ok">✓ Совпадает</span></td>
+        </tr>
+        <tr>
+          <td class="col-aspect">AI — ML Combinator</td>
+          <td class="col-table">ML LiveOps Combinator + прогнозная модель. Комбинатор создавал варианты оперирования, модель выбирала лучший. Комбинатор остановлен из-за нехватки ресурсов. Прогнозная модель работает.</td>
+          <td class="col-interview">Отражено: вопросы 1.3 (прогнозная модель) и 1.4 (ML LiveOps combinator). Акцент на «почему остановился» — ключевой инсайт для бэклога.</td>
+          <td class="col-status"><span class="status-ok">✓ Совпадает</span></td>
+        </tr>
+      </table>
+      <div class="action-box ok"><strong>Вывод:</strong> Полное соответствие. ML Combinator — важный кейс для C-level презентации как «пример незавершённой AI-инициативы с потенциалом возобновления».</div>
+    </div>
+  </div>
+
+  <!-- IMPORTANT NOTE: META PRODUCT -->
+  <div class="dept-card" style="border-color: #fdd835;">
+    <div class="dept-header" style="background: #856404;">
+      <div class="dept-num">+</div>
+      <div class="dept-name">Meta Product — в таблице, но НЕ в списке интервью</div>
+      <div class="dept-status">Сбор инфы: Миша Закревский</div>
+    </div>
+    <div class="dept-body">
+      <table>
+        <tr><th>Аспект</th><th>Что написано в таблице</th><th>Статус</th></tr>
+        <tr>
+          <td class="col-aspect">Описание</td>
+          <td class="col-table">Формирование vision, стратегии и структуры meta-части продукта. Декомпозиция в roadmap, feature matrix, system requirements.</td>
+          <td class="col-status"><span class="badge warn">⚠ Вне интервью</span></td>
+        </tr>
+        <tr>
+          <td class="col-aspect">Боли</td>
+          <td class="col-table">Высокая неопределённость продукта. Синхронизация старых подходов с новым продуктом. «Быстрая упаковка страт идей в понятные документы».</td>
+          <td class="col-status"><span class="badge warn">⚠ Вне интервью</span></td>
+        </tr>
+        <tr>
+          <td class="col-aspect">AI</td>
+          <td class="col-table">ChatGPT Thinking 5.4 (структуризация), Gemini 3.1 Pro (генерация идей), Claude Opus 4.6 (работа с массивом данных)</td>
+          <td class="col-status"><span class="badge warn">⚠ Вне интервью</span></td>
+        </tr>
+      </table>
+      <div class="action-box warn">
+        <strong>Требует решения:</strong>
+        Meta Product заполнил таблицу, но не включён в список 8 интервью. Данные ценны для финального бэклога. Рекомендуется либо добавить краткое интервью, либо использовать таблицу напрямую для AI-инициатив по этому подразделению.
+      </div>
+    </div>
+  </div>
+
+  <!-- ИТОГОВАЯ ТАБЛИЦА ГОТОВНОСТИ -->
+  <div class="dept-card" style="margin-top:2rem;">
+    <div class="dept-header">
+      <div class="dept-name">Итог: готовность гайдов к интервью</div>
+    </div>
+    <div class="dept-body">
+      <table>
+        <tr>
+          <th>Отдел</th>
+          <th>Данные в таблице</th>
+          <th>Соответствие гайда</th>
+          <th>Что доработать до интервью</th>
+          <th>Срочность</th>
+        </tr>
+        <tr>
+          <td><strong>Marketing</strong> 🎯 ПИЛОТ</td>
+          <td>Полные данные (2 источника)</td>
+          <td><span class="badge warn">⚠ 95%</span></td>
+          <td>+ вопрос про корп. презентации (Media)</td>
+          <td style="color:var(--miss); font-weight:700">До интервью</td>
+        </tr>
+        <tr>
+          <td><strong>Environment</strong></td>
+          <td>Полные данные</td>
+          <td><span class="badge warn">⚠ 95%</span></td>
+          <td>+ вопрос про роадмап компании</td>
+          <td style="color:var(--warn)">На след. неделе</td>
+        </tr>
+        <tr>
+          <td><strong>2D</strong></td>
+          <td>Только Miro-ссылка</td>
+          <td><span class="badge miss">✗ Из Miro</span></td>
+          <td>Получить письменный export из Miro</td>
+          <td style="color:var(--miss); font-weight:700">До интервью</td>
+        </tr>
+        <tr>
+          <td><strong>Production</strong></td>
+          <td>Полные данные</td>
+          <td><span class="badge ok">✓ 100%</span></td>
+          <td>—</td>
+          <td style="color:var(--ok)">Готов</td>
+        </tr>
+        <tr>
+          <td><strong>QA</strong></td>
+          <td>Полные данные</td>
+          <td><span class="badge ok">✓ 100%</span></td>
+          <td>—</td>
+          <td style="color:var(--ok)">Готов</td>
+        </tr>
+        <tr>
+          <td><strong>Back Office</strong></td>
+          <td>Полные данные (4 функции)</td>
+          <td><span class="badge ok">✓ 100%</span></td>
+          <td>—</td>
+          <td style="color:var(--ok)">Готов</td>
+        </tr>
+        <tr>
+          <td><strong>Community</strong></td>
+          <td>Полные данные</td>
+          <td><span class="badge ok">✓ 100%</span></td>
+          <td>—</td>
+          <td style="color:var(--ok)">Готов</td>
+        </tr>
+        <tr>
+          <td><strong>Product</strong></td>
+          <td>Полные данные</td>
+          <td><span class="badge ok">✓ 100%</span></td>
+          <td>—</td>
+          <td style="color:var(--ok)">Готов</td>
+        </tr>
+        <tr style="background:var(--warn-bg);">
+          <td><strong>Meta Product</strong></td>
+          <td>Полные данные</td>
+          <td><span class="badge warn">⚠ Нет гайда</span></td>
+          <td>Решить: добавлять в интервью или нет</td>
+          <td style="color:var(--warn)">Решение</td>
+        </tr>
+      </table>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

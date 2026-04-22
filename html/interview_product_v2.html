@@ -1,0 +1,1175 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Интервью — Product v2 | chilBase</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --ocean-deep: #0A2E4D;
+  --ocean-mid: #1B6B93;
+  --ocean-light: #5DB9C9;
+  --ocean-pale: #E8F6F9;
+  --success: #2ECC71;
+  --warning: #F39C12;
+  --danger: #E74C3C;
+  --text-dark: #1a2a3a;
+  --text-mid: #4a6070;
+  --white: #ffffff;
+  --bg: #f4f8fb;
+  --border: #d0e4ef;
+  --new-green: #1a7a4a;
+  --new-green-pale: #e6f7ee;
+  --new-green-border: #a8dfc0;
+  --score-1: #E74C3C; --score-2: #F39C12; --score-3: #F1C40F;
+  --score-4: #2ECC71; --score-5: #1B9E5A;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text-dark); min-height: 100vh; }
+
+/* ── LAYOUT ── */
+.layout { display: grid; grid-template-columns: 270px 1fr; min-height: 100vh; }
+
+/* ── SIDEBAR ── */
+.sidebar {
+  background: var(--ocean-deep); color: var(--white);
+  position: sticky; top: 0; height: 100vh; overflow-y: auto;
+  padding: 1.5rem 0; display: flex; flex-direction: column;
+}
+.sidebar-logo { padding: 0 1.5rem 1.5rem; border-bottom: 1px solid rgba(255,255,255,.1); margin-bottom: 1rem; }
+.sidebar-logo .brand { font-family: 'Space Grotesk', sans-serif; font-size: .75rem; font-weight: 600; letter-spacing: .15em; text-transform: uppercase; opacity: .5; margin-bottom: .3rem; }
+.sidebar-logo .dept { font-family: 'Space Grotesk', sans-serif; font-size: 1.1rem; font-weight: 700; }
+.sidebar-logo .meta { font-size: .75rem; opacity: .55; margin-top: .2rem; }
+.v2-pill { display: inline-block; background: var(--new-green); color: #fff; font-size: .6rem; font-weight: 700; letter-spacing: .08em; padding: .15rem .5rem; border-radius: 20px; margin-left: .4rem; vertical-align: middle; }
+
+.nav-section { padding: 0 .75rem; margin-bottom: .5rem; }
+.nav-label { font-size: .65rem; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; opacity: .4; padding: .5rem .75rem .3rem; }
+.nav-item {
+  display: flex; align-items: center; gap: .7rem;
+  padding: .55rem .75rem; border-radius: 8px; cursor: pointer;
+  font-size: .82rem; opacity: .7; transition: all .2s; text-decoration: none; color: var(--white);
+}
+.nav-item:hover { background: rgba(255,255,255,.08); opacity: 1; }
+.nav-item.active { background: rgba(93,185,201,.18); opacity: 1; color: var(--ocean-light); }
+.nav-item .wave-num { width: 22px; height: 22px; border-radius: 50%; background: rgba(255,255,255,.12); display: flex; align-items: center; justify-content: center; font-size: .7rem; font-weight: 700; flex-shrink: 0; }
+.nav-item.active .wave-num { background: var(--ocean-light); color: var(--ocean-deep); }
+.nav-item .check { margin-left: auto; opacity: 0; color: var(--success); font-size: .85rem; }
+.nav-item.done .check { opacity: 1; }
+.nav-new-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--new-green); flex-shrink: 0; margin-left: auto; }
+
+.sidebar-timer { margin-top: auto; padding: 1rem 1.5rem; border-top: 1px solid rgba(255,255,255,.1); }
+.timer-label { font-size: .65rem; opacity: .4; text-transform: uppercase; letter-spacing: .1em; margin-bottom: .4rem; }
+.timer-display { font-family: 'Space Grotesk', sans-serif; font-size: 1.8rem; font-weight: 700; letter-spacing: .05em; }
+.timer-btn { margin-top: .5rem; width: 100%; background: rgba(255,255,255,.1); border: none; color: var(--white); padding: .5rem; border-radius: 8px; cursor: pointer; font-size: .8rem; font-family: 'Inter', sans-serif; transition: background .2s; }
+.timer-btn:hover { background: rgba(255,255,255,.18); }
+
+/* ── MAIN ── */
+.main { padding: 2rem 2.5rem; max-width: 860px; }
+
+/* ── PAGE HEADER ── */
+.page-header { background: var(--white); border: 1px solid var(--border); border-radius: 16px; padding: 1.5rem 2rem; margin-bottom: 2rem; display: flex; align-items: flex-start; justify-content: space-between; }
+.page-header h1 { font-family: 'Space Grotesk', sans-serif; font-size: 1.5rem; font-weight: 700; color: var(--ocean-deep); margin-bottom: .3rem; }
+.page-header .subtitle { font-size: .85rem; color: var(--text-mid); }
+.meta-grid { display: flex; gap: 1.5rem; margin-top: 1rem; flex-wrap: wrap; }
+.meta-item .label { opacity: .5; text-transform: uppercase; font-size: .65rem; letter-spacing: .08em; }
+.meta-item .value { font-weight: 600; color: var(--ocean-deep); margin-top: .1rem; font-size: .85rem; }
+.consent-badge { background: #FFF3CD; border: 1px solid #FFC107; border-radius: 8px; padding: .6rem 1rem; font-size: .8rem; color: #856404; white-space: nowrap; flex-shrink: 0; }
+
+/* ── SECTIONS ── */
+.section { margin-bottom: 1.5rem; scroll-margin-top: 1rem; }
+.section-card { background: var(--white); border: 1px solid var(--border); border-radius: 16px; overflow: hidden; }
+.section-card.new-section { border-color: var(--new-green-border); }
+.section-header { padding: 1.2rem 1.5rem; display: flex; align-items: center; gap: 1rem; cursor: pointer; user-select: none; }
+.section-header:hover { background: var(--ocean-pale); }
+.section-card.new-section .section-header:hover { background: var(--new-green-pale); }
+.section-icon { width: 36px; height: 36px; border-radius: 10px; background: var(--ocean-pale); display: flex; align-items: center; justify-content: center; font-size: 1rem; flex-shrink: 0; }
+.new-section .section-icon { background: var(--new-green-pale); }
+.section-title { font-family: 'Space Grotesk', sans-serif; font-size: 1rem; font-weight: 600; }
+.section-sub { font-size: .78rem; color: var(--text-mid); margin-top: .1rem; }
+.section-toggle { margin-left: auto; color: var(--text-mid); font-size: .9rem; transition: transform .2s; }
+.section-toggle.open { transform: rotate(180deg); }
+.section-body { padding: 1.5rem; border-top: 1px solid var(--border); }
+.section-body.hidden { display: none; }
+
+/* ── CONTEXT ── */
+.context-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+.context-block { background: var(--ocean-pale); border-radius: 10px; padding: 1rem; }
+.context-block.full { grid-column: 1 / -1; }
+.context-block h4 { font-family: 'Space Grotesk', sans-serif; font-size: .75rem; font-weight: 600; text-transform: uppercase; letter-spacing: .1em; color: var(--ocean-mid); margin-bottom: .6rem; }
+.context-block ul { list-style: none; }
+.context-block ul li { font-size: .83rem; padding: .2rem 0; padding-left: 1rem; position: relative; color: var(--text-dark); }
+.context-block ul li::before { content: '\2192'; position: absolute; left: 0; color: var(--ocean-mid); opacity: .5; font-size: .75rem; }
+.tag-list { display: flex; flex-wrap: wrap; gap: .4rem; }
+.tag { background: rgba(27,107,147,.12); color: var(--ocean-mid); padding: .2rem .6rem; border-radius: 20px; font-size: .75rem; font-weight: 500; }
+
+/* ── PSYCHOTYPE ── */
+.psycho-table { width: 100%; border-collapse: collapse; font-size: .83rem; }
+.psycho-table th { background: var(--ocean-pale); padding: .6rem .8rem; text-align: left; font-weight: 600; font-size: .75rem; text-transform: uppercase; letter-spacing: .06em; color: var(--ocean-mid); }
+.psycho-table td { padding: .7rem .8rem; border-bottom: 1px solid var(--border); vertical-align: top; }
+.psycho-table tr:last-child td { border-bottom: none; }
+.type-badge { font-weight: 700; font-family: 'Space Grotesk', sans-serif; }
+.type-badge.analyst { color: #2980B9; } .type-badge.skeptic { color: #E74C3C; }
+.type-badge.enthusiast { color: #27AE60; } .type-badge.executor { color: #8E44AD; }
+.redflag { background: #FFF3CD; border-left: 3px solid var(--warning); padding: .8rem 1rem; border-radius: 0 8px 8px 0; margin-top: 1rem; font-size: .83rem; }
+.respondent-note { background: #E8F5E9; border-left: 3px solid var(--success); padding: .8rem 1rem; border-radius: 0 8px 8px 0; margin-top: .8rem; font-size: .83rem; }
+
+/* ── HYPOTHESES ── */
+.hypo-grid { display: flex; flex-direction: column; gap: .7rem; }
+.hypo-card { display: grid; grid-template-columns: 32px 1fr 1fr; gap: .8rem; align-items: start; padding: .8rem 1rem; background: var(--ocean-pale); border-radius: 10px; }
+.hypo-num { width: 28px; height: 28px; border-radius: 50%; background: var(--ocean-mid); color: var(--white); display: flex; align-items: center; justify-content: center; font-size: .75rem; font-weight: 700; flex-shrink: 0; }
+.hypo-text { font-size: .83rem; font-weight: 500; }
+.hypo-goal { font-size: .78rem; color: var(--text-mid); }
+
+/* ── WAVES ── */
+.wave-header { display: flex; align-items: center; gap: 1rem; padding: 1.2rem 1.5rem; cursor: pointer; user-select: none; }
+.wave-header:hover { background: var(--ocean-pale); }
+.new-section .wave-header:hover { background: var(--new-green-pale); }
+.wave-badge { font-family: 'Space Grotesk', sans-serif; font-size: .7rem; font-weight: 700; padding: .25rem .7rem; border-radius: 20px; background: var(--ocean-mid); color: var(--white); white-space: nowrap; }
+.wave-0 { background: #6C757D; } .wave-1 { background: #1B6B93; }
+.wave-2 { background: #E74C3C; } .wave-3 { background: #F39C12; }
+.wave-4 { background: #8E44AD; } .wave-5 { background: #27AE60; }
+.wave-title { font-family: 'Space Grotesk', sans-serif; font-size: 1rem; font-weight: 600; }
+.wave-time { margin-left: auto; font-size: .78rem; color: var(--text-mid); background: var(--ocean-pale); padding: .2rem .6rem; border-radius: 20px; white-space: nowrap; }
+.wave-body { padding: 1.5rem; border-top: 1px solid var(--border); }
+.wave-body.hidden { display: none; }
+
+.question-block { margin-bottom: 1.5rem; }
+.question-block:last-child { margin-bottom: 0; }
+.q-num { font-size: .7rem; font-weight: 700; text-transform: uppercase; letter-spacing: .1em; color: var(--ocean-mid); margin-bottom: .4rem; }
+.q-num.new { color: var(--new-green); }
+.q-text { background: var(--ocean-pale); border-left: 3px solid var(--ocean-mid); padding: .8rem 1rem; border-radius: 0 8px 8px 0; font-size: .88rem; font-style: italic; line-height: 1.55; color: var(--text-dark); }
+.q-text.new { background: var(--new-green-pale); border-left-color: var(--new-green); }
+.q-note { font-size: .78rem; color: var(--text-mid); margin-top: .4rem; font-style: italic; padding-left: .5rem; border-left: 2px solid var(--border); }
+.q-note.scoring { color: var(--new-green); border-left-color: var(--new-green-border); background: var(--new-green-pale); padding: .4rem .7rem; border-radius: 0 6px 6px 0; }
+
+.divider { height: 1px; background: var(--border); margin: 1.5rem 0; }
+.new-divider { height: 1px; background: var(--new-green-border); margin: 1.5rem 0; position: relative; }
+.new-divider::before { content: 'НОВЫЕ ВОПРОСЫ v2'; position: absolute; left: 50%; top: 50%; transform: translate(-50%,-50%); background: var(--new-green); color: #fff; font-size: .6rem; font-weight: 700; letter-spacing: .1em; padding: .2rem .7rem; border-radius: 20px; white-space: nowrap; }
+.interim-note { background: #FFF8E7; border: 1px solid #FDEAA7; border-radius: 10px; padding: .8rem 1rem; font-size: .82rem; color: #856404; margin: 1rem 0; }
+.task-note { background: #EDF7FF; border: 1px solid #B3D9F5; border-radius: 10px; padding: .8rem 1rem; font-size: .82rem; color: #1B5E8A; margin-bottom: 1.2rem; }
+
+/* ── ARTIFACTS ── */
+.artifact-section { background: #F8F9FA; border-radius: 12px; padding: 1.5rem; margin-bottom: 1.5rem; }
+.artifact-section.new { background: #f0faf5; border: 1px solid var(--new-green-border); }
+.artifact-section-title {
+  font-family: 'Space Grotesk', sans-serif; font-size: .95rem; font-weight: 700;
+  color: var(--ocean-deep); margin-bottom: 1rem;
+  display: flex; align-items: center; gap: .5rem;
+}
+.artifact-section-title .art-num {
+  width: 24px; height: 24px; border-radius: 50%; background: var(--ocean-mid);
+  color: #fff; font-size: .72rem; font-weight: 700;
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.artifact-section.new .artifact-section-title .art-num { background: var(--new-green); }
+.artifact-sub { font-family: 'Space Grotesk', sans-serif; font-size: .75rem; font-weight: 600; text-transform: uppercase; letter-spacing: .08em; color: var(--ocean-mid); margin-bottom: .6rem; margin-top: 1rem; }
+.artifact-sub.new { color: var(--new-green); }
+
+.artifact-table { width: 100%; border-collapse: collapse; font-size: .8rem; margin-bottom: 1rem; }
+.artifact-table th { background: var(--ocean-deep); color: var(--white); padding: .5rem .7rem; text-align: left; font-size: .72rem; font-weight: 600; }
+.artifact-table.new-table th { background: var(--new-green); }
+.artifact-table td { padding: .5rem .7rem; border-bottom: 1px solid var(--border); background: var(--white); vertical-align: middle; }
+.artifact-table td:first-child { font-weight: 500; }
+.fill-field { width: 100%; min-height: 24px; border: none; border-bottom: 1px dashed var(--border); background: transparent; font-size: .8rem; font-family: 'Inter', sans-serif; outline: none; }
+.fill-field:focus { border-bottom-color: var(--ocean-mid); }
+
+/* ── MATURITY SCORE ── */
+.score-input {
+  display: flex; gap: .3rem; align-items: center;
+}
+.score-btn {
+  width: 28px; height: 28px; border-radius: 50%; border: 2px solid #ddd;
+  background: transparent; font-size: .75rem; font-weight: 700; cursor: pointer;
+  display: flex; align-items: center; justify-content: center; transition: all .2s; color: #999;
+}
+.score-btn:hover { border-color: var(--ocean-mid); color: var(--ocean-mid); }
+.score-btn.s1.selected { background: var(--score-1); border-color: var(--score-1); color: #fff; }
+.score-btn.s2.selected { background: var(--score-2); border-color: var(--score-2); color: #fff; }
+.score-btn.s3.selected { background: var(--score-3); border-color: var(--score-3); color: #333; }
+.score-btn.s4.selected { background: var(--score-4); border-color: var(--score-4); color: #fff; }
+.score-btn.s5.selected { background: var(--score-5); border-color: var(--score-5); color: #fff; }
+.score-label { font-size: .72rem; color: var(--text-mid); min-width: 60px; margin-left: .3rem; }
+
+/* ── AMBASSADOR ── */
+.ambassador-card { background: var(--white); border: 1px solid var(--new-green-border); border-radius: 10px; padding: 1rem 1.2rem; margin-bottom: .8rem; }
+.ambassador-name { font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: .9rem; color: var(--ocean-deep); margin-bottom: .8rem; display: flex; align-items: center; gap: .5rem; }
+.ambassador-grid { display: grid; grid-template-columns: 1fr 1fr; gap: .6rem; }
+.amb-row { display: flex; flex-direction: column; gap: .3rem; }
+.amb-label { font-size: .72rem; color: var(--text-mid); }
+.amb-score-total { margin-top: .8rem; padding-top: .8rem; border-top: 1px solid var(--new-green-border); display: flex; align-items: center; gap: 1rem; }
+.amb-total-num { font-family: 'Space Grotesk', sans-serif; font-size: 1.4rem; font-weight: 700; color: var(--new-green); }
+.amb-total-label { font-size: .78rem; color: var(--text-mid); }
+.champion-badge { padding: .2rem .7rem; border-radius: 20px; font-size: .72rem; font-weight: 700; }
+.champion { background: #e6f7ee; color: var(--new-green); border: 1px solid var(--new-green-border); }
+.advocate { background: #e8f4fd; color: #1B6B93; border: 1px solid #B3D9F5; }
+.curious { background: #FFF8E7; color: #856404; border: 1px solid #FDEAA7; }
+.observer { background: #f5f5f5; color: #777; border: 1px solid #ddd; }
+
+/* ── AMBASSADOR extra names ── */
+.amb-extra-table { width: 100%; border-collapse: collapse; font-size: .8rem; }
+.amb-extra-table th { background: var(--new-green); color: #fff; padding: .5rem .7rem; text-align: left; font-size: .72rem; font-weight: 600; }
+.amb-extra-table td { padding: .5rem .7rem; border-bottom: 1px solid var(--border); background: var(--white); }
+
+/* ── IMPACT-FEASIBILITY ── */
+.matrix-table { width: 100%; border-collapse: collapse; font-size: .8rem; margin-bottom: 1rem; }
+.matrix-table th { background: var(--new-green); color: #fff; padding: .5rem .7rem; text-align: left; font-size: .72rem; font-weight: 600; }
+.matrix-table td { padding: .55rem .7rem; border-bottom: 1px solid var(--border); background: var(--white); vertical-align: middle; }
+.quadrant-q1 { background: #e6f7ee !important; font-weight: 700; color: var(--new-green); font-size: .72rem; padding: .2rem .5rem; border-radius: 4px; }
+.quadrant-q2 { background: #e8f4fd !important; font-weight: 700; color: #1B6B93; font-size: .72rem; padding: .2rem .5rem; border-radius: 4px; }
+.quadrant-q3 { background: #FFF8E7 !important; font-weight: 700; color: #856404; font-size: .72rem; padding: .2rem .5rem; border-radius: 4px; }
+.quadrant-q4 { background: #f5f5f5 !important; font-weight: 700; color: #999; font-size: .72rem; padding: .2rem .5rem; border-radius: 4px; }
+
+.quadrant-legend { display: grid; grid-template-columns: 1fr 1fr; gap: .6rem; margin-top: 1rem; }
+.q-legend-item { padding: .6rem .8rem; border-radius: 8px; font-size: .78rem; }
+.q-legend-item strong { display: block; font-family: 'Space Grotesk', sans-serif; font-size: .8rem; margin-bottom: .2rem; }
+.ql1 { background: #e6f7ee; color: var(--new-green); } .ql2 { background: #e8f4fd; color: #1B6B93; }
+.ql3 { background: #FFF8E7; color: #856404; } .ql4 { background: #f5f5f5; color: #777; }
+
+.feasibility-mini { display: grid; grid-template-columns: 1fr 1fr; gap: .5rem; margin-top: .8rem; }
+.f-item { background: var(--white); border: 1px solid var(--border); border-radius: 8px; padding: .5rem .7rem; }
+.f-item-label { font-size: .72rem; color: var(--text-mid); margin-bottom: .3rem; }
+
+/* ── OPP TABLE ── */
+.opp-table { width: 100%; border-collapse: collapse; font-size: .8rem; }
+.opp-table th { background: var(--ocean-mid); color: var(--white); padding: .4rem .7rem; font-size: .72rem; }
+.opp-table td { padding: .4rem .7rem; border-bottom: 1px solid var(--border); background: var(--white); }
+
+/* ── TIMING ── */
+.timing-list { display: flex; flex-direction: column; gap: .5rem; }
+.timing-item { display: flex; align-items: center; gap: 1rem; padding: .6rem 1rem; background: var(--ocean-pale); border-radius: 8px; }
+.timing-item.new-timing { background: var(--new-green-pale); border: 1px solid var(--new-green-border); }
+.timing-time { font-family: 'Space Grotesk', sans-serif; font-size: .8rem; font-weight: 700; color: var(--ocean-mid); white-space: nowrap; min-width: 110px; }
+.timing-item.new-timing .timing-time { color: var(--new-green); }
+.timing-label { font-size: .83rem; }
+.timing-mark { margin-left: auto; }
+.timing-mark input[type=checkbox] { width: 16px; height: 16px; cursor: pointer; }
+
+/* ── PRINT BTN ── */
+.print-btn { position: fixed; bottom: 2rem; right: 2rem; background: var(--ocean-mid); color: var(--white); border: none; border-radius: 50px; padding: .7rem 1.4rem; cursor: pointer; font-family: 'Inter', sans-serif; font-size: .85rem; box-shadow: 0 4px 20px rgba(27,107,147,.3); display: flex; align-items: center; gap: .5rem; transition: all .2s; z-index: 100; }
+.print-btn:hover { background: var(--ocean-deep); transform: translateY(-2px); }
+
+@media print {
+  .sidebar, .print-btn, .timer-btn { display: none !important; }
+  .layout { display: block; }
+  .main { padding: 0; max-width: 100%; }
+  .section-body, .wave-body { display: block !important; }
+  .section-card, .page-header { break-inside: avoid; }
+}
+</style>
+</head>
+<body>
+<div class="layout">
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <div class="brand">chilBase · AI Диагностика</div>
+    <div class="dept">Product <span class="v2-pill">v2</span></div>
+    <div class="meta">Станкевич / Щербаков · iAP · LiveOps · Analytics</div>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-label">Подготовка</div>
+    <a href="#context" class="nav-item active" onclick="setActive(this)">
+      <span class="wave-num">📋</span> Контекст отдела <span class="check">✓</span>
+    </a>
+    <a href="#psychotype" class="nav-item" onclick="setActive(this)">
+      <span class="wave-num">🧠</span> Психотип <span class="check">✓</span>
+    </a>
+    <a href="#hypotheses" class="nav-item" onclick="setActive(this)">
+      <span class="wave-num">💡</span> Гипотезы <span class="check">✓</span>
+    </a>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-label">Интервью</div>
+    <a href="#wave0" class="nav-item" onclick="setActive(this)">
+      <span class="wave-num">0</span> Rapport <span class="check">✓</span>
+    </a>
+    <a href="#wave1" class="nav-item" onclick="setActive(this)">
+      <span class="wave-num">1</span> Карта процессов <span class="check">✓</span>
+    </a>
+    <a href="#wave2" class="nav-item" onclick="setActive(this)">
+      <span class="wave-num">2</span> Боли и фрикции <span class="check">✓</span>
+    </a>
+    <a href="#wave3" class="nav-item" onclick="setActive(this)">
+      <span class="wave-num">3</span> Scaling Stress Test <span class="check">✓</span>
+    </a>
+    <a href="#wave4" class="nav-item" onclick="setActive(this)">
+      <span class="wave-num">4</span> Data & Architecture <span class="nav-new-dot"></span>
+    </a>
+    <a href="#wave5" class="nav-item" onclick="setActive(this)">
+      <span class="wave-num">5</span> AI Signals & Strategy <span class="nav-new-dot"></span>
+    </a>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-label">Артефакты</div>
+    <a href="#art1" class="nav-item" onclick="setActive(this)">
+      <span class="wave-num">①</span> Карта процессов <span class="check">✓</span>
+    </a>
+    <a href="#art2" class="nav-item" onclick="setActive(this)">
+      <span class="wave-num">②</span> Зрелость отдела <span class="nav-new-dot"></span>
+    </a>
+    <a href="#art3" class="nav-item" onclick="setActive(this)">
+      <span class="wave-num">③</span> Амбассадоры <span class="nav-new-dot"></span>
+    </a>
+    <a href="#art4" class="nav-item" onclick="setActive(this)">
+      <span class="wave-num">④</span> Инициативы <span class="nav-new-dot"></span>
+    </a>
+    <a href="#timing" class="nav-item" onclick="setActive(this)">
+      <span class="wave-num">⏱</span> Тайминг <span class="check">✓</span>
+    </a>
+  </div>
+
+  <div class="sidebar-timer">
+    <div class="timer-label">Время интервью</div>
+    <div class="timer-display" id="timerDisplay">0:00</div>
+    <button class="timer-btn" id="timerBtn" onclick="toggleTimer()">▶ Старт</button>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<main class="main">
+
+  <!-- HEADER -->
+  <div class="page-header">
+    <div>
+      <h1>Интервью — Product <span style="font-size:.9rem; background:#e6f7ee; color:var(--new-green); padding:.15rem .5rem; border-radius:6px; font-family:'Inter',sans-serif; font-weight:600;">v2</span></h1>
+      <div class="subtitle">Глубинное интервью с продуктовой командой · ~2 часа · 3 задачи диагностики</div>
+      <div class="meta-grid">
+        <div class="meta-item"><div class="label">Респонденты</div><div class="value">Станкевич / Бутримов / Скударнов / Лозневой / Щербаков</div></div>
+        <div class="meta-item"><div class="label">Отдел</div><div class="value">Product (iAP / Gameplay / Analytics / Meta Product)</div></div>
+        <div class="meta-item"><div class="label">Сбор инфы</div><div class="value">Щербаков / Липатников</div></div>
+        <div class="meta-item"><div class="label">Дата</div><div class="value" id="interviewDate">—</div></div>
+      </div>
+    </div>
+    <div class="consent-badge">⚠️ Зачитать скрипт<br>согласия перед стартом</div>
+  </div>
+
+  <!-- IMPORTANT NOTE -->
+  <div style="background:#FFF3CD; border:1px solid #FFC107; border-radius:12px; padding:1rem 1.5rem; margin-bottom:2rem; font-size:.88rem; color:#856404; line-height:1.6">
+    ⚠️ <strong>Product — наиболее AI-зрелый отдел.</strong> Chill-AI, прогнозная модель, три LLM-модели. Цель: следующий уровень, не объяснять AI.
+  </div>
+
+  <!-- CONTEXT -->
+  <div class="section" id="context">
+    <div class="section-card">
+      <div class="section-header" onclick="toggleSection(this)">
+        <div class="section-icon">📋</div>
+        <div><div class="section-title">Контекст отдела</div><div class="section-sub">Что мы знаем до интервью</div></div>
+        <span class="section-toggle open">▼</span>
+      </div>
+      <div class="section-body">
+        <div class="context-grid">
+          <div class="context-block full">
+            <h4>Продуктовые направления</h4>
+            <ul>
+              <li><strong>iAP / Монетизация:</strong> управление внутриигровыми покупками, LiveOps-календарь</li>
+              <li><strong>Gameplay:</strong> развитие mid & late gameplay</li>
+              <li><strong>Analytics:</strong> поиск точек роста через данные</li>
+              <li><strong>Meta Product (отдельная команда):</strong> product vision, system vision, roadmap, feature matrix</li>
+            </ul>
+          </div>
+          <div class="context-block">
+            <h4>Инструменты</h4>
+            <div class="tag-list">
+              <span class="tag">Google Sheets</span><span class="tag">Redash</span><span class="tag">Tableau</span>
+              <span class="tag">Confluence</span><span class="tag">Slack</span><span class="tag">Jira</span>
+              <span class="tag">Miro</span><span class="tag">Keynote</span>
+            </div>
+          </div>
+          <div class="context-block">
+            <h4>Известные боли</h4>
+            <ul>
+              <li>Низкая скорость разработки</li>
+              <li>Нехватка ресурса 2D-команды</li>
+              <li>Нет автоматизации тестирования</li>
+              <li>Мало аналитических ресурсов</li>
+              <li>Растаскивание экономики разными сквадами</li>
+              <li>Высокая неопределённость продукта (Meta)</li>
+              <li>Быстрая упаковка стратегических идей</li>
+            </ul>
+          </div>
+          <div class="context-block">
+            <h4>Текущий AI (передовой уровень!)</h4>
+            <ul>
+              <li><strong>Chill-AI</strong> — внутренний инструмент на базе Claude для аналитических запросов</li>
+              <li><strong>ML LiveOps Combinator</strong> — остановлен (нехватка ресурсов)</li>
+              <li><strong>Прогнозная модель</strong> — доходность (день/неделя/месяц)</li>
+              <li><strong>Meta Product:</strong> ChatGPT Thinking 5.4, Gemini 3.1 pro, Claude Opus 4.6 — все активно</li>
+            </ul>
+          </div>
+          <div class="context-block full">
+            <h4>AI-сценарии для обсуждения</h4>
+            <div class="tag-list">
+              <span class="tag">Расширение Chill-AI</span>
+              <span class="tag">Перезапуск ML-комбинатора</span>
+              <span class="tag">Автоматизация документации</span>
+              <span class="tag">AI-тестирование</span>
+              <span class="tag">Единая экономическая модель</span>
+              <span class="tag">AI мониторинг экономики</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PSYCHOTYPE -->
+  <div class="section" id="psychotype">
+    <div class="section-card">
+      <div class="section-header" onclick="toggleSection(this)">
+        <div class="section-icon">🧠</div>
+        <div><div class="section-title">Психотип респондента — тактика</div><div class="section-sub">Определи в первые 2–3 минуты</div></div>
+        <span class="section-toggle open">▼</span>
+      </div>
+      <div class="section-body">
+        <table class="psycho-table">
+          <thead><tr><th>Тип</th><th>Сигналы</th><th>Тактика</th></tr></thead>
+          <tbody>
+            <tr><td><span class="type-badge analyst">Аналитик</span></td><td>Цифры и процессы, уточняет детали, говорит медленно</td><td>Структуру заранее, метрические вопросы, не торопи</td></tr>
+            <tr><td><span class="type-badge skeptic">Скептик</span></td><td>«У нас всё нормально», защищает отдел, короткие ответы</td><td>Гипотетические сценарии, не оценивай, копай через примеры</td></tr>
+            <tr><td><span class="type-badge enthusiast">Энтузиаст</span></td><td>Много говорит, перепрыгивает темы, генерирует идеи</td><td>Возвращай к конкретике, разделяй факты и желания</td></tr>
+            <tr><td><span class="type-badge executor">Исполнитель</span></td><td>Короткие ответы, ждёт следующего вопроса</td><td>Закрытые вопросы с вариантами, медленнее темп</td></tr>
+          </tbody>
+        </table>
+        <div class="redflag">⚠️ <strong>Красный флаг:</strong> «AI — это угроза» или «мы уже всё пробовали» — скептик с тревогой. Не спорь. Переходи к болям, оставь AI-тему на Волну 5.</div>
+        <div class="respondent-note">✦ <strong>Про продактов:</strong> Аналитическая команда с реальным ML-опытом (Chill-AI). Ставь на Аналитиков, готовься к data-driven разговору. Говори на их языке: ROI, метрики, accuracy, precision/recall, latency, стоимость инференса. Они будут оценивать тебя по глубине вопросов — если пойдёшь поверхностно, потеряешь кредит доверия за 5 минут. Когда заговорят про Chill-AI — это их гордость, дай рассказать 5–7 минут. Потом аккуратно копай в ограничения.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- HYPOTHESES -->
+  <div class="section" id="hypotheses">
+    <div class="section-card">
+      <div class="section-header" onclick="toggleSection(this)">
+        <div class="section-icon">💡</div>
+        <div><div class="section-title">Гипотезы для проверки</div><div class="section-sub">5 предположений — хотим подтвердить или опровергнуть</div></div>
+        <span class="section-toggle open">▼</span>
+      </div>
+      <div class="section-body">
+        <div class="hypo-grid">
+          <div class="hypo-card"><div class="hypo-num">H1</div><div class="hypo-text">Chill-AI используется не всеми продактами — барьер в промптинге</div><div class="hypo-goal">Насколько широко, кто пользуется, кто нет</div></div>
+          <div class="hypo-card"><div class="hypo-num">H2</div><div class="hypo-text">Комбинатор LiveOps остановлен — можно перезапустить с меньшими ресурсами</div><div class="hypo-goal">Что именно требует ресурс</div></div>
+          <div class="hypo-card"><div class="hypo-num">H3</div><div class="hypo-text">Прогнозная модель — точность известна, но доверие к ней не всегда</div><div class="hypo-goal">Как принимаются решения: модель vs интуиция</div></div>
+          <div class="hypo-card"><div class="hypo-num">H4</div><div class="hypo-text">Meta Product тратит много времени на оформление документов</div><div class="hypo-goal">Шаблоны? AI-помощь?</div></div>
+          <div class="hypo-card"><div class="hypo-num">H5</div><div class="hypo-text">Аналитика — боттлнек для продакт-решений</div><div class="hypo-goal">Сколько ждут данные</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- WAVE 0 -->
+  <div class="section" id="wave0">
+    <div class="section-card">
+      <div class="wave-header" onclick="toggleWave(this)">
+        <span class="wave-badge wave-0">Волна 0</span>
+        <div><div class="wave-title">Rapport</div></div>
+        <span class="wave-time">⏱ 0:00 – 0:10</span>
+        <span class="section-toggle open" style="margin-left:1rem">▼</span>
+      </div>
+      <div class="wave-body">
+        <div class="question-block">
+          <div class="q-num">Открывающий вопрос</div>
+          <div class="q-text">«Продукт в open world — это постоянный баланс между тем, что игроки хотят, и тем, что работает экономически. Как вы держите этот баланс?»</div>
+          <div class="q-note">Слушай: data-driven или intuition-driven — это скажет, насколько они доверяют своей же прогнозной модели.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- WAVE 1 -->
+  <div class="section" id="wave1">
+    <div class="section-card">
+      <div class="wave-header" onclick="toggleWave(this)">
+        <span class="wave-badge wave-1">Волна 1</span>
+        <div><div class="wave-title">Карта процессов</div></div>
+        <span class="wave-time">⏱ 0:10 – 0:30</span>
+        <span class="section-toggle open" style="margin-left:1rem">▼</span>
+      </div>
+      <div class="wave-body">
+        <div class="question-block">
+          <div class="q-num">1.1 LiveOps-цикл</div>
+          <div class="q-text">«Опишите, как формируется LiveOps-календарь на следующий месяц. Кто, что делает, какие данные используются?»</div>
+        </div>
+        <div class="question-block">
+          <div class="q-num">1.2 Chill-AI в работе</div>
+          <div class="q-text">«Расскажите, как конкретно продакты используют Chill-AI. Приведите пример вопроса, который кто-то задал на прошлой неделе.»</div>
+        </div>
+        <div class="question-block">
+          <div class="q-num">1.3 Прогнозная модель</div>
+          <div class="q-text">«Как используется прогнозная модель доходности? Кто смотрит, как часто, в каких решениях она участвует?»</div>
+        </div>
+        <div class="question-block">
+          <div class="q-num">1.4 Продуктовый цикл</div>
+          <div class="q-text">«Новая фича в roadmap — от идеи до запуска. Кто участвует на каждом шаге?»</div>
+        </div>
+        <div class="question-block">
+          <div class="q-num">1.5 Meta Product — документация</div>
+          <div class="q-text">«Как превращается продуктовый vision в конкретный документ для разработки? Что пишется, кем, как долго?»</div>
+        </div>
+        <div class="interim-note">📝 <strong>Промежуточный вывод:</strong> Записать 3–5 ключевых процессов с исполнителем, частотой, объёмом. Особое внимание: роль Chill-AI и прогнозной модели в принятии решений.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- WAVE 2 -->
+  <div class="section" id="wave2">
+    <div class="section-card">
+      <div class="wave-header" onclick="toggleWave(this)">
+        <span class="wave-badge wave-2">Волна 2</span>
+        <div><div class="wave-title">Боли и фрикции</div></div>
+        <span class="wave-time">⏱ 0:30 – 0:50</span>
+        <span class="section-toggle open" style="margin-left:1rem">▼</span>
+      </div>
+      <div class="wave-body">
+        <div class="task-note">🎯 <strong>Задача 3:</strong> Каждую боль мысленно маппи на категорию инициативы — таблица в Артефакте 4.</div>
+        <div class="question-block">
+          <div class="q-num">2.1 Скорость разработки</div>
+          <div class="q-text">«Низкая скорость разработки — это главная боль. Где именно теряется время: в формулировке задач, в разработке, в ревью, в тестировании?»</div>
+        </div>
+        <div class="question-block">
+          <div class="q-num">2.2 Комбинатор LiveOps</div>
+          <div class="q-text">«ML-комбинатор остановился из-за нехватки ресурсов. Что конкретно требовало ресурс — data science, бэкенд, продуктовое время?»</div>
+        </div>
+        <div class="question-block">
+          <div class="q-num">2.3 Аналитика как боттлнек</div>
+          <div class="q-text">«Когда вы принимаете продуктовое решение без данных — потому что данные не готовы — как часто это происходит? Что тормозит?»</div>
+        </div>
+        <div class="question-block">
+          <div class="q-num">2.4 Растаскивание экономики</div>
+          <div class="q-text">«Разные сквады тянут экономику в разные стороны — расскажите подробнее. Где нет согласованности? Как это проявляется?»</div>
+        </div>
+        <div class="question-block">
+          <div class="q-num">2.5 2D как ограничение</div>
+          <div class="q-text">«Нехватка ресурса 2D-команды — как это ограничивает продукт конкретно? Что не сделали из-за этого?»</div>
+        </div>
+        <div class="question-block">
+          <div class="q-num">2.6 Meta Product — высокая неопределённость</div>
+          <div class="q-text">«Что значит "высокая неопределённость продукта"? Откуда она? Как с ней работаете?»</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- WAVE 3 -->
+  <div class="section" id="wave3">
+    <div class="section-card">
+      <div class="wave-header" onclick="toggleWave(this)">
+        <span class="wave-badge wave-3">Волна 3</span>
+        <div><div class="wave-title">Scaling Stress Test</div></div>
+        <span class="wave-time">⏱ 0:55 – 1:10</span>
+        <span class="section-toggle open" style="margin-left:1rem">▼</span>
+      </div>
+      <div class="wave-body">
+        <div class="question-block">
+          <div class="q-num">Сценарий x3 пользователей</div>
+          <div class="q-text">«Предположим, DAU вырос в 3 раза за 3 месяца. Что в LiveOps-операциях ломается первым?»</div>
+        </div>
+        <div class="question-block">
+          <div class="q-num">Сценарий 5 новых фич параллельно</div>
+          <div class="q-text">«Product хочет запустить 5 крупных фич одновременно. Что является главным ограничением — разработка, аналитика, 2D, что-то ещё?»</div>
+        </div>
+        <div class="question-block">
+          <div class="q-num">Сценарий Chill-AI x10</div>
+          <div class="q-text">«Предположим, Chill-AI используется в 10 раз больше — каждый продакт, каждый день. Инфраструктура держит? Качество ответов стабильно?»</div>
+        </div>
+        <div class="question-block">
+          <div class="q-num">Сценарий ключевой человек</div>
+          <div class="q-text">«Человек, который лучше всего понимает прогнозную модель и экономику игры, уходит. Что происходит?»</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- WAVE 4 — UPDATED -->
+  <div class="section" id="wave4">
+    <div class="section-card new-section">
+      <div class="wave-header" onclick="toggleWave(this)">
+        <span class="wave-badge wave-4">Волна 4</span>
+        <div>
+          <div class="wave-title">Data Architecture <span class="v2-pill">+4 вопроса</span></div>
+          <div style="font-size:.75rem; color:var(--new-green); margin-top:.2rem">Добавлены: Governance · Стратегия · Экосистема · Измерение ценности</div>
+        </div>
+        <span class="wave-time">⏱ 1:10 – 1:30</span>
+        <span class="section-toggle open" style="margin-left:1rem">▼</span>
+      </div>
+      <div class="wave-body">
+        <div class="question-block">
+          <div class="q-num">4.1 Данные для Chill-AI</div>
+          <div class="q-text">«На каких данных работает Chill-AI? Redash? Tableau? Прямой доступ к БД? Какие данные недоступны, но нужны?»</div>
+        </div>
+        <div class="question-block">
+          <div class="q-num">4.2 Прогнозная модель — детали</div>
+          <div class="q-text">«Что именно предсказывает модель? Точность? Как часто она ошибается и почему?»</div>
+        </div>
+        <div class="question-block">
+          <div class="q-num">4.3 Источники данных</div>
+          <div class="q-text">«Где хранятся данные о поведении пользователей, доходах, LiveOps-результатах? Всё в одном месте или разбросано?»</div>
+        </div>
+        <div class="question-block">
+          <div class="q-num">4.4 Документация решений</div>
+          <div class="q-text">«Где фиксируются продуктовые решения и их обоснование? Confluence? Есть ли база по тому, что пробовали и не сработало?»</div>
+        </div>
+        <div class="question-block">
+          <div class="q-num">4.5 Разрыв данных</div>
+          <div class="q-text">«Что вы хотели бы знать о пользователях, но сейчас не знаете?»</div>
+        </div>
+
+        <div class="new-divider"></div>
+
+        <div class="question-block">
+          <div class="q-num new">4.6 · Governance — правила работы с данными в AI</div>
+          <div class="q-text new">«Chill-AI работает с реальными данными игры — есть ли правила, какие данные можно в него передавать? Финансовые? Пользовательские? Кто устанавливает эти ограничения?»</div>
+          <div class="q-note scoring">→ Артефакт 2, измерение 5 (Governance)</div>
+        </div>
+        <div class="question-block">
+          <div class="q-num new">4.7 · Стратегия компании по AI</div>
+          <div class="q-text new">«Вы самый AI-зрелый отдел. Есть ли у компании AI-стратегия на уровне выше Product? Или это только ваша инициатива?»</div>
+          <div class="q-note scoring">→ Артефакт 2, измерение 1 (Стратегия)</div>
+        </div>
+        <div class="question-block">
+          <div class="q-num new">4.8 · Экосистема — внешние AI-партнёры</div>
+          <div class="q-text new">«Anthropic (Claude), OpenAI, Google — это внешние AI-партнёры. Как выстраиваете эти отношения? Есть ли enterprise-договорённости?»</div>
+          <div class="q-note scoring">→ Артефакт 2, измерение 6 (Экосистема)</div>
+        </div>
+        <div class="question-block">
+          <div class="q-num new">4.9 · Измерение ценности Chill-AI</div>
+          <div class="q-text new">«Chill-AI — как измеряете его ценность? Количество запросов? Качество решений? Скорость получения инсайта?»</div>
+          <div class="q-note scoring">→ Артефакт 2, измерение 7 (Измерение ценности)</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- WAVE 5 — UPDATED -->
+  <div class="section" id="wave5">
+    <div class="section-card new-section">
+      <div class="wave-header" onclick="toggleWave(this)">
+        <span class="wave-badge wave-5">Волна 5</span>
+        <div>
+          <div class="wave-title">AI Signals & Strategy <span class="v2-pill">+3 вопроса</span></div>
+          <div style="font-size:.75rem; color:var(--new-green); margin-top:.2rem">Добавлены: распространение знаний · готовность к пилоту · готовность обучать</div>
+        </div>
+        <span class="wave-time">⏱ 1:30 – 1:50</span>
+        <span class="section-toggle open" style="margin-left:1rem">▼</span>
+      </div>
+      <div class="wave-body">
+        <div class="question-block">
+          <div class="q-num">5.1 Честная оценка Chill-AI</div>
+          <div class="q-text">«Chill-AI — что с ним реально хорошо, что не устраивает? Где он даёт ценность, где разочаровывает?»</div>
+        </div>
+        <div class="question-block">
+          <div class="q-num">5.2 Следующий AI-проект</div>
+          <div class="q-text">«Если бы у вас был месяц только на AI-проект для Product — что бы это было?»</div>
+        </div>
+        <div class="question-block">
+          <div class="q-num">5.3 Комбинатор — перезапуск</div>
+          <div class="q-text">«Можно ли перезапустить ML-комбинатор с меньшими ресурсами, если применить современные LLM? Что думаете?»</div>
+        </div>
+        <div class="question-block">
+          <div class="q-num">5.4 Три модели (Meta Product)</div>
+          <div class="q-text">«ChatGPT Thinking, Gemini, Claude Opus — для разных задач. Расскажите конкретно: какую задачу даёте каждой модели?»</div>
+        </div>
+        <div class="question-block">
+          <div class="q-num">5.5 AI-стратегия Product</div>
+          <div class="q-text">«Как вы видите AI в работе Product через год? Это эволюция текущих инструментов или что-то принципиально новое?»</div>
+        </div>
+
+        <div class="new-divider"></div>
+
+        <div class="question-block">
+          <div class="q-num new">5.6 · Распространение знаний</div>
+          <div class="q-text new">«Когда кто-то находит хороший промпт для Chill-AI или паттерн анализа — как это распространяется по команде? Есть ли база знаний по AI-использованию?»</div>
+          <div class="q-note scoring">→ Артефакт 3: индикатор «делится опытом» (1 = не делится, 5 = проводит обучения, пишет инструкции)</div>
+        </div>
+        <div class="question-block">
+          <div class="q-num new">5.7 · Готовность вести пилот</div>
+          <div class="q-text new">«Если бы мы запускали пилот — скажем, перезапуск ML-комбинатора или расширение Chill-AI на новые данные — кто готов быть внутри? В какой роли?»</div>
+          <div class="q-note scoring">→ Артефакт 3: индикатор «готовность к пилоту» (1 = нет интереса, 5 = готов координировать и обучать команду)</div>
+        </div>
+        <div class="question-block">
+          <div class="q-num new">5.8 · Готовность обучать других</div>
+          <div class="q-text new">«Если компания решила распространить опыт Product по AI на другие отделы — кто из команды готов это вести?»</div>
+          <div class="q-note scoring">→ Артефакт 3: индикатор «готовность обучать». Не форсируй — если разговор не идёт, оцени по контексту.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════ ARTIFACTS ═══════════════ -->
+
+  <!-- ARTIFACT 1 -->
+  <div class="section" id="art1">
+    <div class="section-card">
+      <div class="section-header" onclick="toggleSection(this)">
+        <div class="section-icon">①</div>
+        <div><div class="section-title">Артефакт 1 — Карта процессов</div><div class="section-sub">Заполнять во время интервью</div></div>
+        <span class="section-toggle open">▼</span>
+      </div>
+      <div class="section-body">
+        <div class="artifact-section">
+          <div class="artifact-sub">Chill-AI — факты</div>
+          <table class="artifact-table">
+            <thead><tr><th>Параметр</th><th>Значение</th></tr></thead>
+            <tbody>
+              <tr><td>Активных пользователей</td><td><input class="fill-field" placeholder="___"></td></tr>
+              <tr><td>Запросов в день</td><td><input class="fill-field" placeholder="___"></td></tr>
+              <tr><td>Типичные запросы</td><td><input class="fill-field" placeholder="___"></td></tr>
+              <tr><td>Ограничения</td><td><input class="fill-field" placeholder="___"></td></tr>
+            </tbody>
+          </table>
+
+          <div class="artifact-sub">Прогнозная модель</div>
+          <table class="artifact-table">
+            <thead><tr><th>Параметр</th><th>Значение</th></tr></thead>
+            <tbody>
+              <tr><td>Что предсказывает</td><td><input class="fill-field" placeholder="___"></td></tr>
+              <tr><td>Точность (как измеряется)</td><td><input class="fill-field" placeholder="___"></td></tr>
+              <tr><td>Как используется в решениях</td><td><input class="fill-field" placeholder="___"></td></tr>
+            </tbody>
+          </table>
+
+          <div class="artifact-sub">LiveOps-цикл</div>
+          <table class="artifact-table">
+            <thead><tr><th>Этап</th><th>Кто</th><th>Время</th><th>AI участие</th></tr></thead>
+            <tbody>
+              <tr><td><input class="fill-field" placeholder="Планирование"></td><td><input class="fill-field"></td><td><input class="fill-field"></td><td><input class="fill-field"></td></tr>
+              <tr><td><input class="fill-field" placeholder="Подготовка контента"></td><td><input class="fill-field"></td><td><input class="fill-field"></td><td><input class="fill-field"></td></tr>
+              <tr><td><input class="fill-field" placeholder="Запуск"></td><td><input class="fill-field"></td><td><input class="fill-field"></td><td><input class="fill-field"></td></tr>
+              <tr><td><input class="fill-field" placeholder="Анализ результатов"></td><td><input class="fill-field"></td><td><input class="fill-field"></td><td><input class="fill-field"></td></tr>
+              <tr><td><input class="fill-field" placeholder="Оптимизация"></td><td><input class="fill-field"></td><td><input class="fill-field"></td><td><input class="fill-field"></td></tr>
+            </tbody>
+          </table>
+
+          <div class="artifact-sub">Сигнальные цитаты</div>
+          <textarea style="width:100%;min-height:70px;border:1px dashed var(--border);border-radius:8px;padding:.8rem;font-family:'Inter',sans-serif;font-size:.83rem;background:var(--white);resize:vertical;" placeholder="Записывай дословно — лучшие цитаты для отчёта..."></textarea>
+          <div class="artifact-sub">Single Points of Failure</div>
+          <textarea style="width:100%;min-height:50px;border:1px dashed var(--border);border-radius:8px;padding:.8rem;font-family:'Inter',sans-serif;font-size:.83rem;background:var(--white);resize:vertical;" placeholder="Люди или процессы, уход которых парализует работу..."></textarea>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ARTIFACT 2 — NEW -->
+  <div class="section" id="art2">
+    <div class="section-card new-section">
+      <div class="section-header" onclick="toggleSection(this)">
+        <div class="section-icon" style="background:var(--new-green-pale)">②</div>
+        <div>
+          <div class="section-title">Артефакт 2 — Профиль AI-зрелости отдела <span class="v2-pill">new</span></div>
+          <div class="section-sub">Задача 1 · Deloitte AI Maturity Model · Балл ставит интервьюер</div>
+        </div>
+        <span class="section-toggle open">▼</span>
+      </div>
+      <div class="section-body">
+        <div class="artifact-section new">
+          <p style="font-size:.82rem; color:var(--text-mid); margin-bottom:1.2rem; line-height:1.55">Баллы 1–5 выставляешь ты по итогам разговора — не спрашиваешь респондентов напрямую. Кликни цифру чтобы выбрать балл.</p>
+
+          <table class="artifact-table new-table">
+            <thead>
+              <tr><th style="width:30%">Измерение</th><th style="width:20%">Балл</th><th>Что услышал / увидел</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>1. Стратегия и roadmap</strong><br><span style="font-size:.72rem;color:#888">← Q4.7</span></td>
+                <td><div class="score-input" id="s1">
+                  <button class="score-btn s1" onclick="setScore('s1',1,this)">1</button>
+                  <button class="score-btn s2" onclick="setScore('s1',2,this)">2</button>
+                  <button class="score-btn s3" onclick="setScore('s1',3,this)">3</button>
+                  <button class="score-btn s4" onclick="setScore('s1',4,this)">4</button>
+                  <button class="score-btn s5" onclick="setScore('s1',5,this)">5</button>
+                </div></td>
+                <td><input class="fill-field" placeholder="Есть ли AI-стратегия выше Product..."></td>
+              </tr>
+              <tr>
+                <td><strong>2. Таланты и культура</strong><br><span style="font-size:.72rem;color:#888">← Q5.5, Q5.6</span></td>
+                <td><div class="score-input" id="s2">
+                  <button class="score-btn s1" onclick="setScore('s2',1,this)">1</button>
+                  <button class="score-btn s2" onclick="setScore('s2',2,this)">2</button>
+                  <button class="score-btn s3" onclick="setScore('s2',3,this)">3</button>
+                  <button class="score-btn s4" onclick="setScore('s2',4,this)">4</button>
+                  <button class="score-btn s5" onclick="setScore('s2',5,this)">5</button>
+                </div></td>
+                <td><input class="fill-field" placeholder="AI-грамотность команды, культура экспериментов..."></td>
+              </tr>
+              <tr>
+                <td><strong>3. Данные</strong><br><span style="font-size:.72rem;color:#888">← Q4.1–4.3, Q4.5</span></td>
+                <td><div class="score-input" id="s3">
+                  <button class="score-btn s1" onclick="setScore('s3',1,this)">1</button>
+                  <button class="score-btn s2" onclick="setScore('s3',2,this)">2</button>
+                  <button class="score-btn s3" onclick="setScore('s3',3,this)">3</button>
+                  <button class="score-btn s4" onclick="setScore('s3',4,this)">4</button>
+                  <button class="score-btn s5" onclick="setScore('s3',5,this)">5</button>
+                </div></td>
+                <td><input class="fill-field" placeholder="Состояние данных, доступность для AI..."></td>
+              </tr>
+              <tr>
+                <td><strong>4. Технологии</strong><br><span style="font-size:.72rem;color:#888">← Q1.2, Q1.3, Q4.2</span></td>
+                <td><div class="score-input" id="s4">
+                  <button class="score-btn s1" onclick="setScore('s4',1,this)">1</button>
+                  <button class="score-btn s2" onclick="setScore('s4',2,this)">2</button>
+                  <button class="score-btn s3" onclick="setScore('s4',3,this)">3</button>
+                  <button class="score-btn s4" onclick="setScore('s4',4,this)">4</button>
+                  <button class="score-btn s5" onclick="setScore('s4',5,this)">5</button>
+                </div></td>
+                <td><input class="fill-field" placeholder="Chill-AI, прогнозная модель, LLM-стек..."></td>
+              </tr>
+              <tr>
+                <td><strong>5. Governance</strong><br><span style="font-size:.72rem;color:#888">← Q4.6</span></td>
+                <td><div class="score-input" id="s5">
+                  <button class="score-btn s1" onclick="setScore('s5',1,this)">1</button>
+                  <button class="score-btn s2" onclick="setScore('s5',2,this)">2</button>
+                  <button class="score-btn s3" onclick="setScore('s5',3,this)">3</button>
+                  <button class="score-btn s4" onclick="setScore('s5',4,this)">4</button>
+                  <button class="score-btn s5" onclick="setScore('s5',5,this)">5</button>
+                </div></td>
+                <td><input class="fill-field" placeholder="Правила по данным в AI, ограничения..."></td>
+              </tr>
+              <tr>
+                <td><strong>6. Экосистема</strong><br><span style="font-size:.72rem;color:#888">← Q4.8</span></td>
+                <td><div class="score-input" id="s6">
+                  <button class="score-btn s1" onclick="setScore('s6',1,this)">1</button>
+                  <button class="score-btn s2" onclick="setScore('s6',2,this)">2</button>
+                  <button class="score-btn s3" onclick="setScore('s6',3,this)">3</button>
+                  <button class="score-btn s4" onclick="setScore('s6',4,this)">4</button>
+                  <button class="score-btn s5" onclick="setScore('s6',5,this)">5</button>
+                </div></td>
+                <td><input class="fill-field" placeholder="Anthropic, OpenAI, Google — enterprise-отношения..."></td>
+              </tr>
+              <tr>
+                <td><strong>7. Измерение ценности</strong><br><span style="font-size:.72rem;color:#888">← Q4.9</span></td>
+                <td><div class="score-input" id="s7">
+                  <button class="score-btn s1" onclick="setScore('s7',1,this)">1</button>
+                  <button class="score-btn s2" onclick="setScore('s7',2,this)">2</button>
+                  <button class="score-btn s3" onclick="setScore('s7',3,this)">3</button>
+                  <button class="score-btn s4" onclick="setScore('s7',4,this)">4</button>
+                  <button class="score-btn s5" onclick="setScore('s7',5,this)">5</button>
+                </div></td>
+                <td><input class="fill-field" placeholder="Как измеряют ROI Chill-AI..."></td>
+              </tr>
+              <tr style="background:#f0faf5">
+                <td><strong>Composite</strong></td>
+                <td><div id="composite" style="font-family:'Space Grotesk',sans-serif;font-size:1.2rem;font-weight:700;color:var(--new-green);">—</div></td>
+                <td><div id="maturity-level" style="font-size:.82rem;color:var(--text-mid)">Выберите баллы выше</div></td>
+              </tr>
+            </tbody>
+          </table>
+          <div style="font-size:.75rem; color:var(--text-mid); line-height:1.6">
+            <strong>Уровни:</strong> 1.0–1.8 = Осведомлённость · 1.9–2.5 = Экспериментирование · 2.6–3.3 = Операционализация · 3.4–4.1 = Масштабирование · 4.2–5.0 = Трансформация
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ARTIFACT 3 — NEW -->
+  <div class="section" id="art3">
+    <div class="section-card new-section">
+      <div class="section-header" onclick="toggleSection(this)">
+        <div class="section-icon" style="background:var(--new-green-pale)">③</div>
+        <div>
+          <div class="section-title">Артефакт 3 — Оценка амбассадоров <span class="v2-pill">new</span></div>
+          <div class="section-sub">Задача 2 · Заполняется на Щербакова + Лозневого + имена из Q5.5</div>
+        </div>
+        <span class="section-toggle open">▼</span>
+      </div>
+      <div class="section-body">
+        <div class="artifact-section new">
+
+          <!-- Ambassador 1: Щербаков -->
+          <div class="ambassador-card">
+            <div class="ambassador-name">Щербаков <span style="font-size:.75rem;font-weight:400;color:var(--text-mid)">(Analytics)</span></div>
+            <div class="ambassador-grid">
+              <div class="amb-row"><div class="amb-label">Частота использования AI (Q5.1)</div><div class="score-input" id="a1"><button class="score-btn s1" onclick="setAmbScore('a1',1,this)">1</button><button class="score-btn s2" onclick="setAmbScore('a1',2,this)">2</button><button class="score-btn s3" onclick="setAmbScore('a1',3,this)">3</button><button class="score-btn s4" onclick="setAmbScore('a1',4,this)">4</button><button class="score-btn s5" onclick="setAmbScore('a1',5,this)">5</button></div></div>
+              <div class="amb-row"><div class="amb-label">Делится опытом с командой (Q5.6)</div><div class="score-input" id="a2"><button class="score-btn s1" onclick="setAmbScore('a2',1,this)">1</button><button class="score-btn s2" onclick="setAmbScore('a2',2,this)">2</button><button class="score-btn s3" onclick="setAmbScore('a2',3,this)">3</button><button class="score-btn s4" onclick="setAmbScore('a2',4,this)">4</button><button class="score-btn s5" onclick="setAmbScore('a2',5,this)">5</button></div></div>
+              <div class="amb-row"><div class="amb-label">Реализованная ценность от AI (Q5.2)</div><div class="score-input" id="a3"><button class="score-btn s1" onclick="setAmbScore('a3',1,this)">1</button><button class="score-btn s2" onclick="setAmbScore('a3',2,this)">2</button><button class="score-btn s3" onclick="setAmbScore('a3',3,this)">3</button><button class="score-btn s4" onclick="setAmbScore('a3',4,this)">4</button><button class="score-btn s5" onclick="setAmbScore('a3',5,this)">5</button></div></div>
+              <div class="amb-row"><div class="amb-label">Проактивность / инновационность (Q5.3)</div><div class="score-input" id="a4"><button class="score-btn s1" onclick="setAmbScore('a4',1,this)">1</button><button class="score-btn s2" onclick="setAmbScore('a4',2,this)">2</button><button class="score-btn s3" onclick="setAmbScore('a4',3,this)">3</button><button class="score-btn s4" onclick="setAmbScore('a4',4,this)">4</button><button class="score-btn s5" onclick="setAmbScore('a4',5,this)">5</button></div></div>
+              <div class="amb-row"><div class="amb-label">Готовность к пилоту (Q5.7)</div><div class="score-input" id="a5"><button class="score-btn s1" onclick="setAmbScore('a5',1,this)">1</button><button class="score-btn s2" onclick="setAmbScore('a5',2,this)">2</button><button class="score-btn s3" onclick="setAmbScore('a5',3,this)">3</button><button class="score-btn s4" onclick="setAmbScore('a5',4,this)">4</button><button class="score-btn s5" onclick="setAmbScore('a5',5,this)">5</button></div></div>
+              <div class="amb-row"><div class="amb-label">Готовность обучать других (Q5.8)</div><div class="score-input" id="a6"><button class="score-btn s1" onclick="setAmbScore('a6',1,this)">1</button><button class="score-btn s2" onclick="setAmbScore('a6',2,this)">2</button><button class="score-btn s3" onclick="setAmbScore('a6',3,this)">3</button><button class="score-btn s4" onclick="setAmbScore('a6',4,this)">4</button><button class="score-btn s5" onclick="setAmbScore('a6',5,this)">5</button></div></div>
+            </div>
+            <div class="amb-score-total">
+              <div><div class="amb-total-num" id="amb-total-1">—</div><div class="amb-total-label">из 30 баллов</div></div>
+              <div id="amb-category-1" class="champion-badge observer">—</div>
+              <div style="margin-left:auto">
+                <div style="font-size:.75rem;color:var(--text-mid);margin-bottom:.3rem">Включить в шортлист?</div>
+                <label style="font-size:.82rem;cursor:pointer"><input type="checkbox" style="margin-right:.4rem">Да · AI Champion/Advocate</label>
+              </div>
+            </div>
+          </div>
+
+          <!-- Ambassador 2: Лозневой -->
+          <div class="ambassador-card">
+            <div class="ambassador-name">Лозневой <span style="font-size:.75rem;font-weight:400;color:var(--text-mid)">(Product)</span></div>
+            <div class="ambassador-grid">
+              <div class="amb-row"><div class="amb-label">Частота использования AI (Q5.1)</div><div class="score-input" id="b1"><button class="score-btn s1" onclick="setAmbScore('b1',1,this)">1</button><button class="score-btn s2" onclick="setAmbScore('b1',2,this)">2</button><button class="score-btn s3" onclick="setAmbScore('b1',3,this)">3</button><button class="score-btn s4" onclick="setAmbScore('b1',4,this)">4</button><button class="score-btn s5" onclick="setAmbScore('b1',5,this)">5</button></div></div>
+              <div class="amb-row"><div class="amb-label">Делится опытом с командой (Q5.6)</div><div class="score-input" id="b2"><button class="score-btn s1" onclick="setAmbScore('b2',1,this)">1</button><button class="score-btn s2" onclick="setAmbScore('b2',2,this)">2</button><button class="score-btn s3" onclick="setAmbScore('b2',3,this)">3</button><button class="score-btn s4" onclick="setAmbScore('b2',4,this)">4</button><button class="score-btn s5" onclick="setAmbScore('b2',5,this)">5</button></div></div>
+              <div class="amb-row"><div class="amb-label">Реализованная ценность от AI (Q5.2)</div><div class="score-input" id="b3"><button class="score-btn s1" onclick="setAmbScore('b3',1,this)">1</button><button class="score-btn s2" onclick="setAmbScore('b3',2,this)">2</button><button class="score-btn s3" onclick="setAmbScore('b3',3,this)">3</button><button class="score-btn s4" onclick="setAmbScore('b3',4,this)">4</button><button class="score-btn s5" onclick="setAmbScore('b3',5,this)">5</button></div></div>
+              <div class="amb-row"><div class="amb-label">Проактивность / инновационность (Q5.3)</div><div class="score-input" id="b4"><button class="score-btn s1" onclick="setAmbScore('b4',1,this)">1</button><button class="score-btn s2" onclick="setAmbScore('b4',2,this)">2</button><button class="score-btn s3" onclick="setAmbScore('b4',3,this)">3</button><button class="score-btn s4" onclick="setAmbScore('b4',4,this)">4</button><button class="score-btn s5" onclick="setAmbScore('b4',5,this)">5</button></div></div>
+              <div class="amb-row"><div class="amb-label">Готовность к пилоту (Q5.7)</div><div class="score-input" id="b5"><button class="score-btn s1" onclick="setAmbScore('b5',1,this)">1</button><button class="score-btn s2" onclick="setAmbScore('b5',2,this)">2</button><button class="score-btn s3" onclick="setAmbScore('b5',3,this)">3</button><button class="score-btn s4" onclick="setAmbScore('b5',4,this)">4</button><button class="score-btn s5" onclick="setAmbScore('b5',5,this)">5</button></div></div>
+              <div class="amb-row"><div class="amb-label">Готовность обучать других (Q5.8)</div><div class="score-input" id="b6"><button class="score-btn s1" onclick="setAmbScore('b6',1,this)">1</button><button class="score-btn s2" onclick="setAmbScore('b6',2,this)">2</button><button class="score-btn s3" onclick="setAmbScore('b6',3,this)">3</button><button class="score-btn s4" onclick="setAmbScore('b6',4,this)">4</button><button class="score-btn s5" onclick="setAmbScore('b6',5,this)">5</button></div></div>
+            </div>
+            <div class="amb-score-total">
+              <div><div class="amb-total-num" id="amb-total-2">—</div><div class="amb-total-label">из 30 баллов</div></div>
+              <div id="amb-category-2" class="champion-badge observer">—</div>
+              <div style="margin-left:auto">
+                <div style="font-size:.75rem;color:var(--text-mid);margin-bottom:.3rem">Включить в шортлист?</div>
+                <label style="font-size:.82rem;cursor:pointer"><input type="checkbox" style="margin-right:.4rem">Да · AI Champion/Advocate</label>
+              </div>
+            </div>
+          </div>
+
+          <div class="artifact-sub new">Другие имена из команды (Q5.5)</div>
+          <table class="amb-extra-table">
+            <thead><tr><th>Имя</th><th>Что сказали респонденты</th><th>Предварительная категория</th></tr></thead>
+            <tbody>
+              <tr><td><input class="fill-field"></td><td><input class="fill-field"></td><td><input class="fill-field"></td></tr>
+              <tr><td><input class="fill-field"></td><td><input class="fill-field"></td><td><input class="fill-field"></td></tr>
+            </tbody>
+          </table>
+
+          <div style="margin-top:.8rem; font-size:.75rem; color:var(--text-mid); line-height:1.6">
+            <strong>Классификация:</strong> 23–30 = AI Champion · 17–22 = AI Advocate · 11–16 = AI Curious · 0–10 = AI Observer
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ARTIFACT 4 — NEW -->
+  <div class="section" id="art4">
+    <div class="section-card new-section">
+      <div class="section-header" onclick="toggleSection(this)">
+        <div class="section-icon" style="background:var(--new-green-pale)">④</div>
+        <div>
+          <div class="section-title">Артефакт 4 — Инициативы Impact × Feasibility <span class="v2-pill">new</span></div>
+          <div class="section-sub">Задача 3 · McKinsey Impact-Feasibility Matrix</div>
+        </div>
+        <span class="section-toggle open">▼</span>
+      </div>
+      <div class="section-body">
+        <div class="artifact-section new">
+          <table class="matrix-table">
+            <thead>
+              <tr><th>Инициатива</th><th>Категория</th><th>Боль (1–5)</th><th>Ценность (1–5)</th><th>Feasibility (1–5)</th><th>Квадрант</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Расширение Chill-AI (новые источники данных)</td>
+                <td style="font-size:.75rem">Аналитика и решения</td>
+                <td><input class="fill-field" style="width:40px" placeholder="—"></td>
+                <td><input class="fill-field" style="width:40px" placeholder="—"></td>
+                <td><input class="fill-field" style="width:40px" placeholder="—"></td>
+                <td><select style="font-size:.75rem;border:1px solid #ddd;border-radius:4px;padding:.2rem .4rem;background:#fff" onchange="colorQuadrant(this)"><option value="">—</option><option value="q1">Q1: Quick Win</option><option value="q2">Q2: Strategic Bet</option><option value="q3">Q3: Low Fruit</option><option value="q4">Q4: Депри</option></select></td>
+              </tr>
+              <tr>
+                <td>Перезапуск ML LiveOps комбинатора</td>
+                <td style="font-size:.75rem">Автоматизация данных</td>
+                <td><input class="fill-field" style="width:40px" placeholder="—"></td>
+                <td><input class="fill-field" style="width:40px" placeholder="—"></td>
+                <td><input class="fill-field" style="width:40px" placeholder="—"></td>
+                <td><select style="font-size:.75rem;border:1px solid #ddd;border-radius:4px;padding:.2rem .4rem;background:#fff" onchange="colorQuadrant(this)"><option value="">—</option><option value="q1">Q1: Quick Win</option><option value="q2">Q2: Strategic Bet</option><option value="q3">Q3: Low Fruit</option><option value="q4">Q4: Депри</option></select></td>
+              </tr>
+              <tr>
+                <td>Автоматизация документации Meta Product</td>
+                <td style="font-size:.75rem">Генерация документов</td>
+                <td><input class="fill-field" style="width:40px" placeholder="—"></td>
+                <td><input class="fill-field" style="width:40px" placeholder="—"></td>
+                <td><input class="fill-field" style="width:40px" placeholder="—"></td>
+                <td><select style="font-size:.75rem;border:1px solid #ddd;border-radius:4px;padding:.2rem .4rem;background:#fff" onchange="colorQuadrant(this)"><option value="">—</option><option value="q1">Q1: Quick Win</option><option value="q2">Q2: Strategic Bet</option><option value="q3">Q3: Low Fruit</option><option value="q4">Q4: Депри</option></select></td>
+              </tr>
+              <tr>
+                <td>AI-автоматизация тестирования</td>
+                <td style="font-size:.75rem">Контроль качества</td>
+                <td><input class="fill-field" style="width:40px" placeholder="—"></td>
+                <td><input class="fill-field" style="width:40px" placeholder="—"></td>
+                <td><input class="fill-field" style="width:40px" placeholder="—"></td>
+                <td><select style="font-size:.75rem;border:1px solid #ddd;border-radius:4px;padding:.2rem .4rem;background:#fff" onchange="colorQuadrant(this)"><option value="">—</option><option value="q1">Q1: Quick Win</option><option value="q2">Q2: Strategic Bet</option><option value="q3">Q3: Low Fruit</option><option value="q4">Q4: Депри</option></select></td>
+              </tr>
+              <tr>
+                <td>Единая экономическая модель (AI мониторинг)</td>
+                <td style="font-size:.75rem">Аналитика и решения</td>
+                <td><input class="fill-field" style="width:40px" placeholder="—"></td>
+                <td><input class="fill-field" style="width:40px" placeholder="—"></td>
+                <td><input class="fill-field" style="width:40px" placeholder="—"></td>
+                <td><select style="font-size:.75rem;border:1px solid #ddd;border-radius:4px;padding:.2rem .4rem;background:#fff" onchange="colorQuadrant(this)"><option value="">—</option><option value="q1">Q1: Quick Win</option><option value="q2">Q2: Strategic Bet</option><option value="q3">Q3: Low Fruit</option><option value="q4">Q4: Депри</option></select></td>
+              </tr>
+              <tr>
+                <td><input class="fill-field" placeholder="+ из разговора"></td>
+                <td><input class="fill-field" placeholder="категория"></td>
+                <td><input class="fill-field" style="width:40px" placeholder="—"></td>
+                <td><input class="fill-field" style="width:40px" placeholder="—"></td>
+                <td><input class="fill-field" style="width:40px" placeholder="—"></td>
+                <td><select style="font-size:.75rem;border:1px solid #ddd;border-radius:4px;padding:.2rem .4rem;background:#fff" onchange="colorQuadrant(this)"><option value="">—</option><option value="q1">Q1: Quick Win</option><option value="q2">Q2: Strategic Bet</option><option value="q3">Q3: Low Fruit</option><option value="q4">Q4: Депри</option></select></td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="quadrant-legend">
+            <div class="q-legend-item ql1"><strong>Q1: Quick Win</strong>Impact ≥ 3.5 + Feasibility ≥ 3.5 → Запускать первыми</div>
+            <div class="q-legend-item ql2"><strong>Q2: Strategic Bet</strong>Impact ≥ 3.5 + F &lt; 3.5 → Инвестировать в prerequisites</div>
+            <div class="q-legend-item ql3"><strong>Q3: Low Hanging Fruit</strong>Impact &lt; 3.5 + F ≥ 3.5 → Быстрые пилоты, build momentum</div>
+            <div class="q-legend-item ql4"><strong>Q4: Deprioritize</strong>Оба &lt; 3.5 → Не сейчас, пересмотр через 6–12 мес.</div>
+          </div>
+
+          <div class="artifact-sub new">Общая Feasibility отдела</div>
+          <div class="feasibility-mini">
+            <div class="f-item"><div class="f-item-label">Данные готовы (Q4.1–4.3)</div><input class="fill-field" placeholder="1–5"></div>
+            <div class="f-item"><div class="f-item-label">Стандартизация процессов (В1)</div><input class="fill-field" placeholder="1–5"></div>
+            <div class="f-item"><div class="f-item-label">Документация знаний (В3)</div><input class="fill-field" placeholder="1–5"></div>
+            <div class="f-item"><div class="f-item-label">Навыки команды (Q5.5)</div><input class="fill-field" placeholder="1–5"></div>
+          </div>
+
+          <div class="artifact-sub new">Открытые вопросы для follow-up</div>
+          <textarea style="width:100%;min-height:60px;border:1px dashed var(--new-green-border);border-radius:8px;padding:.8rem;font-family:'Inter',sans-serif;font-size:.83rem;background:var(--white);resize:vertical;" placeholder="Что нужно уточнить дополнительно..."></textarea>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TIMING -->
+  <div class="section" id="timing">
+    <div class="section-card">
+      <div class="section-header" onclick="toggleSection(this)">
+        <div class="section-icon">⏱</div>
+        <div><div class="section-title">Тайминг сессии</div><div class="section-sub">Отмечай по ходу интервью</div></div>
+        <span class="section-toggle open">▼</span>
+      </div>
+      <div class="section-body">
+        <div class="timing-list">
+          <div class="timing-item"><div class="timing-time">0:00 – 0:10</div><div class="timing-label">Согласие + Rapport</div><div class="timing-mark"><input type="checkbox"></div></div>
+          <div class="timing-item"><div class="timing-time">0:10 – 0:30</div><div class="timing-label">Волна 1: Текущие AI-инструменты + процессы</div><div class="timing-mark"><input type="checkbox"></div></div>
+          <div class="timing-item"><div class="timing-time">0:30 – 0:50</div><div class="timing-label">Волна 2: Боли и ограничения</div><div class="timing-mark"><input type="checkbox"></div></div>
+          <div class="timing-item" style="opacity:.5"><div class="timing-time">0:50 – 0:55</div><div class="timing-label">☕ Пауза</div><div class="timing-mark"><input type="checkbox"></div></div>
+          <div class="timing-item"><div class="timing-time">0:55 – 1:10</div><div class="timing-label">Волна 3: Scaling</div><div class="timing-mark"><input type="checkbox"></div></div>
+          <div class="timing-item new-timing"><div class="timing-time">1:10 – 1:30</div><div class="timing-label">Волна 4: Data Architecture <span class="v2-pill">+5 мин</span></div><div class="timing-mark"><input type="checkbox"></div></div>
+          <div class="timing-item new-timing"><div class="timing-time">1:30 – 1:50</div><div class="timing-label">Волна 5: AI Signals & Strategy <span class="v2-pill">+5 мин</span></div><div class="timing-mark"><input type="checkbox"></div></div>
+          <div class="timing-item"><div class="timing-time">1:50 – 2:00</div><div class="timing-label">Финальный вопрос + закрытие</div><div class="timing-mark"><input type="checkbox"></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</main>
+</div>
+
+<button class="print-btn" onclick="window.print()">🖨️ Печать / PDF</button>
+
+<script>
+function toggleSection(header) {
+  const body = header.nextElementSibling;
+  const toggle = header.querySelector('.section-toggle');
+  body.classList.toggle('hidden');
+  toggle.classList.toggle('open');
+}
+function toggleWave(header) {
+  const body = header.nextElementSibling;
+  const toggle = header.querySelector('.section-toggle');
+  body.classList.toggle('hidden');
+  toggle.classList.toggle('open');
+}
+function setActive(el) {
+  document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+  el.classList.add('active');
+}
+const sections = document.querySelectorAll('.section');
+window.addEventListener('scroll', () => {
+  let current = '';
+  sections.forEach(s => { if (window.scrollY >= s.offsetTop - 80) current = s.id; });
+  document.querySelectorAll('.nav-item').forEach(n => {
+    n.classList.remove('active');
+    if (n.getAttribute('href') === '#' + current) n.classList.add('active');
+  });
+});
+
+// Timer
+let timerInterval = null, timerSeconds = 0, running = false;
+function toggleTimer() {
+  const btn = document.getElementById('timerBtn');
+  if (running) { clearInterval(timerInterval); btn.textContent = '▶ Продолжить'; }
+  else {
+    timerInterval = setInterval(() => {
+      timerSeconds++;
+      const m = Math.floor(timerSeconds / 60), s = timerSeconds % 60;
+      document.getElementById('timerDisplay').textContent = m + ':' + String(s).padStart(2,'0');
+    }, 1000);
+    btn.textContent = '⏸ Пауза';
+  }
+  running = !running;
+}
+
+// Maturity scores
+const matScores = {};
+const matWeights = [1.5, 1.5, 1.25, 1.0, 1.0, 0.75, 1.0];
+const matLevels = [[1.9,'Осведомлённость'],[2.6,'Экспериментирование'],[3.4,'Операционализация'],[4.2,'Масштабирование'],[99,'Трансформация']];
+function setScore(id, val, btn) {
+  const row = document.getElementById(id);
+  row.querySelectorAll('.score-btn').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  matScores[id] = val;
+  updateComposite();
+}
+function updateComposite() {
+  const keys = ['s1','s2','s3','s4','s5','s6','s7'];
+  const vals = keys.map(k => matScores[k] || null);
+  if (vals.some(v => v === null)) return;
+  let weighted = 0, totalW = 0;
+  vals.forEach((v,i) => { weighted += v * matWeights[i]; totalW += matWeights[i]; });
+  const composite = (weighted / totalW).toFixed(2);
+  document.getElementById('composite').textContent = composite;
+  const level = matLevels.find(l => parseFloat(composite) < l[0]);
+  document.getElementById('maturity-level').textContent = level ? level[1] : 'Трансформация';
+}
+
+// Ambassador scores — supports two cards (a1-a6, b1-b6)
+const ambScores = {};
+const ambCats = [[11,'AI Observer','observer'],[17,'AI Curious','curious'],[23,'AI Advocate','advocate'],[31,'AI Champion','champion']];
+function setAmbScore(id, val, btn) {
+  const row = document.getElementById(id);
+  row.querySelectorAll('.score-btn').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  ambScores[id] = val;
+  updateAmbTotals();
+}
+function updateAmbTotals() {
+  // Card 1: Щербаков (a1-a6)
+  const keysA = ['a1','a2','a3','a4','a5','a6'];
+  const valsA = keysA.map(k => ambScores[k] || 0);
+  if (valsA.some(v => v > 0)) {
+    const totalA = valsA.reduce((a,b) => a+b, 0);
+    document.getElementById('amb-total-1').textContent = totalA;
+    const catA = ambCats.find(c => totalA < c[0]);
+    const catElA = document.getElementById('amb-category-1');
+    catElA.textContent = catA ? catA[1] : 'AI Champion';
+    catElA.className = 'champion-badge ' + (catA ? catA[2] : 'champion');
+  }
+  // Card 2: Лозневой (b1-b6)
+  const keysB = ['b1','b2','b3','b4','b5','b6'];
+  const valsB = keysB.map(k => ambScores[k] || 0);
+  if (valsB.some(v => v > 0)) {
+    const totalB = valsB.reduce((a,b) => a+b, 0);
+    document.getElementById('amb-total-2').textContent = totalB;
+    const catB = ambCats.find(c => totalB < c[0]);
+    const catElB = document.getElementById('amb-category-2');
+    catElB.textContent = catB ? catB[1] : 'AI Champion';
+    catElB.className = 'champion-badge ' + (catB ? catB[2] : 'champion');
+  }
+}
+
+// Quadrant color
+function colorQuadrant(sel) {
+  const td = sel.parentElement;
+  td.className = '';
+  if (sel.value === 'q1') td.className = 'quadrant-q1';
+  else if (sel.value === 'q2') td.className = 'quadrant-q2';
+  else if (sel.value === 'q3') td.className = 'quadrant-q3';
+  else if (sel.value === 'q4') td.className = 'quadrant-q4';
+}
+
+document.getElementById('interviewDate').textContent =
+  new Date().toLocaleDateString('ru-RU', {day:'numeric', month:'long', year:'numeric'});
+</script>
+</body>
+</html>
