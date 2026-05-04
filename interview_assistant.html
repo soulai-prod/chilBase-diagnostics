@@ -534,7 +534,7 @@
   <select id="deptSelect" onchange="switchDept()"></select>
   <span class="badge" id="waveLabel">Волна 0</span>
   <div class="spacer"></div>
-  <span class="key-status ok" id="keyStatus">● ключ активен</span>
+  <span class="key-status no" id="keyStatus">● проверка...</span>
 </div>
 
 <!-- MAIN -->
@@ -1730,12 +1730,17 @@ function exportNotes() {
 // ═══════════════════════════════════════════════════
 // KEY
 // ═══════════════════════════════════════════════════
-const HARDCODED_API_KEY = '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';
+const HARDCODED_API_KEY = new URLSearchParams(window.location.search).get('key') || '';
 
 function checkKey() {
   const status = document.getElementById('keyStatus');
-  status.textContent = '● ключ активен';
-  status.className = 'key-status ok';
+  if (HARDCODED_API_KEY.startsWith('sk-ant-')) {
+    status.textContent = '● ключ активен';
+    status.className = 'key-status ok';
+  } else {
+    status.textContent = '● нет ключа';
+    status.className = 'key-status no';
+  }
   if (false) {
   }
 }
@@ -1744,12 +1749,7 @@ function checkKey() {
 // INIT
 // ═══════════════════════════════════════════════════
 function init() {
-  // Load saved key
-  const savedKey = localStorage.getItem('cb_api_key');
-  if (savedKey) {
-    document.getElementById('apiKey').value = savedKey;
-    checkKey();
-  }
+  checkKey();
 
   // Populate dept selector
   const sel = document.getElementById('deptSelect');
