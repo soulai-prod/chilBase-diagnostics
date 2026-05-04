@@ -1,0 +1,971 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Диагностика — Универсальный опросник | ChillBase</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --ocean-deep: #0A2E4D;
+  --ocean-mid: #1B6B93;
+  --ocean-light: #5DB9C9;
+  --foam: #F5F0EB;
+  --sand: #E8DCC8;
+  --sun: #E8A838;
+  --sun-glow: #F4C56B;
+  --text-dark: #1a1a2e;
+  --text-light: #5a6577;
+  --white: #FFFFFF;
+  --success: #2ECC71;
+  --card-border: rgba(27,107,147,0.12);
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior: smooth; }
+body { font-family:'Inter',sans-serif; color:var(--text-dark); background:var(--foam); min-height:100vh; }
+h1,h2,h3,h4 { font-family:'Space Grotesk',sans-serif; line-height:1.2; }
+
+/* ─── HEADER ─── */
+.header {
+  background: linear-gradient(135deg, var(--ocean-deep) 0%, var(--ocean-mid) 100%);
+  padding: 1.5rem 2rem;
+  display:flex; align-items:center; justify-content:space-between;
+  position:sticky; top:0; z-index:100;
+  box-shadow: 0 4px 20px rgba(10,46,77,0.2);
+}
+.header-brand { display:flex; align-items:center; gap:.75rem; }
+.header-brand span { color:var(--white); font-family:'Space Grotesk',sans-serif; font-weight:600; font-size:1.05rem; }
+.header-tag {
+  color:var(--sun-glow); font-size:.85rem; font-weight:500;
+  padding:.3rem .9rem; border:1px solid rgba(244,197,107,0.4); border-radius:50px;
+}
+
+/* ─── PROGRESS ─── */
+.progress-wrap { background:var(--white); padding:1rem 2rem; border-bottom:1px solid var(--card-border); }
+.progress-steps {
+  display:flex; align-items:center; gap:.5rem;
+  max-width:720px; margin:0 auto;
+}
+.step-dot {
+  width:28px; height:28px; border-radius:50%;
+  display:flex; align-items:center; justify-content:center;
+  font-size:.7rem; font-weight:600; flex-shrink:0; transition:all .3s;
+}
+.step-dot.done { background:var(--ocean-mid); color:var(--white); }
+.step-dot.active { background:var(--sun); color:var(--ocean-deep); box-shadow:0 0 0 4px rgba(232,168,56,.2); }
+.step-dot.todo { background:var(--sand); color:var(--text-light); }
+.step-line { flex:1; height:2px; background:var(--sand); border-radius:2px; }
+.step-line.done { background:var(--ocean-light); }
+.progress-label { text-align:center; font-size:.8rem; color:var(--text-light); margin-top:.6rem; max-width:720px; margin-left:auto; margin-right:auto; }
+
+/* ─── MAIN ─── */
+.main { max-width:720px; margin:0 auto; padding:2.5rem 1.5rem 4rem; }
+
+/* ─── BLOCK HEADER ─── */
+.block-header { margin-bottom:2rem; animation:fadeUp .5s ease both; }
+.block-label {
+  display:inline-block; font-size:.75rem; font-weight:600; letter-spacing:.12em;
+  text-transform:uppercase; color:var(--ocean-mid);
+  padding:.35rem .9rem; border:1px solid var(--ocean-light); border-radius:50px; margin-bottom:1rem;
+}
+.block-title { font-size:1.7rem; color:var(--ocean-deep); margin-bottom:.6rem; }
+.block-sub { color:var(--text-light); font-size:.95rem; line-height:1.7; }
+
+/* ─── QUESTION ─── */
+.question {
+  background:var(--white); border-radius:16px; padding:1.75rem; margin-bottom:1.25rem;
+  border:1px solid var(--card-border); animation:fadeUp .4s ease both;
+}
+.question:nth-child(2) { animation-delay:.05s; }
+.question:nth-child(3) { animation-delay:.1s; }
+.question:nth-child(4) { animation-delay:.15s; }
+.question:nth-child(5) { animation-delay:.2s; }
+@keyframes fadeUp {
+  from { opacity:0; transform:translateY(20px); }
+  to { opacity:1; transform:translateY(0); }
+}
+.q-label { font-weight:600; color:var(--ocean-deep); margin-bottom:1.1rem; font-size:1rem; line-height:1.5; }
+.q-num {
+  display:inline-block; width:22px; height:22px; border-radius:50%;
+  background:var(--ocean-light); color:var(--white);
+  font-size:.7rem; font-weight:700; text-align:center; line-height:22px; margin-right:.5rem; flex-shrink:0;
+}
+
+/* ─── SELECT ─── */
+.q-select {
+  width:100%; padding:.75rem 1rem; border:1.5px solid var(--sand); border-radius:10px;
+  font-family:'Inter',sans-serif; font-size:.95rem; color:var(--text-dark);
+  background:var(--white); outline:none; transition:border-color .2s; cursor:pointer;
+}
+.q-select:focus { border-color:var(--ocean-mid); }
+
+/* ─── RADIO / CHECKBOX ─── */
+.options { display:flex; flex-direction:column; gap:.6rem; }
+.opt {
+  display:flex; align-items:flex-start; gap:.75rem;
+  padding:.85rem 1rem; border:1.5px solid var(--sand); border-radius:10px; cursor:pointer;
+  transition:all .2s; position:relative;
+}
+.opt:hover { border-color:var(--ocean-light); background:rgba(93,185,201,.04); }
+.opt.selected { border-color:var(--ocean-mid); background:rgba(27,107,147,.06); }
+.opt input { position:absolute; opacity:0; pointer-events:none; }
+.opt-marker {
+  width:18px; height:18px; border-radius:50%; flex-shrink:0; margin-top:1px;
+  border:2px solid var(--sand); background:var(--white);
+  transition:all .2s; display:flex; align-items:center; justify-content:center;
+}
+.opt.selected .opt-marker { border-color:var(--ocean-mid); background:var(--ocean-mid); }
+.opt.selected .opt-marker::after { content:''; width:6px; height:6px; border-radius:50%; background:var(--white); }
+.opt.checkbox-opt .opt-marker { border-radius:5px; }
+.opt.checkbox-opt.selected .opt-marker::after { content:'✓'; font-size:.65rem; color:var(--white); font-weight:700; }
+.opt-text { color:var(--text-dark); font-size:.93rem; line-height:1.5; }
+
+/* ─── LIKERT ─── */
+.likert-wrap { display:flex; flex-direction:column; gap:.75rem; }
+.likert-labels { display:flex; justify-content:space-between; font-size:.75rem; color:var(--text-light); }
+.likert-row { display:flex; gap:.5rem; justify-content:center; }
+.likert-btn {
+  width:44px; height:44px; border-radius:50%;
+  border:2px solid var(--sand); background:var(--white);
+  font-weight:600; font-size:.9rem; color:var(--text-light);
+  cursor:pointer; transition:all .2s;
+  display:flex; align-items:center; justify-content:center;
+}
+.likert-btn:hover { border-color:var(--ocean-light); color:var(--ocean-mid); }
+.likert-btn.selected { background:var(--ocean-mid); border-color:var(--ocean-mid); color:var(--white); }
+
+/* ─── TASK ─── */
+.task-situation {
+  background:linear-gradient(135deg, var(--ocean-deep), var(--ocean-mid));
+  border-radius:12px; padding:1.25rem 1.5rem; margin-bottom:1.25rem; color:var(--white);
+}
+.task-situation .sit-label { font-size:.7rem; text-transform:uppercase; letter-spacing:.1em; opacity:.6; margin-bottom:.4rem; }
+.task-situation p { font-size:.92rem; line-height:1.6; opacity:.9; }
+.task-q { font-weight:600; color:var(--ocean-deep); margin-bottom:1rem; font-size:.95rem; }
+.task-options { display:flex; flex-direction:column; gap:.6rem; }
+.task-opt {
+  display:flex; gap:.75rem; align-items:flex-start;
+  padding:.9rem 1rem; border:1.5px solid var(--sand); border-radius:10px;
+  cursor:pointer; transition:all .2s;
+}
+.task-opt:hover { border-color:var(--ocean-light); background:rgba(93,185,201,.04); }
+.task-opt.selected { border-color:var(--ocean-mid); background:rgba(27,107,147,.06); }
+.task-opt.correct { border-color:var(--success)!important; background:rgba(46,204,113,.08)!important; }
+.task-opt.wrong { border-color:#E74C3C!important; background:rgba(231,76,60,.06)!important; opacity:.7; }
+.task-letter {
+  width:24px; height:24px; border-radius:6px; flex-shrink:0;
+  background:var(--sand); color:var(--text-dark);
+  font-weight:700; font-size:.8rem; display:flex; align-items:center; justify-content:center;
+  transition:all .2s;
+}
+.task-opt.selected .task-letter { background:var(--ocean-mid); color:var(--white); }
+.task-opt.correct .task-letter { background:var(--success); color:var(--white); }
+.task-opt.wrong .task-letter { background:#E74C3C; color:var(--white); }
+.task-text { font-size:.88rem; color:var(--text-dark); line-height:1.5; }
+.task-explain {
+  margin-top:.75rem; padding:.75rem 1rem;
+  background:rgba(46,204,113,.1); border-radius:8px;
+  font-size:.82rem; color:#1a6b3a; line-height:1.5; display:none;
+}
+.task-explain.show { display:block; }
+
+/* ─── TIME SPLIT ─── */
+.time-split { display:flex; flex-direction:column; gap:.75rem; }
+.time-row { display:flex; align-items:center; gap:1rem; }
+.time-label { flex:1; font-size:.88rem; color:var(--text-dark); }
+.time-input {
+  width:70px; padding:.45rem .6rem; border:1.5px solid var(--sand); border-radius:8px;
+  font-size:.9rem; font-weight:600; color:var(--ocean-mid); text-align:center; outline:none;
+  transition:border-color .2s;
+}
+.time-input:focus { border-color:var(--ocean-mid); }
+.time-unit { font-size:.8rem; color:var(--text-light); width:16px; }
+.time-total {
+  display:flex; justify-content:flex-end; align-items:center; gap:.5rem;
+  padding:.6rem 1rem; background:var(--sand); border-radius:8px; margin-top:.25rem;
+  font-size:.85rem; color:var(--text-dark);
+}
+.time-total strong { font-family:'Space Grotesk',sans-serif; font-size:1rem; color:var(--ocean-mid); }
+.time-total.over strong { color:#E74C3C; }
+
+/* ─── TEXTAREA ─── */
+.open-q textarea {
+  width:100%; padding:1rem; border:1.5px solid var(--sand); border-radius:10px;
+  font-family:'Inter',sans-serif; font-size:.93rem; color:var(--text-dark);
+  resize:vertical; min-height:80px; background:var(--white);
+  transition:border-color .2s; outline:none;
+}
+.open-q textarea:focus { border-color:var(--ocean-mid); }
+.open-q .q-optional { font-size:.78rem; color:var(--text-light); font-weight:400; margin-left:.4rem; }
+
+/* ─── NAVIGATION ─── */
+.nav-row {
+  display:flex; gap:1rem; margin-top:2.5rem; justify-content:space-between; align-items:center;
+}
+.btn {
+  padding:.85rem 2rem; border-radius:50px; font-weight:600; font-size:.95rem;
+  cursor:pointer; border:none; transition:all .25s; font-family:'Inter',sans-serif;
+}
+.btn-primary {
+  background:linear-gradient(135deg, var(--ocean-mid), var(--ocean-deep));
+  color:var(--white); box-shadow:0 4px 16px rgba(27,107,147,.3);
+}
+.btn-primary:hover { transform:translateY(-2px); box-shadow:0 8px 24px rgba(27,107,147,.4); }
+.btn-secondary { background:transparent; color:var(--text-light); border:1.5px solid var(--sand); }
+.btn-secondary:hover { border-color:var(--ocean-light); color:var(--ocean-mid); }
+.btn-submit {
+  background:linear-gradient(135deg, var(--sun), var(--sun-glow));
+  color:var(--ocean-deep); box-shadow:0 4px 16px rgba(232,168,56,.3);
+  flex:1; text-align:center; font-size:1rem;
+}
+.btn-submit:hover { transform:translateY(-2px); box-shadow:0 8px 24px rgba(232,168,56,.4); }
+
+/* ─── THANK YOU ─── */
+.thankyou { text-align:center; padding:4rem 2rem; display:none; }
+.thankyou.show { display:block; animation:fadeUp .6s ease both; }
+.ty-icon { font-size:3.5rem; margin-bottom:1.5rem; }
+.ty-title { font-size:2rem; color:var(--ocean-deep); margin-bottom:1rem; }
+.ty-sub { color:var(--text-light); font-size:1.05rem; line-height:1.7; max-width:480px; margin:0 auto; }
+.ty-type {
+  margin:2rem auto; max-width:400px; padding:1.5rem 2rem;
+  background:linear-gradient(135deg, var(--ocean-deep), var(--ocean-mid));
+  border-radius:20px; color:var(--white);
+}
+.ty-type .type-label { font-size:.75rem; text-transform:uppercase; letter-spacing:.1em; opacity:.6; margin-bottom:.4rem; }
+.ty-type .type-name { font-size:1.3rem; font-weight:700; margin-bottom:.4rem; }
+.ty-type .type-desc { font-size:.88rem; opacity:.8; line-height:1.6; }
+
+/* ─── CONFIDENTIAL ─── */
+.confidential {
+  background:rgba(27,107,147,.06); border:1px solid rgba(27,107,147,.15);
+  border-radius:10px; padding:.75rem 1rem; margin-bottom:2rem;
+  font-size:.83rem; color:var(--text-light); display:flex; gap:.6rem; align-items:flex-start;
+}
+.confidential b { color:var(--ocean-mid); }
+
+/* ─── GOAL PILLS ─── */
+.goal-pills { display:flex; gap:.5rem; flex-wrap:wrap; margin-top:.75rem; }
+.goal-pill {
+  font-size:.75rem; font-weight:600; padding:.3rem .85rem; border-radius:50px;
+  font-family:'Space Grotesk',sans-serif; letter-spacing:.03em;
+}
+.goal-pill.g1 { background:rgba(27,107,147,.1); color:var(--ocean-mid); }
+.goal-pill.g2 { background:rgba(232,168,56,.15); color:#a06b00; }
+.goal-pill.g3 { background:rgba(46,204,113,.12); color:#1a6b3a; }
+
+/* ─── BLOCKS ─── */
+.block { display:none; }
+.block.active { display:block; }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-brand">
+    <span>ChillBase · AI Диагностика</span>
+  </div>
+  <div class="header-tag">Все отделы · 2026</div>
+</div>
+
+<!-- PROGRESS -->
+<div class="progress-wrap">
+  <div class="progress-steps" id="progressSteps"></div>
+  <div class="progress-label" id="progressLabel"></div>
+</div>
+
+<!-- MAIN -->
+<div class="main" id="mainContent">
+
+  <!-- ══════════════════════════════════
+       БЛОК 0 — ВОСПРИЯТИЕ ИЗМЕНЕНИЙ
+  ══════════════════════════════════ -->
+  <div class="block active" id="block-0">
+    <div class="block-header">
+      <div class="block-label">Блок 0 · 5 вопросов</div>
+      <h1 class="block-title">Восприятие изменений</h1>
+      <p class="block-sub">Этот блок помогает понять, как вы реагируете на новые инструменты. Нет правильных или неправильных ответов — все ответы одинаково ценны.</p>
+    </div>
+
+    <div class="confidential">
+      <b>Конфиденциально.</b> Результаты агрегируются по отделам, имена не раскрываются.
+      &nbsp;Время заполнения: ~12–15 минут.
+    </div>
+
+    <!-- Q0.1 -->
+    <div class="question">
+      <div class="q-label"><span class="q-num">1</span>Когда в компании внедряется новый инструмент или процесс, вы обычно...</div>
+      <div class="options" data-type="radio" data-id="q0_1">
+        <label class="opt"><input type="radio" name="q0_1" value="A"><div class="opt-marker"></div><span class="opt-text">Один из первых пробую — мне интересно, как это работает</span></label>
+        <label class="opt"><input type="radio" name="q0_1" value="B"><div class="opt-marker"></div><span class="opt-text">Жду, пока коллеги опробуют, потом подключаюсь</span></label>
+        <label class="opt"><input type="radio" name="q0_1" value="C"><div class="opt-marker"></div><span class="opt-text">Начинаю использовать, когда это становится обязательным</span></label>
+        <label class="opt"><input type="radio" name="q0_1" value="D"><div class="opt-marker"></div><span class="opt-text">Предпочитаю проверенные инструменты, к новым отношусь осторожно</span></label>
+      </div>
+    </div>
+
+    <!-- Q0.2 -->
+    <div class="question">
+      <div class="q-label"><span class="q-num">2</span>Когда задача занимает больше времени, чем должна, вы...</div>
+      <div class="options" data-type="radio" data-id="q0_2">
+        <label class="opt"><input type="radio" name="q0_2" value="A"><div class="opt-marker"></div><span class="opt-text">Сразу ищу способ ускорить или автоматизировать</span></label>
+        <label class="opt"><input type="radio" name="q0_2" value="B"><div class="opt-marker"></div><span class="opt-text">Делаю как есть, но запоминаю — вернусь к этому позже</span></label>
+        <label class="opt"><input type="radio" name="q0_2" value="C"><div class="opt-marker"></div><span class="opt-text">Делаю как есть — это часть работы</span></label>
+        <label class="opt"><input type="radio" name="q0_2" value="D"><div class="opt-marker"></div><span class="opt-text">Сообщаю руководителю, что нужно больше ресурсов</span></label>
+      </div>
+    </div>
+
+    <!-- Q0.3 -->
+    <div class="question">
+      <div class="q-label"><span class="q-num">3</span>Как вы относитесь к идее, что AI будет помогать вам в работе?</div>
+      <div class="options" data-type="radio" data-id="q0_3">
+        <label class="opt"><input type="radio" name="q0_3" value="A"><div class="opt-marker"></div><span class="opt-text">Очень позитивно — хочу попробовать прямо сейчас</span></label>
+        <label class="opt"><input type="radio" name="q0_3" value="B"><div class="opt-marker"></div><span class="opt-text">Позитивно, если это реально экономит время</span></label>
+        <label class="opt"><input type="radio" name="q0_3" value="C"><div class="opt-marker"></div><span class="opt-text">Нейтрально — посмотрю на результаты</span></label>
+        <label class="opt"><input type="radio" name="q0_3" value="D"><div class="opt-marker"></div><span class="opt-text">С осторожностью — важно не потерять качество</span></label>
+        <label class="opt"><input type="radio" name="q0_3" value="E"><div class="opt-marker"></div><span class="opt-text">Скептически — AI в моей работе не применим</span></label>
+      </div>
+    </div>
+
+    <!-- Q0.4 -->
+    <div class="question">
+      <div class="q-label"><span class="q-num">4</span>Если бы у вас был свободный час на изучение AI-инструмента для работы, вы бы...</div>
+      <div class="options" data-type="radio" data-id="q0_4">
+        <label class="opt"><input type="radio" name="q0_4" value="A"><div class="opt-marker"></div><span class="opt-text">Сразу открыл и начал пробовать на реальных задачах</span></label>
+        <label class="opt"><input type="radio" name="q0_4" value="B"><div class="opt-marker"></div><span class="opt-text">Посмотрел обзор или примеры использования коллег</span></label>
+        <label class="opt"><input type="radio" name="q0_4" value="C"><div class="opt-marker"></div><span class="opt-text">Подождал бы официального обучения от компании</span></label>
+        <label class="opt"><input type="radio" name="q0_4" value="D"><div class="opt-marker"></div><span class="opt-text">Потратил час на другие рабочие задачи</span></label>
+      </div>
+    </div>
+
+    <!-- Q0.5 -->
+    <div class="question">
+      <div class="q-label"><span class="q-num">5</span>Если вы находите полезный AI-инструмент или приём, вы...</div>
+      <div class="options" data-type="radio" data-id="q0_5">
+        <label class="opt"><input type="radio" name="q0_5" value="A"><div class="opt-marker"></div><span class="opt-text">Сразу делюсь с командой — стараюсь, чтобы все знали</span></label>
+        <label class="opt"><input type="radio" name="q0_5" value="B"><div class="opt-marker"></div><span class="opt-text">Рассказываю, если кто-то спросит</span></label>
+        <label class="opt"><input type="radio" name="q0_5" value="C"><div class="opt-marker"></div><span class="opt-text">Пользуюсь сам — особо не распространяюсь</span></label>
+        <label class="opt"><input type="radio" name="q0_5" value="D"><div class="opt-marker"></div><span class="opt-text">Не применимо — AI пока не использую</span></label>
+      </div>
+    </div>
+
+    <div class="nav-row">
+      <div></div>
+      <button class="btn btn-primary" onclick="nextBlock(0)">Далее →</button>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════
+       БЛОК 1 — ЛИЧНЫЙ ПРОФИЛЬ
+  ══════════════════════════════════ -->
+  <div class="block" id="block-1">
+    <div class="block-header">
+      <div class="block-label">Блок 1 · 4 вопроса</div>
+      <h1 class="block-title">Личный профиль</h1>
+      <p class="block-sub">Несколько вопросов о вашей роли и опыте.</p>
+    </div>
+
+    <!-- Q1.1 -->
+    <div class="question">
+      <div class="q-label"><span class="q-num">1</span>Ваш отдел</div>
+      <select class="q-select" id="q1_1">
+        <option value="">— выберите —</option>
+        <option value="environment">Environment (3D окружение)</option>
+        <option value="2d">2D / UI/UX</option>
+        <option value="production">Production / Engineering</option>
+        <option value="qa">QA</option>
+        <option value="finance">Back Office — Finance</option>
+        <option value="legal">Back Office — Legal</option>
+        <option value="hr">Back Office — HR / Recruiting</option>
+        <option value="bizdev">Back Office — BizDev</option>
+        <option value="community">Community / Support</option>
+        <option value="marketing_perf">Marketing — Performance</option>
+        <option value="marketing_media">Marketing — Media / SMM</option>
+        <option value="product">Product / Game Design / Analytics</option>
+        <option value="other">Другой отдел</option>
+      </select>
+    </div>
+
+    <!-- Q1.2 -->
+    <div class="question">
+      <div class="q-label"><span class="q-num">2</span>Ваша роль</div>
+      <div class="options" data-type="radio" data-id="q1_2">
+        <label class="opt"><input type="radio" name="q1_2" value="specialist"><div class="opt-marker"></div><span class="opt-text">Специалист / исполнитель</span></label>
+        <label class="opt"><input type="radio" name="q1_2" value="senior_lead"><div class="opt-marker"></div><span class="opt-text">Senior / Lead</span></label>
+        <label class="opt"><input type="radio" name="q1_2" value="manager"><div class="opt-marker"></div><span class="opt-text">Менеджер / Product Owner / PM</span></label>
+        <label class="opt"><input type="radio" name="q1_2" value="head"><div class="opt-marker"></div><span class="opt-text">Head / Director</span></label>
+      </div>
+    </div>
+
+    <!-- Q1.3 -->
+    <div class="question">
+      <div class="q-label"><span class="q-num">3</span>Сколько вы работаете в ChillBase?</div>
+      <div class="options" data-type="radio" data-id="q1_3">
+        <label class="opt"><input type="radio" name="q1_3" value="lt6m"><div class="opt-marker"></div><span class="opt-text">Менее 6 месяцев</span></label>
+        <label class="opt"><input type="radio" name="q1_3" value="6_12m"><div class="opt-marker"></div><span class="opt-text">6–12 месяцев</span></label>
+        <label class="opt"><input type="radio" name="q1_3" value="1_2y"><div class="opt-marker"></div><span class="opt-text">1–2 года</span></label>
+        <label class="opt"><input type="radio" name="q1_3" value="2_4y"><div class="opt-marker"></div><span class="opt-text">2–4 года</span></label>
+        <label class="opt"><input type="radio" name="q1_3" value="gt4y"><div class="opt-marker"></div><span class="opt-text">Более 4 лет</span></label>
+      </div>
+    </div>
+
+    <!-- Q1.4 -->
+    <div class="question">
+      <div class="q-label"><span class="q-num">4</span>Ваш общий опыт работы в индустрии (геймдев, IT, медиа, бэк-офис...)</div>
+      <div class="options" data-type="radio" data-id="q1_4">
+        <label class="opt"><input type="radio" name="q1_4" value="lt2y"><div class="opt-marker"></div><span class="opt-text">До 2 лет</span></label>
+        <label class="opt"><input type="radio" name="q1_4" value="2_5y"><div class="opt-marker"></div><span class="opt-text">2–5 лет</span></label>
+        <label class="opt"><input type="radio" name="q1_4" value="5_10y"><div class="opt-marker"></div><span class="opt-text">5–10 лет</span></label>
+        <label class="opt"><input type="radio" name="q1_4" value="gt10y"><div class="opt-marker"></div><span class="opt-text">Более 10 лет</span></label>
+      </div>
+    </div>
+
+    <div class="nav-row">
+      <button class="btn btn-secondary" onclick="prevBlock(1)">← Назад</button>
+      <button class="btn btn-primary" onclick="nextBlock(1)">Далее →</button>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════
+       БЛОК 2 — ТЕКУЩАЯ РУТИНА
+  ══════════════════════════════════ -->
+  <div class="block" id="block-2">
+    <div class="block-header">
+      <div class="block-label">Блок 2 · 5 вопросов</div>
+      <h1 class="block-title">Текущая рутина</h1>
+      <p class="block-sub">Цель: понять, где уходит время и что тормозит работу. Именно здесь рождается список AI-инициатив.</p>
+      <div class="goal-pills">
+        <span class="goal-pill g1">Приоритизированный список инициатив</span>
+      </div>
+    </div>
+
+    <!-- Q2.1 -->
+    <div class="question">
+      <div class="q-label"><span class="q-num">1</span>Оцените, как примерно распределяется ваше рабочее время (итого ~100%)</div>
+      <div class="time-split" id="timeSplit">
+        <div class="time-row"><span class="time-label">Основная работа / создание продукта</span><input class="time-input" type="number" min="0" max="100" placeholder="0" oninput="updateTotal()"><span class="time-unit">%</span></div>
+        <div class="time-row"><span class="time-label">Ревью / согласования / правки</span><input class="time-input" type="number" min="0" max="100" placeholder="0" oninput="updateTotal()"><span class="time-unit">%</span></div>
+        <div class="time-row"><span class="time-label">Коммуникация / созвоны / встречи</span><input class="time-input" type="number" min="0" max="100" placeholder="0" oninput="updateTotal()"><span class="time-unit">%</span></div>
+        <div class="time-row"><span class="time-label">Трекер задач / документация</span><input class="time-input" type="number" min="0" max="100" placeholder="0" oninput="updateTotal()"><span class="time-unit">%</span></div>
+        <div class="time-row"><span class="time-label">Ручные операции с данными / файлами</span><input class="time-input" type="number" min="0" max="100" placeholder="0" oninput="updateTotal()"><span class="time-unit">%</span></div>
+        <div class="time-row"><span class="time-label">Другое</span><input class="time-input" type="number" min="0" max="100" placeholder="0" oninput="updateTotal()"><span class="time-unit">%</span></div>
+        <div class="time-total" id="timeTotal"><span>Итого:</span><strong id="totalVal">0%</strong></div>
+      </div>
+    </div>
+
+    <!-- Q2.2 -->
+    <div class="question">
+      <div class="q-label"><span class="q-num">2</span>Какие задачи занимают больше времени, чем должны? <small style="color:var(--text-light); font-weight:400">(выберите до 5)</small></div>
+      <div class="options" data-type="checkbox" data-id="q2_2" data-max="5">
+        <label class="opt checkbox-opt"><input type="checkbox" name="q2_2" value="routine_manual"><div class="opt-marker"></div><span class="opt-text">Повторяющиеся ручные операции (копирование, сортировка, переименование и т.п.)</span></label>
+        <label class="opt checkbox-opt"><input type="checkbox" name="q2_2" value="search_info"><div class="opt-marker"></div><span class="opt-text">Поиск нужной информации / документации / данных</span></label>
+        <label class="opt checkbox-opt"><input type="checkbox" name="q2_2" value="approval"><div class="opt-marker"></div><span class="opt-text">Ожидание согласования или обратной связи</span></label>
+        <label class="opt checkbox-opt"><input type="checkbox" name="q2_2" value="rework"><div class="opt-marker"></div><span class="opt-text">Переделки из-за неточных или поздних требований</span></label>
+        <label class="opt checkbox-opt"><input type="checkbox" name="q2_2" value="reporting"><div class="opt-marker"></div><span class="opt-text">Подготовка отчётов и сводок вручную</span></label>
+        <label class="opt checkbox-opt"><input type="checkbox" name="q2_2" value="communication"><div class="opt-marker"></div><span class="opt-text">Лишние коммуникации из-за отсутствия единого источника правды</span></label>
+        <label class="opt checkbox-opt"><input type="checkbox" name="q2_2" value="onboarding_docs"><div class="opt-marker"></div><span class="opt-text">Объяснение одного и того же новым коллегам или нахождение нужных инструкций</span></label>
+        <label class="opt checkbox-opt"><input type="checkbox" name="q2_2" value="tool_switching"><div class="opt-marker"></div><span class="opt-text">Переключение между несвязанными инструментами</span></label>
+        <label class="opt checkbox-opt"><input type="checkbox" name="q2_2" value="nothing"><div class="opt-marker"></div><span class="opt-text">Ничего из перечисленного — всё в порядке</span></label>
+      </div>
+    </div>
+
+    <!-- Q2.3 -->
+    <div class="question">
+      <div class="q-label"><span class="q-num">3</span>Есть ли задача, которую вы делаете вручную хотя бы раз в неделю, хотя теоретически её можно автоматизировать?</div>
+      <div class="options" data-type="radio" data-id="q2_3">
+        <label class="opt"><input type="radio" name="q2_3" value="yes_obvious"><div class="opt-marker"></div><span class="opt-text">Да, и я точно знаю, что это можно автоматизировать</span></label>
+        <label class="opt"><input type="radio" name="q2_3" value="yes_unsure"><div class="opt-marker"></div><span class="opt-text">Возможно — не уверен(а), насколько это реально</span></label>
+        <label class="opt"><input type="radio" name="q2_3" value="no"><div class="opt-marker"></div><span class="opt-text">Нет, в моей работе такого нет</span></label>
+      </div>
+    </div>
+
+    <!-- Q2.4 -->
+    <div class="question">
+      <div class="q-label"><span class="q-num">4</span>Где чаще всего возникают задержки в работе вашего отдела?</div>
+      <div class="options" data-type="checkbox" data-id="q2_4" data-max="3">
+        <label class="opt checkbox-opt"><input type="checkbox" name="q2_4" value="dep_other"><div class="opt-marker"></div><span class="opt-text">Ожидаем ресурс/ответ от другого отдела</span></label>
+        <label class="opt checkbox-opt"><input type="checkbox" name="q2_4" value="tools"><div class="opt-marker"></div><span class="opt-text">Инструменты медленные или не подходят</span></label>
+        <label class="opt checkbox-opt"><input type="checkbox" name="q2_4" value="unclear_task"><div class="opt-marker"></div><span class="opt-text">Задача поставлена нечётко — много итераций уточнения</span></label>
+        <label class="opt checkbox-opt"><input type="checkbox" name="q2_4" value="no_data"><div class="opt-marker"></div><span class="opt-text">Нет нужных данных или доступа к ним</span></label>
+        <label class="opt checkbox-opt"><input type="checkbox" name="q2_4" value="no_plan"><div class="opt-marker"></div><span class="opt-text">Нет чёткого плана / роадмапа — приоритеты меняются</span></label>
+        <label class="opt checkbox-opt"><input type="checkbox" name="q2_4" value="overload"><div class="opt-marker"></div><span class="opt-text">Просто слишком много задач одновременно</span></label>
+        <label class="opt checkbox-opt"><input type="checkbox" name="q2_4" value="no_bottleneck"><div class="opt-marker"></div><span class="opt-text">Существенных задержек нет</span></label>
+      </div>
+    </div>
+
+    <!-- Q2.5 -->
+    <div class="question">
+      <div class="q-label"><span class="q-num">5</span>Насколько вас устраивает текущий набор инструментов в работе?</div>
+      <div class="likert-wrap">
+        <div class="likert-labels"><span>Сильно не устраивает</span><span>Полностью устраивает</span></div>
+        <div class="likert-row" data-id="q2_5">
+          <button class="likert-btn" data-val="1" onclick="selectLikert('q2_5',1)">1</button>
+          <button class="likert-btn" data-val="2" onclick="selectLikert('q2_5',2)">2</button>
+          <button class="likert-btn" data-val="3" onclick="selectLikert('q2_5',3)">3</button>
+          <button class="likert-btn" data-val="4" onclick="selectLikert('q2_5',4)">4</button>
+          <button class="likert-btn" data-val="5" onclick="selectLikert('q2_5',5)">5</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="nav-row">
+      <button class="btn btn-secondary" onclick="prevBlock(2)">← Назад</button>
+      <button class="btn btn-primary" onclick="nextBlock(2)">Далее →</button>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════
+       БЛОК 3 — AI-ГРАМОТНОСТЬ
+  ══════════════════════════════════ -->
+  <div class="block" id="block-3">
+    <div class="block-header">
+      <div class="block-label">Блок 3 · 4 вопроса</div>
+      <h1 class="block-title">AI-грамотность</h1>
+      <p class="block-sub">Здесь нет «правильных» ответов с карьерными последствиями. Вопросы нужны, чтобы правильно подобрать формат обучения.</p>
+      <div class="goal-pills">
+        <span class="goal-pill g2">Профиль AI-зрелости</span>
+      </div>
+    </div>
+
+    <!-- Q3.1 -->
+    <div class="question">
+      <div class="q-label"><span class="q-num">1</span>Что такое LLM (Large Language Model)?</div>
+      <div class="options" data-type="radio" data-id="q3_1">
+        <label class="opt"><input type="radio" name="q3_1" value="A"><div class="opt-marker"></div><span class="opt-text">Поисковик, который ищет ответы в интернете в реальном времени</span></label>
+        <label class="opt"><input type="radio" name="q3_1" value="B"><div class="opt-marker"></div><span class="opt-text">Модель, предсказывающая следующий токен на основе обученных данных</span></label>
+        <label class="opt"><input type="radio" name="q3_1" value="C"><div class="opt-marker"></div><span class="opt-text">База знаний с готовыми ответами</span></label>
+        <label class="opt"><input type="radio" name="q3_1" value="D"><div class="opt-marker"></div><span class="opt-text">Программа, которая «думает» как человек</span></label>
+        <label class="opt"><input type="radio" name="q3_1" value="E"><div class="opt-marker"></div><span class="opt-text">Не знаю точно</span></label>
+      </div>
+    </div>
+
+    <!-- Q3.2 -->
+    <div class="question">
+      <div class="q-label"><span class="q-num">2</span>Что такое «галлюцинация» LLM?</div>
+      <div class="options" data-type="radio" data-id="q3_2">
+        <label class="opt"><input type="radio" name="q3_2" value="A"><div class="opt-marker"></div><span class="opt-text">Ошибка сервера</span></label>
+        <label class="opt"><input type="radio" name="q3_2" value="B"><div class="opt-marker"></div><span class="opt-text">Модель уверенно выдаёт фактически неверную информацию</span></label>
+        <label class="opt"><input type="radio" name="q3_2" value="C"><div class="opt-marker"></div><span class="opt-text">Модель зависает и не отвечает</span></label>
+        <label class="opt"><input type="radio" name="q3_2" value="D"><div class="opt-marker"></div><span class="opt-text">Не знаю</span></label>
+      </div>
+    </div>
+
+    <!-- Q3.3 — МИНИ-ЗАДАЧА -->
+    <div class="question">
+      <div class="q-label"><span class="q-num">3</span>Мини-задача: выберите лучший промт</div>
+      <div class="task-situation">
+        <div class="sit-label">Ситуация</div>
+        <p>Вам нужно попросить ChatGPT написать короткое саммари встречи: 5 ключевых решений, кто ответственный, дедлайны. У вас есть транскрипт на 3000 слов.</p>
+      </div>
+      <div class="task-q">Какой промт даст наиболее полезный результат?</div>
+      <div class="task-options" data-id="q3_3" data-correct="C">
+        <div class="task-opt" onclick="selectTask('q3_3','A',this)">
+          <div class="task-letter">A</div>
+          <div class="task-text">«Сделай саммари»</div>
+        </div>
+        <div class="task-opt" onclick="selectTask('q3_3','B',this)">
+          <div class="task-letter">B</div>
+          <div class="task-text">«Напиши саммари встречи из этого текста: [транскрипт]»</div>
+        </div>
+        <div class="task-opt" onclick="selectTask('q3_3','C',this)">
+          <div class="task-letter">C</div>
+          <div class="task-text">«Проанализируй транскрипт встречи и выдай: 1) Список ровно 5 ключевых решений; 2) Для каждого — ответственный (если упоминался) и дедлайн (если назывался). Формат: нумерованный список. Если дедлайн не назывался — пиши "не определён". [транскрипт]»</div>
+        </div>
+        <div class="task-opt" onclick="selectTask('q3_3','D',this)">
+          <div class="task-letter">D</div>
+          <div class="task-text">«Что было на встрече?»</div>
+        </div>
+      </div>
+      <div class="task-explain" id="explain_q3_3">Правильный ответ — C. Чёткая структура, конкретный формат вывода и инструкция для крайних случаев дают предсказуемый результат. Без этих деталей LLM выдаст расплывчатое резюме.</div>
+    </div>
+
+    <!-- Q3.4 -->
+    <div class="question">
+      <div class="q-label"><span class="q-num">4</span>Оцените свой уровень работы с AI-инструментами (ChatGPT, Claude, Gemini и т.п.)</div>
+      <div class="likert-wrap">
+        <div class="likert-labels"><span>Никогда не использовал(а)</span><span>Использую продвинутые техники</span></div>
+        <div class="likert-row" data-id="q3_4">
+          <button class="likert-btn" data-val="1" onclick="selectLikert('q3_4',1)">1</button>
+          <button class="likert-btn" data-val="2" onclick="selectLikert('q3_4',2)">2</button>
+          <button class="likert-btn" data-val="3" onclick="selectLikert('q3_4',3)">3</button>
+          <button class="likert-btn" data-val="4" onclick="selectLikert('q3_4',4)">4</button>
+          <button class="likert-btn" data-val="5" onclick="selectLikert('q3_4',5)">5</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="nav-row">
+      <button class="btn btn-secondary" onclick="prevBlock(3)">← Назад</button>
+      <button class="btn btn-primary" onclick="nextBlock(3)">Далее →</button>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════
+       БЛОК 4 — AI В РАБОТЕ СЕЙЧАС
+  ══════════════════════════════════ -->
+  <div class="block" id="block-4">
+    <div class="block-header">
+      <div class="block-label">Блок 4 · 5 вопросов</div>
+      <h1 class="block-title">AI в работе сейчас</h1>
+      <p class="block-sub">Что уже используется, как часто и что мешает использовать больше.</p>
+      <div class="goal-pills">
+        <span class="goal-pill g2">Профиль AI-зрелости</span>
+        <span class="goal-pill g1">Список инициатив</span>
+      </div>
+    </div>
+
+    <!-- Q4.1 -->
+    <div class="question">
+      <div class="q-label"><span class="q-num">1</span>Какими AI-инструментами вы пользовались по работе? <small style="color:var(--text-light); font-weight:400">(отметьте все)</small></div>
+      <div class="options" data-type="checkbox" data-id="q4_1">
+        <label class="opt checkbox-opt"><input type="checkbox" name="q4_1" value="chatgpt"><div class="opt-marker"></div><span class="opt-text">ChatGPT</span></label>
+        <label class="opt checkbox-opt"><input type="checkbox" name="q4_1" value="claude"><div class="opt-marker"></div><span class="opt-text">Claude</span></label>
+        <label class="opt checkbox-opt"><input type="checkbox" name="q4_1" value="gemini"><div class="opt-marker"></div><span class="opt-text">Gemini</span></label>
+        <label class="opt checkbox-opt"><input type="checkbox" name="q4_1" value="copilot"><div class="opt-marker"></div><span class="opt-text">GitHub Copilot или другой AI-ассистент кода</span></label>
+        <label class="opt checkbox-opt"><input type="checkbox" name="q4_1" value="image_gen"><div class="opt-marker"></div><span class="opt-text">Midjourney / DALL·E / Stable Diffusion / Firefly</span></label>
+        <label class="opt checkbox-opt"><input type="checkbox" name="q4_1" value="video_gen"><div class="opt-marker"></div><span class="opt-text">Sora / Veo / Runway / другой AI-видео</span></label>
+        <label class="opt checkbox-opt"><input type="checkbox" name="q4_1" value="ai_in_tools"><div class="opt-marker"></div><span class="opt-text">AI-функции внутри рабочих инструментов (Notion AI, Excel AI, Grammarly, AppFollow AI и т.п.)</span></label>
+        <label class="opt checkbox-opt"><input type="checkbox" name="q4_1" value="voice"><div class="opt-marker"></div><span class="opt-text">AI-транскрипция / озвучка (Whisper, ElevenLabs и т.п.)</span></label>
+        <label class="opt checkbox-opt"><input type="checkbox" name="q4_1" value="none"><div class="opt-marker"></div><span class="opt-text">Не использую AI</span></label>
+      </div>
+    </div>
+
+    <!-- Q4.2 -->
+    <div class="question">
+      <div class="q-label"><span class="q-num">2</span>Как часто вы используете AI в работе?</div>
+      <div class="options" data-type="radio" data-id="q4_2">
+        <label class="opt"><input type="radio" name="q4_2" value="daily"><div class="opt-marker"></div><span class="opt-text">Ежедневно</span></label>
+        <label class="opt"><input type="radio" name="q4_2" value="weekly"><div class="opt-marker"></div><span class="opt-text">Несколько раз в неделю</span></label>
+        <label class="opt"><input type="radio" name="q4_2" value="monthly"><div class="opt-marker"></div><span class="opt-text">Раз в неделю или реже</span></label>
+        <label class="opt"><input type="radio" name="q4_2" value="never"><div class="opt-marker"></div><span class="opt-text">Не использую</span></label>
+      </div>
+    </div>
+
+    <!-- Q4.3 -->
+    <div class="question">
+      <div class="q-label"><span class="q-num">3</span>Для каких задач вы используете AI? <small style="color:var(--text-light); font-weight:400">(отметьте все)</small></div>
+      <div class="options" data-type="checkbox" data-id="q4_3">
+        <label class="opt checkbox-opt"><input type="checkbox" name="q4_3" value="text_writing"><div class="opt-marker"></div><span class="opt-text">Написание / редактура текстов (письма, описания, посты)</span></label>
+        <label class="opt checkbox-opt"><input type="checkbox" name="q4_3" value="translation"><div class="opt-marker"></div><span class="opt-text">Перевод</span></label>
+        <label class="opt checkbox-opt"><input type="checkbox" name="q4_3" value="analysis"><div class="opt-marker"></div><span class="opt-text">Анализ данных или документов</span></label>
+        <label class="opt checkbox-opt"><input type="checkbox" name="q4_3" value="search"><div class="opt-marker"></div><span class="opt-text">Поиск информации / ответы на вопросы</span></label>
+        <label class="opt checkbox-opt"><input type="checkbox" name="q4_3" value="images"><div class="opt-marker"></div><span class="opt-text">Генерация изображений / контента</span></label>
+        <label class="opt checkbox-opt"><input type="checkbox" name="q4_3" value="code"><div class="opt-marker"></div><span class="opt-text">Написание или отладка кода / скриптов</span></label>
+        <label class="opt checkbox-opt"><input type="checkbox" name="q4_3" value="summaries"><div class="opt-marker"></div><span class="opt-text">Саммари встреч / документов</span></label>
+        <label class="opt checkbox-opt"><input type="checkbox" name="q4_3" value="ideas"><div class="opt-marker"></div><span class="opt-text">Генерация идей / мозговой штурм</span></label>
+        <label class="opt checkbox-opt"><input type="checkbox" name="q4_3" value="none"><div class="opt-marker"></div><span class="opt-text">Пока не использую</span></label>
+      </div>
+    </div>
+
+    <!-- Q4.4 -->
+    <div class="question">
+      <div class="q-label"><span class="q-num">4</span>Что мешает использовать AI больше? <small style="color:var(--text-light); font-weight:400">(отметьте все подходящие)</small></div>
+      <div class="options" data-type="checkbox" data-id="q4_4">
+        <label class="opt checkbox-opt"><input type="checkbox" name="q4_4" value="no_time"><div class="opt-marker"></div><span class="opt-text">Нет времени разбираться</span></label>
+        <label class="opt checkbox-opt"><input type="checkbox" name="q4_4" value="no_start"><div class="opt-marker"></div><span class="opt-text">Не знаю, с чего начать</span></label>
+        <label class="opt checkbox-opt"><input type="checkbox" name="q4_4" value="unstable"><div class="opt-marker"></div><span class="opt-text">Результат нестабильный — не могу на него полагаться</span></label>
+        <label class="opt checkbox-opt"><input type="checkbox" name="q4_4" value="no_access"><div class="opt-marker"></div><span class="opt-text">Нет доступа к платным инструментам</span></label>
+        <label class="opt checkbox-opt"><input type="checkbox" name="q4_4" value="nda"><div class="opt-marker"></div><span class="opt-text">Опасения по поводу NDA / утечки данных</span></label>
+        <label class="opt checkbox-opt"><input type="checkbox" name="q4_4" value="no_culture"><div class="opt-marker"></div><span class="opt-text">В компании нет культуры / поддержки использования AI</span></label>
+        <label class="opt checkbox-opt"><input type="checkbox" name="q4_4" value="not_applicable"><div class="opt-marker"></div><span class="opt-text">В моей работе AI просто не применим</span></label>
+        <label class="opt checkbox-opt"><input type="checkbox" name="q4_4" value="nothing"><div class="opt-marker"></div><span class="opt-text">Ничего не мешает — уже использую активно</span></label>
+      </div>
+    </div>
+
+    <!-- Q4.5 -->
+    <div class="question">
+      <div class="q-label"><span class="q-num">5</span>Насколько AI-инструменты уже сейчас помогают вам в работе?</div>
+      <div class="likert-wrap">
+        <div class="likert-labels"><span>Бесполезно</span><span>Сильно экономит время</span></div>
+        <div class="likert-row" data-id="q4_5">
+          <button class="likert-btn" data-val="1" onclick="selectLikert('q4_5',1)">1</button>
+          <button class="likert-btn" data-val="2" onclick="selectLikert('q4_5',2)">2</button>
+          <button class="likert-btn" data-val="3" onclick="selectLikert('q4_5',3)">3</button>
+          <button class="likert-btn" data-val="4" onclick="selectLikert('q4_5',4)">4</button>
+          <button class="likert-btn" data-val="5" onclick="selectLikert('q4_5',5)">5</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="nav-row">
+      <button class="btn btn-secondary" onclick="prevBlock(4)">← Назад</button>
+      <button class="btn btn-primary" onclick="nextBlock(4)">Далее →</button>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════
+       БЛОК 5 — АМБАССАДОРСКИЙ ПОТЕНЦИАЛ
+  ══════════════════════════════════ -->
+  <div class="block" id="block-5">
+    <div class="block-header">
+      <div class="block-label">Блок 5 · 4 вопроса</div>
+      <h1 class="block-title">Готовность к изменениям</h1>
+      <p class="block-sub">Этот блок помогает понять, кто готов стать AI-амбассадором — первопроходцем, который поможет внедрить инструменты в своём отделе.</p>
+      <div class="goal-pills">
+        <span class="goal-pill g3">Список AI-амбассадоров</span>
+      </div>
+    </div>
+
+    <!-- Q5.1 -->
+    <div class="question">
+      <div class="q-label"><span class="q-num">1</span>Готовы ли вы участвовать в пилотном внедрении нового AI-инструмента в вашем отделе (тестировать, давать фидбэк)?</div>
+      <div class="options" data-type="radio" data-id="q5_1">
+        <label class="opt"><input type="radio" name="q5_1" value="yes"><div class="opt-marker"></div><span class="opt-text">Да, хочу быть в числе первых</span></label>
+        <label class="opt"><input type="radio" name="q5_1" value="maybe"><div class="opt-marker"></div><span class="opt-text">Возможно — зависит от инструмента и нагрузки</span></label>
+        <label class="opt"><input type="radio" name="q5_1" value="no"><div class="opt-marker"></div><span class="opt-text">Нет — предпочту подождать, пока коллеги опробуют</span></label>
+      </div>
+    </div>
+
+    <!-- Q5.2 -->
+    <div class="question">
+      <div class="q-label"><span class="q-num">2</span>Если освоите новый AI-инструмент, насколько готовы помочь обучить коллег?</div>
+      <div class="likert-wrap">
+        <div class="likert-labels"><span>Совсем не готов(а)</span><span>Готов(а) активно обучать</span></div>
+        <div class="likert-row" data-id="q5_2">
+          <button class="likert-btn" data-val="1" onclick="selectLikert('q5_2',1)">1</button>
+          <button class="likert-btn" data-val="2" onclick="selectLikert('q5_2',2)">2</button>
+          <button class="likert-btn" data-val="3" onclick="selectLikert('q5_2',3)">3</button>
+          <button class="likert-btn" data-val="4" onclick="selectLikert('q5_2',4)">4</button>
+          <button class="likert-btn" data-val="5" onclick="selectLikert('q5_2',5)">5</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Q5.3 -->
+    <div class="question">
+      <div class="q-label"><span class="q-num">3</span>Сколько часов в неделю вы готовы инвестировать в обучение AI-инструментам?</div>
+      <div class="options" data-type="radio" data-id="q5_3">
+        <label class="opt"><input type="radio" name="q5_3" value="0"><div class="opt-marker"></div><span class="opt-text">0 — предпочту готовые решения</span></label>
+        <label class="opt"><input type="radio" name="q5_3" value="1_2"><div class="opt-marker"></div><span class="opt-text">1–2 часа</span></label>
+        <label class="opt"><input type="radio" name="q5_3" value="3_5"><div class="opt-marker"></div><span class="opt-text">3–5 часов</span></label>
+        <label class="opt"><input type="radio" name="q5_3" value="6plus"><div class="opt-marker"></div><span class="opt-text">6+ часов — хочу разобраться глубоко</span></label>
+      </div>
+    </div>
+
+    <!-- Q5.4 -->
+    <div class="question">
+      <div class="q-label"><span class="q-num">4</span>Какой формат обучения подходит вам больше всего?</div>
+      <div class="options" data-type="radio" data-id="q5_4">
+        <label class="opt"><input type="radio" name="q5_4" value="video"><div class="opt-marker"></div><span class="opt-text">Короткие видео (5–15 мин)</span></label>
+        <label class="opt"><input type="radio" name="q5_4" value="workshop_online"><div class="opt-marker"></div><span class="opt-text">Онлайн-воркшоп с практикой</span></label>
+        <label class="opt"><input type="radio" name="q5_4" value="workshop_offline"><div class="opt-marker"></div><span class="opt-text">Очный воркшоп</span></label>
+        <label class="opt"><input type="radio" name="q5_4" value="guides"><div class="opt-marker"></div><span class="opt-text">Письменные гайды / чеклисты</span></label>
+        <label class="opt"><input type="radio" name="q5_4" value="peer"><div class="opt-marker"></div><span class="opt-text">Парное «смотри, как я делаю»</span></label>
+        <label class="opt"><input type="radio" name="q5_4" value="self"><div class="opt-marker"></div><span class="opt-text">Самостоятельно — просто дайте ссылки</span></label>
+      </div>
+    </div>
+
+    <div class="nav-row">
+      <button class="btn btn-secondary" onclick="prevBlock(5)">← Назад</button>
+      <button class="btn btn-primary" onclick="nextBlock(5)">Далее →</button>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════
+       БЛОК 6 — ОТКРЫТЫЕ ВОПРОСЫ
+  ══════════════════════════════════ -->
+  <div class="block" id="block-6">
+    <div class="block-header">
+      <div class="block-label">Блок 6 · 3 вопроса · финальный</div>
+      <h1 class="block-title">Ваши мысли</h1>
+      <p class="block-sub">Открытые вопросы — необязательные, но самые ценные. Именно здесь появляются неочевидные идеи.</p>
+    </div>
+
+    <!-- Q6.1 -->
+    <div class="question open-q">
+      <div class="q-label"><span class="q-num">1</span>Если бы вы могли устранить одну рутину в своей работе прямо сейчас — что бы это было?</div>
+      <textarea id="q6_1" placeholder="Опишите задачу, которую ненавидите делать вручную..."></textarea>
+    </div>
+
+    <!-- Q6.2 -->
+    <div class="question open-q">
+      <div class="q-label"><span class="q-num">2</span>Какую задачу вашего отдела AI мог бы помочь решить первым делом?</div>
+      <textarea id="q6_2" placeholder="Любая идея — даже нереалистичная на первый взгляд..."></textarea>
+    </div>
+
+    <!-- Q6.3 -->
+    <div class="question open-q">
+      <div class="q-label">
+        <span class="q-num">3</span>Ваше имя (если готовы участвовать в пилоте)
+        <span class="q-optional">необязательно</span>
+      </div>
+      <textarea id="q6_3" rows="1" style="min-height:48px; resize:none;" placeholder="Имя и отдел — только если хотите, чтобы с вами связались по поводу пилота..."></textarea>
+    </div>
+
+    <div class="nav-row">
+      <button class="btn btn-secondary" onclick="prevBlock(6)">← Назад</button>
+      <button class="btn btn-submit" onclick="submitSurvey()">Отправить ответы</button>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════
+       THANK YOU
+  ══════════════════════════════════ -->
+  <div class="thankyou" id="thankyou">
+    <div class="ty-icon">🎉</div>
+    <h2 class="ty-title">Спасибо!</h2>
+    <p class="ty-sub">Ваши ответы помогут нам построить инструменты, которые реально снимают рутину — а не добавляют новую.</p>
+    <div class="ty-type" id="tyType"></div>
+    <p class="ty-sub" style="margin-top:1.5rem; font-size:.88rem;">Результаты будут представлены на общей сессии после завершения всех интервью.</p>
+  </div>
+
+</div><!-- /main -->
+
+<script>
+// ─── BLOCKS CONFIG ───────────────────────────────────────
+const BLOCKS = [
+  { label: 'Восприятие', short: '0' },
+  { label: 'Профиль',    short: '1' },
+  { label: 'Рутина',     short: '2' },
+  { label: 'AI-грамотность', short: '3' },
+  { label: 'AI сейчас', short: '4' },
+  { label: 'Амбассадор', short: '5' },
+  { label: 'Открытые',  short: '6' },
+];
+let currentBlock = 0;
+const answers = {};
+
+// ─── PROGRESS ────────────────────────────────────────────
+function renderProgress() {
+  const steps = document.getElementById('progressSteps');
+  steps.innerHTML = '';
+  BLOCKS.forEach((b, i) => {
+    const dot = document.createElement('div');
+    dot.className = 'step-dot ' + (i < currentBlock ? 'done' : i === currentBlock ? 'active' : 'todo');
+    dot.textContent = b.short;
+    steps.appendChild(dot);
+    if (i < BLOCKS.length - 1) {
+      const line = document.createElement('div');
+      line.className = 'step-line ' + (i < currentBlock ? 'done' : '');
+      steps.appendChild(line);
+    }
+  });
+  document.getElementById('progressLabel').textContent =
+    `Блок ${currentBlock + 1} из ${BLOCKS.length} — ${BLOCKS[currentBlock].label}`;
+}
+
+// ─── NAVIGATION ──────────────────────────────────────────
+function showBlock(n) {
+  document.querySelectorAll('.block').forEach(b => b.classList.remove('active'));
+  const el = document.getElementById('block-' + n);
+  if (el) { el.classList.add('active'); window.scrollTo({top:0, behavior:'smooth'}); }
+}
+
+function nextBlock(from) {
+  currentBlock = from + 1;
+  if (currentBlock >= BLOCKS.length) { submitSurvey(); return; }
+  showBlock(currentBlock);
+  renderProgress();
+}
+
+function prevBlock(from) {
+  if (from <= 0) return;
+  currentBlock = from - 1;
+  showBlock(currentBlock);
+  renderProgress();
+}
+
+// ─── RADIO / CHECKBOX ────────────────────────────────────
+document.addEventListener('click', function(e) {
+  const opt = e.target.closest('.opt');
+  if (!opt) return;
+  const wrap = opt.closest('[data-type]');
+  if (!wrap) return;
+  const type = wrap.dataset.type;
+  const id   = wrap.dataset.id;
+  const max  = parseInt(wrap.dataset.max) || 999;
+  const input = opt.querySelector('input');
+  if (!input) return;
+
+  if (type === 'radio') {
+    wrap.querySelectorAll('.opt').forEach(o => o.classList.remove('selected'));
+    opt.classList.add('selected');
+    input.checked = true;
+    answers[id] = input.value;
+  } else {
+    const checked = wrap.querySelectorAll('.opt.selected');
+    if (!opt.classList.contains('selected') && checked.length >= max) return;
+    opt.classList.toggle('selected');
+    input.checked = opt.classList.contains('selected');
+    answers[id] = Array.from(wrap.querySelectorAll('.opt.selected input')).map(i => i.value);
+  }
+});
+
+// ─── LIKERT ──────────────────────────────────────────────
+function selectLikert(id, val) {
+  const row = document.querySelector(`.likert-row[data-id="${id}"]`);
+  if (!row) return;
+  row.querySelectorAll('.likert-btn').forEach(b => {
+    b.classList.toggle('selected', parseInt(b.dataset.val) === val);
+  });
+  answers[id] = val;
+}
+
+// ─── MINI TASK ───────────────────────────────────────────
+function selectTask(id, val, el) {
+  const wrap = el.closest('[data-id]');
+  const correct = wrap.dataset.correct;
+  wrap.querySelectorAll('.task-opt').forEach(o => {
+    o.classList.remove('selected','correct','wrong');
+    o.style.pointerEvents = 'none';
+  });
+  if (val === correct) {
+    el.classList.add('correct');
+  } else {
+    el.classList.add('wrong');
+    wrap.querySelectorAll('.task-opt').forEach(o => {
+      if (o.querySelector('.task-letter').textContent === correct) o.classList.add('correct');
+    });
+  }
+  const explain = document.getElementById('explain_' + id);
+  if (explain) explain.classList.add('show');
+  answers[id] = val;
+}
+
+// ─── TIME SPLIT ──────────────────────────────────────────
+function updateTotal() {
+  const inputs = document.querySelectorAll('#timeSplit .time-input');
+  let sum = 0;
+  inputs.forEach(i => { sum += parseInt(i.value) || 0; });
+  const el = document.getElementById('totalVal');
+  const wrap = document.getElementById('timeTotal');
+  el.textContent = sum + '%';
+  wrap.classList.toggle('over', sum > 100);
+}
+
+// ─── PSYCHOTYPE SCORING ──────────────────────────────────
+function calcPsychotype() {
+  const scores = { A:0, B:0, C:0, D:0 };
+  ['q0_1','q0_2','q0_3','q0_4','q0_5'].forEach(q => {
+    const v = answers[q] || '';
+    if (v === 'A' || v === 'yes') scores.A++;
+    else if (v === 'B') scores.B++;
+    else if (v === 'C') scores.C++;
+    else if (v === 'D' || v === 'E' || v === 'no') scores.D++;
+  });
+  const max = Math.max(scores.A, scores.B, scores.C, scores.D);
+  if (scores.A === max) return { name: 'Инноватор', desc: 'Вы готовы первым пробовать новые инструменты. Именно такие люди становятся AI-амбассадорами и помогают команде.' };
+  if (scores.B === max) return { name: 'Прагматик', desc: 'Вы принимаете новое, когда видите реальную пользу. Вам важны примеры и конкретный результат.' };
+  if (scores.C === max) return { name: 'Консерватор', desc: 'Вы ценёте стабильность и проверенные методы. Новые инструменты принимаете постепенно.' };
+  return { name: 'Скептик', desc: 'Вы вдумчиво оцениваете изменения. Ваш критический взгляд помогает избежать внедрения ради внедрения.' };
+}
+
+// ─── SUBMIT ──────────────────────────────────────────────
+function submitSurvey() {
+  document.querySelectorAll('.block').forEach(b => b.classList.remove('active'));
+  const ty = document.getElementById('thankyou');
+  ty.classList.add('show');
+  window.scrollTo({top:0, behavior:'smooth'});
+  const p = calcPsychotype();
+  document.getElementById('tyType').innerHTML =
+    `<div class="type-label">Ваш профиль</div>
+     <div class="type-name">${p.name}</div>
+     <div class="type-desc">${p.desc}</div>`;
+  document.getElementById('progressSteps').innerHTML = '';
+  document.getElementById('progressLabel').textContent = 'Опрос завершён — спасибо!';
+}
+
+// ─── INIT ─────────────────────────────────────────────────
+renderProgress();
+</script>
+</body>
+</html>

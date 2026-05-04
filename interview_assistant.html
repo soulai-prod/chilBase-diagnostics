@@ -1,0 +1,1963 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ChillBase Interview Assistant</title>
+<style>
+  :root {
+    --bg: #0A2E4D;
+    --panel: #0d3a5e;
+    --card: #103552;
+    --border: #1B6B93;
+    --accent: #5DB9C9;
+    --sun: #E8A838;
+    --foam: #F5F0EB;
+    --text: #c8dde8;
+    --muted: #6a9ab0;
+    --green: #4ade80;
+    --yellow: #fbbf24;
+    --red: #f87171;
+    --purple: #c084fc;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', system-ui, sans-serif;
+    font-size: 13px;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  /* HEADER */
+  .header {
+    background: var(--panel);
+    border-bottom: 1px solid var(--border);
+    padding: 8px 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-shrink: 0;
+  }
+  .header h1 {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--accent);
+    letter-spacing: 0.5px;
+  }
+  .header .badge {
+    background: var(--border);
+    color: var(--foam);
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 11px;
+    font-weight: 600;
+  }
+  .header select, .header input {
+    background: var(--card);
+    border: 1px solid var(--border);
+    color: var(--foam);
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 12px;
+    outline: none;
+  }
+  .header select { cursor: pointer; }
+  .header input { width: 320px; font-family: monospace; }
+  .header input::placeholder { color: var(--muted); }
+  .key-status { font-size: 11px; }
+  .key-status.ok { color: var(--green); }
+  .key-status.no { color: var(--red); }
+  .spacer { flex: 1; }
+
+  /* MAIN LAYOUT */
+  .main {
+    display: grid;
+    grid-template-columns: 280px 1fr 260px;
+    flex: 1;
+    overflow: hidden;
+    gap: 0;
+  }
+
+  /* LEFT PANEL — GUIDE */
+  .guide-panel {
+    background: var(--panel);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  .panel-title {
+    padding: 10px 12px;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--muted);
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+  }
+  .dept-info {
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+  }
+  .dept-name { font-weight: 700; color: var(--foam); font-size: 13px; margin-bottom: 2px; }
+  .dept-meta { color: var(--muted); font-size: 11px; line-height: 1.6; }
+  .dept-ai-badge {
+    display: inline-block;
+    margin-top: 4px;
+    padding: 2px 7px;
+    border-radius: 8px;
+    font-size: 10px;
+    font-weight: 700;
+  }
+  .ai-high { background: #14532d; color: var(--green); }
+  .ai-med  { background: #713f12; color: var(--yellow); }
+  .ai-low  { background: #450a0a; color: var(--red); }
+  .ai-unk  { background: #1e1b4b; color: var(--purple); }
+
+  /* ── Scripts block ── */
+  .scripts-block {
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+  }
+  .scripts-toggle {
+    padding: 8px 12px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--sun);
+    user-select: none;
+    background: rgba(232,168,56,0.06);
+  }
+  .scripts-toggle:hover { background: rgba(232,168,56,0.12); }
+  .scripts-toggle .arrow { font-size: 10px; transition: transform 0.2s; }
+  .scripts-toggle.open .arrow { transform: rotate(180deg); }
+  .scripts-inner { display: none; padding: 8px 12px 12px; }
+  .scripts-inner.open { display: block; }
+  .script-card {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    margin-bottom: 8px;
+  }
+  .script-card:last-child { margin-bottom: 0; }
+  .script-card-header {
+    padding: 7px 10px;
+    cursor: pointer;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--foam);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-radius: 6px;
+  }
+  .script-card-header:hover { background: rgba(255,255,255,0.05); }
+  .script-card-header .arr { font-size: 9px; transition: transform 0.2s; color: var(--muted); }
+  .script-card-header.open .arr { transform: rotate(180deg); }
+  .script-card-body {
+    display: none;
+    padding: 10px;
+    border-top: 1px solid var(--border);
+    font-size: 12px;
+    line-height: 1.7;
+    color: #cce4f0;
+    white-space: pre-wrap;
+    max-height: 260px;
+    overflow-y: auto;
+  }
+  .script-card-body.open { display: block; }
+  .script-card-body em { color: var(--muted); font-style: italic; font-size: 11px; }
+  .script-blockquote {
+    border-left: 3px solid var(--sun);
+    padding-left: 10px;
+    margin: 6px 0;
+    color: var(--foam);
+  }
+
+  .waves-container { overflow-y: auto; flex: 1; }
+  .wave-block { border-bottom: 1px solid rgba(27,107,147,0.3); }
+  .wave-header {
+    padding: 8px 12px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-weight: 600;
+    font-size: 12px;
+    color: var(--accent);
+    user-select: none;
+  }
+  .wave-header:hover { background: rgba(93,185,201,0.08); }
+  .wave-header.active { background: rgba(93,185,201,0.12); color: var(--foam); }
+  .wave-num {
+    background: var(--border);
+    color: var(--foam);
+    width: 18px; height: 18px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 10px; font-weight: 700; flex-shrink: 0;
+  }
+  .wave-questions { padding: 4px 12px 8px 36px; display: none; }
+  .wave-questions.open { display: block; }
+  .question-item {
+    padding: 5px 0;
+    border-bottom: 1px solid rgba(27,107,147,0.2);
+    color: var(--text);
+    line-height: 1.45;
+    cursor: pointer;
+    font-size: 12px;
+  }
+  .question-item:hover { color: var(--foam); }
+  .question-item:last-child { border: none; }
+  .question-item.used { color: var(--muted); text-decoration: line-through; }
+  .q-num { color: var(--muted); font-size: 10px; }
+
+  /* CENTER — CHAT */
+  .chat-panel {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  .chat-context {
+    background: var(--card);
+    border-bottom: 1px solid var(--border);
+    padding: 8px 14px;
+    font-size: 11px;
+    color: var(--muted);
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .wave-indicator {
+    background: var(--border);
+    color: var(--foam);
+    padding: 2px 8px;
+    border-radius: 8px;
+    font-size: 11px;
+    font-weight: 700;
+  }
+  .chat-messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 12px 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .msg {
+    border-radius: 8px;
+    padding: 8px 12px;
+    max-width: 90%;
+    line-height: 1.5;
+  }
+  .msg-user {
+    background: var(--card);
+    border: 1px solid var(--border);
+    align-self: flex-end;
+    color: var(--foam);
+  }
+  .msg-assistant {
+    background: rgba(93,185,201,0.08);
+    border: 1px solid rgba(93,185,201,0.25);
+    align-self: flex-start;
+    width: 100%;
+  }
+  .msg-assistant .signal-block { margin-bottom: 6px; }
+  .signal-tag {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    padding: 1px 6px;
+    border-radius: 4px;
+    margin-bottom: 3px;
+    text-transform: uppercase;
+  }
+  .tag-signal  { background: #1e3a5f; color: var(--accent); }
+  .tag-q       { background: #1a3320; color: var(--green); }
+  .tag-score   { background: #2d1f00; color: var(--yellow); }
+  .tag-flag    { background: #3b0f0f; color: var(--red); }
+  .tag-champ   { background: #1e1040; color: var(--purple); }
+  .signal-text { font-size: 12px; line-height: 1.5; }
+  .signal-text strong { color: var(--foam); }
+  .msg-error {
+    background: rgba(248,113,113,0.1);
+    border: 1px solid rgba(248,113,113,0.3);
+    color: var(--red);
+    align-self: flex-start;
+  }
+  .msg-info {
+    background: var(--card);
+    border: 1px dashed var(--border);
+    color: var(--muted);
+    align-self: center;
+    font-size: 11px;
+    text-align: center;
+  }
+  .typing {
+    color: var(--muted);
+    font-style: italic;
+    font-size: 12px;
+    padding: 4px 0;
+  }
+
+  /* INPUT AREA */
+  .input-area {
+    border-top: 1px solid var(--border);
+    padding: 10px 14px;
+    flex-shrink: 0;
+    background: var(--panel);
+  }
+  .input-row {
+    display: flex;
+    gap: 8px;
+    align-items: flex-end;
+  }
+  .input-area textarea {
+    flex: 1;
+    background: var(--card);
+    border: 1px solid var(--border);
+    color: var(--foam);
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-family: inherit;
+    resize: none;
+    outline: none;
+    min-height: 52px;
+    max-height: 120px;
+  }
+  .input-area textarea:focus { border-color: var(--accent); }
+  .input-area textarea::placeholder { color: var(--muted); }
+  .btn-send {
+    background: var(--accent);
+    color: var(--bg);
+    border: none;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 12px;
+    cursor: pointer;
+    height: 52px;
+    white-space: nowrap;
+    min-width: 72px;
+    transition: background 0.15s;
+  }
+  .btn-send:hover { background: #7dd3e0; }
+  .btn-send:disabled { background: var(--border); cursor: not-allowed; }
+  .input-hint {
+    font-size: 10px;
+    color: var(--muted);
+    margin-top: 4px;
+  }
+
+  /* RIGHT PANEL — TRACKER */
+  .tracker-panel {
+    background: var(--panel);
+    border-left: 1px solid var(--border);
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+  }
+  .tracker-section {
+    border-bottom: 1px solid var(--border);
+    padding: 10px 12px;
+  }
+  .tracker-section h3 {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: var(--muted);
+    margin-bottom: 8px;
+  }
+  .score-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 4px 0;
+    border-bottom: 1px solid rgba(27,107,147,0.2);
+    font-size: 11px;
+  }
+  .score-row:last-child { border: none; }
+  .score-label { color: var(--text); flex: 1; }
+  .score-val {
+    font-weight: 700;
+    font-size: 13px;
+    min-width: 28px;
+    text-align: right;
+  }
+  .score-bar {
+    width: 50px;
+    height: 4px;
+    background: rgba(27,107,147,0.3);
+    border-radius: 2px;
+    margin-left: 6px;
+    overflow: hidden;
+  }
+  .score-fill {
+    height: 100%;
+    border-radius: 2px;
+    background: var(--accent);
+    transition: width 0.3s;
+  }
+  .btn-small {
+    background: var(--card);
+    border: 1px solid var(--border);
+    color: var(--accent);
+    padding: 3px 8px;
+    border-radius: 5px;
+    font-size: 11px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: background 0.15s;
+  }
+  .btn-small:hover { background: var(--border); }
+  .score-input {
+    background: var(--card);
+    border: 1px solid var(--border);
+    color: var(--foam);
+    width: 36px;
+    padding: 2px 4px;
+    border-radius: 4px;
+    font-size: 12px;
+    text-align: center;
+  }
+  .composite-score {
+    text-align: center;
+    margin: 6px 0;
+  }
+  .composite-num {
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--sun);
+  }
+  .composite-label {
+    font-size: 10px;
+    color: var(--muted);
+  }
+  .maturity-badge {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 10px;
+    font-size: 11px;
+    font-weight: 700;
+    margin-top: 4px;
+  }
+  .m1 { background: #3b0f0f; color: #fca5a5; }
+  .m2 { background: #431407; color: #fdba74; }
+  .m3 { background: #713f12; color: #fcd34d; }
+  .m4 { background: #14532d; color: #6ee7b7; }
+  .m5 { background: #1e3a8a; color: #93c5fd; }
+  .ambassador-total {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--purple);
+    text-align: center;
+    margin: 4px 0;
+  }
+  .ambassador-class {
+    text-align: center;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 10px;
+    display: inline-block;
+    margin: 0 auto;
+    display: block;
+  }
+  .cls-champion { background: #1e1040; color: var(--purple); }
+  .cls-advocate { background: #1a3320; color: var(--green); }
+  .cls-curious  { background: #713f12; color: var(--yellow); }
+  .cls-observer { background: #1e293b; color: var(--muted); }
+  .notes-area {
+    width: 100%;
+    background: var(--card);
+    border: 1px solid var(--border);
+    color: var(--foam);
+    padding: 6px 8px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-family: inherit;
+    resize: none;
+    min-height: 70px;
+    outline: none;
+  }
+  .notes-area:focus { border-color: var(--accent); }
+  .timing-block { font-size: 11px; }
+  .timing-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 3px 0;
+    border-bottom: 1px solid rgba(27,107,147,0.2);
+  }
+  .timing-row:last-child { border: none; }
+  .timing-label { color: var(--text); }
+  .timing-time { color: var(--muted); }
+  .btn-export {
+    width: 100%;
+    background: var(--sun);
+    border: none;
+    color: var(--bg);
+    padding: 8px;
+    border-radius: 6px;
+    font-weight: 700;
+    font-size: 12px;
+    cursor: pointer;
+    margin-top: 8px;
+  }
+  .btn-export:hover { background: #f0b432; }
+
+  /* SCROLLBAR */
+  ::-webkit-scrollbar { width: 5px; height: 5px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <h1>⚡ ChillBase Interview Assistant</h1>
+  <select id="deptSelect" onchange="switchDept()"></select>
+  <span class="badge" id="waveLabel">Волна 0</span>
+  <div class="spacer"></div>
+  <input type="password" id="apiKey" placeholder="sk-ant-... (Claude API key)" oninput="checkKey()">
+  <span class="key-status no" id="keyStatus">● нет ключа</span>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+
+  <!-- LEFT: GUIDE -->
+  <div class="guide-panel">
+    <div class="panel-title">Гайд интервью</div>
+    <div class="dept-info" id="deptInfo"></div>
+
+    <!-- SCRIPTS BLOCK -->
+    <div class="scripts-block">
+      <div class="scripts-toggle" onclick="toggleScripts(this)">
+        📋 Скрипты интервью
+        <span class="arrow">▼</span>
+      </div>
+      <div class="scripts-inner" id="scriptsInner">
+
+        <!-- 1. ОТКРЫТИЕ -->
+        <div class="script-card">
+          <div class="script-card-header" onclick="toggleScriptCard(this)">
+            🎙 Вступительное слово
+            <span class="arr">▼</span>
+          </div>
+          <div class="script-card-body">
+<em>Зачитать после подключения всех участников. ~1 минута.</em>
+
+<div class="script-blockquote">Добрый день! Меня зовут Анастасия.
+Спасибо, что нашли время — понимаю, что день насыщенный.
+
+Сегодня мы проводим диагностическое интервью в рамках AI-аудита ChillBase. Наша задача — понять, как устроена работа в вашем отделе, найти места, где команда тратит время на рутину, и предложить, где AI может это снять.
+
+Я буду задавать вопросы и делать заметки. Иногда буду уточнять — чтобы точно понять контекст. Если какой-то вопрос покажется некорректным — просто скажите, пойдём дальше.
+
+Прежде чем начать — несколько слов о конфиденциальности.</div>
+
+<em>→ Переходи к блоку согласия.</em></div>
+        </div>
+
+        <!-- 2. СОГЛАСИЕ -->
+        <div class="script-card">
+          <div class="script-card-header" onclick="toggleScriptCard(this)">
+            🔒 Конфиденциальность и согласие
+            <span class="arr">▼</span>
+          </div>
+          <div class="script-card-body">
+<em>Зачитать дословно. ~1 минута. Обязательно.</em>
+
+<div class="script-blockquote">Несколько слов о том, как мы работаем с тем, что вы расскажете.
+
+Всё, что вы скажете, идёт в работу — мы строим конкретные рекомендации на основе реальных процессов и реальных людей. Это не анонимный опрос, а диагностика: чем точнее вы описываете, что происходит, тем полезнее будет результат для вашего отдела.
+
+Наша задача — не оценить вас или вашу команду. Мы ищем, где AI может снять рутину и где есть люди, готовые это возглавить.
+
+Если в разговоре окажется, что вы или кто-то из вашей команды активно работает с AI — мы можем упомянуть это в итоговом отчёте как позитивный пример. Только с вашего согласия.
+
+Негативные оценки конкретных людей в отчёт не идут — только процессы и возможности.
+
+Вы готовы работать в таком формате?</div>
+
+<em>После согласия → уточнить: запись разрешена? Сколько времени есть точно?</em></div>
+        </div>
+
+        <!-- 3. ЗАКРЫТИЕ -->
+        <div class="script-card">
+          <div class="script-card-header" onclick="toggleScriptCard(this)">
+            ✅ Заключительное слово
+            <span class="arr">▼</span>
+          </div>
+          <div class="script-card-body">
+<em>Когда все вопросы заданы, до отключения. ~1 минута.</em>
+
+<div class="script-blockquote">Спасибо большое — это было очень ценно.
+
+Хочу сказать честно: то, что вы рассказали, — это не просто формальность. Мы строим рекомендации на основе реальных историй из таких разговоров, и ваш контекст в этом важен.
+
+Результаты вы увидите в итоговом отчёте, который получит вся команда.
+
+Если после нашего разговора что-то всплывёт или захочется добавить — напишите, мы учтём.
+
+Хорошего вам дня!</div>
+
+<em>После отключения → сразу заполнить артефакты, пока свежо.</em></div>
+        </div>
+
+      </div>
+    </div>
+    <!-- /SCRIPTS BLOCK -->
+
+    <div class="waves-container" id="wavesContainer"></div>
+  </div>
+
+  <!-- CENTER: CHAT -->
+  <div class="chat-panel">
+    <div class="chat-context">
+      <span>Контекст:</span>
+      <span class="wave-indicator" id="waveIndicator">Волна 0 — Rapport</span>
+      <span id="currentQ" style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"></span>
+      <button class="btn-small" onclick="clearChat()">Очистить</button>
+    </div>
+    <div class="chat-messages" id="chatMessages">
+      <div class="msg msg-info" style="max-width:100%">
+        Выберите отдел, введите API ключ.<br>
+        Во время интервью — вставляйте сюда что говорит собеседник (точно или близко к тексту).<br>
+        Нажмите <strong>Enter</strong> или кнопку → получите подсказку.
+      </div>
+    </div>
+    <div class="input-area">
+      <div class="input-row">
+        <textarea id="userInput" placeholder="Что говорит собеседник..." rows="2"
+          onkeydown="handleKey(event)"></textarea>
+        <button class="btn-send" id="sendBtn" onclick="sendMessage()">Отправить</button>
+      </div>
+      <div class="input-hint">Enter — отправить &nbsp;|&nbsp; Shift+Enter — новая строка</div>
+    </div>
+  </div>
+
+  <!-- RIGHT: TRACKER -->
+  <div class="tracker-panel">
+
+    <!-- DELOITTE SCORES -->
+    <div class="tracker-section">
+      <h3>Профиль AI-зрелости (Deloitte)</h3>
+      <div class="composite-score">
+        <div class="composite-num" id="compositeScore">—</div>
+        <div class="composite-label">композитный балл</div>
+        <div id="maturityBadge" class="maturity-badge m1" style="display:none"></div>
+      </div>
+      <div id="deloitteScores"></div>
+    </div>
+
+    <!-- AMBASSADOR -->
+    <div class="tracker-section">
+      <h3>Амбассадор-скоринг</h3>
+      <div class="ambassador-total" id="ambassadorTotal">0/30</div>
+      <div class="ambassador-class cls-observer" id="ambassadorClass">AI Observer</div>
+      <div id="ambassadorScores" style="margin-top:8px;"></div>
+    </div>
+
+    <!-- TIMING -->
+    <div class="tracker-section">
+      <h3>Тайминг</h3>
+      <div class="timing-block" id="timingBlock"></div>
+      <button class="btn-small" onclick="startTimer()" style="width:100%;margin-top:6px;">⏱ Старт</button>
+    </div>
+
+    <!-- NOTES -->
+    <div class="tracker-section">
+      <h3>Заметки / Цитаты</h3>
+      <textarea class="notes-area" id="notesArea" placeholder="Ключевые цитаты, наблюдения..."></textarea>
+    </div>
+
+    <!-- EXPORT -->
+    <div class="tracker-section">
+      <button class="btn-export" onclick="exportNotes()">Экспорт артефакта</button>
+    </div>
+
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════
+// DEPARTMENTS DATA
+// ═══════════════════════════════════════════════════
+const DEPARTMENTS = {
+  '01': {
+    id: '01',
+    name: 'Environment (3D)',
+    respondent: 'Прокопцов Артём (3D Environment Lead)',
+    count: 38,
+    aiLevel: 'low-med',
+    psychotype: 'Скорее Аналитик или Исполнитель. Технический лид, говорит точно. Оставайся в конкретике процессов, не тяни к стратегическим обобщениям.',
+    redFlag: 'Если начнёт защищать отдел ("у нас всё ок") — это Скептик. Переходи к конкретным болям: "что конкретно тормозит прямо сейчас?"',
+    context: 'Полный цикл создания 3D-окружения. Инструменты: Unity, Blender, 3dsMax, Maya, Substance Painter, SpeedTree. Боли: ручная синхронизация материалов с Git, нет тестовой среды, нарратив как боттлнек, нет зависимостей между задачами. AI: ChatGPT/Gemini для исследований, Freepik для референсов — нет production pipeline.',
+    hypotheses: [
+      'Текстурный пайплайн содержит много ручной конвертации',
+      'Flowfast не даёт прозрачности — задачи теряются',
+      'Знание сосредоточено у ключевых людей (bus factor)',
+      'Ревью занимает непропорционально много времени лидов',
+      'Референс-поиск — ежедневная рутина без системы'
+    ],
+    waves: [
+      { name: 'Rapport', time: '0:00–0:10', questions: [
+        'Какова роль вашего отдела в создании ChillBase? Что зависит именно от Environment в финальном продукте?'
+      ]},
+      { name: 'Карта процессов', time: '0:10–0:35', questions: [
+        '1.0 [Структура] Как устроен отдел внутри — 38 человек это много. Есть ли суб-команды по направлениям (экстерьеры/интерьеры/terrain)? Кто за что отвечает?',
+        '1.0 [Взаимодействия] От каких отделов вы зависите? Что получаете от них — и что происходит, когда это приходит с задержкой или не в том виде?',
+        '1.0 [Downstream] Кто зависит от вас? Кого вы блокируете, когда что-то затягивается?',
+        '1.0 [Bottleneck] Где чаще всего зависает процесс на границе с другими отделами — где работа встаёт в ожидании чужого решения или правки?',
+        '1.1 Опишите типичную неделю художника вашего отдела — с понедельника. Что происходит первым делом?',
+        '1.2 Возьмём конкретный пример: новый интерьер локации. Шаг за шагом — от получения задачи до финальной интеграции в движок.',
+        '1.3 У вас три направления: экстерьеры, интерьеры, terrain. Как они координируются между собой?',
+        '1.4 Где в процессе ассет переходит от одного человека к другому? Что нужно передать вместе с ним?',
+        '1.5 Как устроено ревью? Кто смотрит, на каком этапе, по каким критериям?',
+        '1.6 [Объёмы] Сколько ассетов создаёт отдел в месяц? Сколько задач в параллели прямо сейчас?'
+      ]},
+      { name: 'Боли и фрикции', time: '0:35–0:55', questions: [
+        '2.1 В пайплайне интерьеров много ручной работы с синхронизацией материалов в Git. Что конкретно делается вручную? Сколько это занимает?',
+        '2.2 Часто ли приходится возвращать LD-блокауты на доработку? Что в них обычно не так?',
+        '2.3 Что значит "нарратив — боттлнек"? Что конкретно от нарратива зависит и почему тормозит?',
+        '2.4 Как оцениваете сроки на задачу? Где чаще всего ошибаетесь в оценке?',
+        '2.5 Бывает ли, что ассет проходит несколько итераций ревью? Почему?',
+        '2.6 [Невидимка] Если взять прошлую неделю — какие задачи вы делали, которых нет ни в одном трекере?'
+      ]},
+      { name: 'Scaling Stress Test', time: '0:55–1:10', questions: [
+        '3.1 Через полгода у вас в два раза больше задач. Справится команда без удвоения людей? Что первым сломается?',
+        '3.2 А если нужно x5 контента? Что ломается первым — люди, пайплайн, инструменты?',
+        '3.3 Ключевой человек, лучше всех знающий пайплайн материалов, уходит завтра. Что встаёт?',
+        '3.4 Где хранится знание о том, как правильно собирать ассет для прода? В Confluence? В голове?'
+      ]},
+      { name: 'Data, Tools & Readiness', time: '1:10–1:30', questions: [
+        '4.1 Перечислите все инструменты, которые ваша команда открывает каждый день.',
+        '4.2 Как измеряете производительность отдела? Есть ли метрики — сколько ассетов в неделю, время цикла, % возвратов на ревью?',
+        '4.3 Насколько Flowfast отражает реальное состояние работ?',
+        '4.4 Как устроена работа в Substance — у каждого своя среда или общие библиотеки?',
+        '4.5 Если бы кто-то хотел обучить AI на ваших ассетах — какие данные есть и в каком состоянии?',
+        '4.6 [Governance] Когда художники используют ChatGPT — есть ли правила, что туда можно загружать? Ассеты игры? Был ли случай, когда хотели использовать инструмент, но не смогли из-за ограничений?',
+        '4.6а [Процесс] Если художник хочет попробовать новый AI-инструмент — что нужно сделать? Нужно ли одобрение? От кого?',
+        '4.7 [Стратегия] Вы слышали о планах ChillBase по внедрению AI в целом? Что-то конкретное, сроки, направления?',
+        '4.8 [Экосистема] Пользуетесь ли внешними сервисами или подрядчиками для автоматизации, тулзов, AI?',
+        '4.9 [Ценность] Когда отдел начинает использовать новый инструмент — как понимаете, что он работает?'
+      ]},
+      { name: 'AI Signals & Champion', time: '1:30–1:50', questions: [
+        '5.0 [Восприятие] Есть ли в команде ощущение, что AI — это угроза для профессии художника? Или скорее инструмент?',
+        '5.1 Как именно сейчас используете ChatGPT и Gemini в работе? Пример из прошлой недели.',
+        '5.2 Генерация вспомогательных карт для текстур через AI — roughness, metallic из color map. На каком это этапе? Что пробовали?',
+        '5.3 Если бы у вас был AI, специально обученный на пайплайне Environment — что бы вы поручили ему первым?',
+        '5.4 Что в работе вашего отдела точно не хотели бы отдавать AI?',
+        '5.4а [Неудачный опыт] Пробовали AI-инструменты, которые сначала казались полезными, но потом создали сложности — с качеством, пайплайном, командой?',
+        '5.5 Есть ли в команде кто-то, кто активно экспериментирует с AI помимо ChatGPT?',
+        '5.6 [Обмен] Если находите полезный AI-инструмент — как это попадает к остальным?',
+        '5.7 [Пилот] Если запускали AI-генерацию texture maps прямо в пайплайне — вы бы хотели быть внутри? В какой роли?',
+        '5.8 [Обучение] Если компания проведёт AI-обучение для художников — вы бы вели его или участвовали?'
+      ]}
+    ]
+  },
+  '02': {
+    id: '02',
+    name: '2D (UI/UX + Art)',
+    respondent: 'Виталий Дмитриев (Senior 2D Lead)',
+    count: 23,
+    aiLevel: 'unknown',
+    psychotype: 'Аналитик или Энтузиаст. 2D Lead — творческая роль. Может иметь сильное мнение об AI-генерации (от "инструмент" до "убивает профессию"). Не занимай позицию, исследуй.',
+    redFlag: 'Если начнёт говорить о "soul of art" — не закатывай глаза. Это ценные данные про культурный барьер.',
+    context: 'Вероятная структура: UI/UX, 2D-арт, маркетинговые ассеты, анимация. Marketing зависит от 2D для рендеров персонажей — явный боттлнек. AI-использование неизвестно — нужно выяснить с нуля.',
+    hypotheses: [
+      '2D — постоянный боттлнек для Marketing (рендеры)',
+      'Много повторяющихся задач: resize, адаптации под форматы',
+      'Концепт-работа требует много итераций согласования',
+      'Нет базы данных ассетов — каждый художник хранит по-своему',
+      'AI-генерация визуалов уже пробуется неформально'
+    ],
+    waves: [
+      { name: 'Rapport', time: '0:00–0:10', questions: [
+        'Какова роль вашего отдела в создании ChillBase? Выясни разделение 2D-арт vs UI/UX.'
+      ]},
+      { name: 'Карта процессов', time: '0:10–0:30', questions: [
+        '1.1 Как устроен ваш отдел внутри — есть ли разделение на направления?',
+        '1.2 Откуда поступают задачи для вашего отдела? Как они формулируются?',
+        '1.3 Возьмём типичную задачу — новый UI-экран или иллюстрация. Шаг за шагом от ТЗ до финального апрува.',
+        '1.4 Marketing зависит от арт-отдела для рендеров персонажей. Как выглядит этот процесс с вашей стороны? Сколько таких запросов в неделю?',
+        '1.5 Как принимаете решение, что делать в первую очередь, когда запросов больше ресурса?'
+      ]},
+      { name: 'Боли и фрикции', time: '0:30–0:50', questions: [
+        '2.1 Сколько активных задач у среднего художника? Бывает ощущение постоянного "горения"?',
+        '2.2 Сколько итераций проходит задача до финального апрува? Что чаще всего не так с первого раза?',
+        '2.3 Приходится ли часто адаптировать один ассет под разные форматы — разные соотношения сторон, платформы?',
+        '2.4 Где хранятся финальные 2D-ассеты? Как другие отделы их находят? Бывает, что Marketing не может найти нужный рендер?',
+        '2.5 Есть ли "вечные задачи" — рефакторинг стилгайда, обновление библиотек?',
+        '2.6 Есть ли задачи, которые делаются регулярно, но нигде не фиксируются как задачи?'
+      ]},
+      { name: 'Scaling Stress Test', time: '0:55–1:10', questions: [
+        '3.1 Marketing хочет в 10 раз больше рекламных креативов — реалистично без x10 команды?',
+        '3.2 ChillBase выходит на 3 новых рынка — нужна локализация всех UI-элементов. Что это значит для вашего отдела?',
+        '3.3 Главный UI-дизайнер уходит. Где находится знание о том, как устроены все экраны?'
+      ]},
+      { name: 'Data & Tools', time: '1:10–1:25', questions: [
+        '4.1 Перечислите все инструменты — от Figma до мессенджеров.',
+        '4.2 Как версионируются дизайны? Как откатываетесь если что-то пошло не так?',
+        '4.3 Есть ли единый стилгайд или UI-kit? Насколько актуален?',
+        '4.4 Как измеряете работу отдела?',
+        '4.5 Если AI нужно обучить генерировать ассеты в вашем стиле — есть ли датасет?'
+      ]},
+      { name: 'AI Signals', time: '1:25–1:40', questions: [
+        '5.1 Используете ли вы или команда AI-инструменты? Midjourney, Stable Diffusion, что-то ещё?',
+        '5.2 Marketing упоминал эксперименты с AI-генерацией баннеров. Вы участвовали? Что получилось?',
+        '5.3 Как относитесь к использованию AI для референсов vs финальных ассетов? Где для вас граница?',
+        '5.4 Если бы AI умел делать рутинные задачи — что бы вы отдали первым? Что точно оставили себе?',
+        '5.5 Как ваши художники относятся к AI — с интересом, осторожностью, скептицизмом?'
+      ]}
+    ]
+  },
+  '03': {
+    id: '03',
+    name: 'Production (Engineering)',
+    respondent: 'Андрей Лысак + Илья Прохоров',
+    count: 36,
+    aiLevel: 'low-med',
+    psychotype: 'Два человека — следи за динамикой. Андрей (Production Director) — Аналитик, видит процессы сверху. Илья (Head of Dev) — видит систему изнутри. Нужны оба угла: наверху может казаться "всё нормально", а внизу — реальный бардак.',
+    redFlag: 'Если Андрей начнёт отвечать за Илью — останови мягко: "Илья, а что ты видишь на своём уровне?"',
+    context: 'Разработка всех программных компонент. Copilot (GitHub), ChatGPT — без системного подхода. Боли: монолитная структура приложения, много временных решений ставших постоянными, мало внутренних тулзов, дорогая разработка.',
+    hypotheses: [
+      'Copilot используется поверхностно (автокомплит), не как архитектурный помощник',
+      'Code review ручной, занимает много времени лидов',
+      'Документация кода отстаёт от кода',
+      'Тех.долг тормозит новые фичи непропорционально',
+      'Постмортемы есть, но выводы не применяются системно'
+    ],
+    waves: [
+      { name: 'Rapport', time: '0:00–0:10', questions: [
+        'Опишите Production — что это за отдел, если объяснять новому человеку в компании?'
+      ]},
+      { name: 'Карта процессов', time: '0:10–0:30', questions: [
+        '1.1 Возьмём конкретную фичу — новый тип ивента или монетизационный механик. Полный путь от идеи до релиза.',
+        '1.2 Как часто выходят релизы? Что происходит в Release Week?',
+        '1.3 Новый разработчик выходит в команду. Сколько времени до первого полезного вклада? Что тормозит?',
+        '1.4 Как планируется спринт? Откуда берутся задачи, кто приоритизирует?',
+        '1.5 После релиза или инцидента — что происходит? Есть ли база знаний по постмортемам?'
+      ]},
+      { name: 'Боли и фрикции', time: '0:30–0:50', questions: [
+        '2.1 Монолитная структура и временные решения, ставшие вечными. Приведите пример.',
+        '2.2 "Дорогая разработка" — что конкретно дорого? Время? Риск сломать что-то?',
+        '2.3 Где в разработке создаётся очередь? Что ждёт конкретного человека?',
+        '2.4 Какие процессы в разработке до сих пор делаются вручную, хотя могли быть автоматизированы?',
+        '2.5 Как реально используется Flowfast — для планирования, трекинга, или формально?',
+        '2.6 GitHub Copilot — как конкретно используется? Кто пользуется активно, кто отключил?'
+      ]},
+      { name: 'Scaling Stress Test', time: '0:55–1:10', questions: [
+        '3.1 Количество задач удваивается. Что тормозит рост прежде всего — люди, архитектура, процессы?',
+        '3.2 Задача от Product — нужно выйти с фичей в 2 раза быстрее обычного. Что нужно изменить?',
+        '3.3 Ключевой разработчик, знающий монолитную архитектуру, уходит. Что происходит?',
+        '3.4 Если бы был месяц чистого времени на рефакторинг — что бы сделали в первую очередь?'
+      ]},
+      { name: 'Data & Tools', time: '1:10–1:25', questions: [
+        '4.1 Как измеряете эффективность разработки? Cycle time? Velocity? Дефекты на релиз?',
+        '4.2 Расскажите про CI/CD пайплайн — что автоматизировано, что нет?',
+        '4.3 Как устроено code review? Сколько времени тратят лиды в неделю?',
+        '4.4 Как задокументирована архитектура? Насколько Confluence актуален?',
+        '4.5 Если AI-агент помогал бы ориентироваться в кодовой базе — какие данные ему нужны?'
+      ]},
+      { name: 'AI Signals', time: '1:25–1:40', questions: [
+        '5.1 Честная оценка Copilot: где реально помогает, где мешает или даёт плохой код?',
+        '5.2 ChatGPT — для чего конкретно используется в разработке?',
+        '5.3 Если бы был AI-агент, специально знающий кодовую базу ChillBase — что бы ему поручили первым?',
+        '5.4 Есть ли опасения по использованию AI в разработке — безопасность, качество кода?',
+        '5.5 Насколько команда готова глубже осваивать AI-инструменты? Есть ли запрос снизу?'
+      ]}
+    ]
+  },
+  '04': {
+    id: '04',
+    name: 'QA',
+    respondent: 'Максим Кротов + Роман Головин (Lead QA)',
+    count: 22,
+    aiLevel: 'low-med',
+    psychotype: 'Оба Аналитики. QA-люди системные, точные, критичные. Охотно рассказывают о проблемах. РИСК: могут занижать потенциал — "мы уже пробовали, не взлетело". Копай в конкретику: что именно пробовали, на каком инструменте.',
+    redFlag: '"Пробовали" часто означает "один раз посмотрели демо". Уточняй — что именно, почему не взлетело?',
+    context: 'Поиск, учёт и каталогизация ошибок, все виды тестирования, вычитка документации, риск-менеджмент, CI/CD, аппрув на готовность к выпуску. Боли: ПОЧТИ ПОЛНОЕ ОТСУТСТВИЕ АВТОМАТИЗАЦИИ, регресс занимает всю команду. AI: ChatGPT/Gemini/Claude, смотрят TestRail AI.',
+    hypotheses: [
+      'Регресс полностью ручной — каждый релиз команда "стоит"',
+      'TestRail не полностью используется — часть в головах',
+      'Баг-репорты пишутся вручную без стандарта',
+      'Нет данных о покрытии — непонятно что не тестируется',
+      'CI/CD автоматизация минимальна'
+    ],
+    waves: [
+      { name: 'Rapport', time: '0:00–0:10', questions: [
+        'Что для вас значит "хорошо сделанный релиз"? Как понимаете, что версия готова к выходу?'
+      ]},
+      { name: 'Карта процессов', time: '0:10–0:30', questions: [
+        '1.1 Баг найден тестировщиком. Полный путь от обнаружения до закрытия.',
+        '1.2 Как устроён регресс? Что тестируется, кто делает, сколько времени занимает?',
+        '1.3 Что происходит с QA в предрелизную неделю? Хронология: день за днём.',
+        '1.4 Кроме регресса — какие ещё виды тестирования проводятся?',
+        '1.5 Вычитка документации — это Game Design документы? Технические спеки? Как часто и в каком объёме?'
+      ]},
+      { name: 'Боли и фрикции', time: '0:30–0:50', questions: [
+        '2.1 Регресс занимает время всей команды — это значит в эти периоды QA вообще ничем другим не занимается? Как часто, сколько дней?',
+        '2.2 Что могло бы быть автоматизировано, но не автоматизировано? Почему ещё нет?',
+        '2.3 "Мало метрик" — какие хотелось бы видеть, но их нет? Как принимаются решения без них?',
+        '2.4 Насколько TestRail заполнен реальными тест-кейсами? Это живой документ?',
+        '2.5 Бывают ситуации, когда баг возвращается после "фикса"? Насколько часто?',
+        '2.6 Как принимается решение — какой баг критичный, какой может подождать?'
+      ]},
+      { name: 'Scaling Stress Test', time: '0:55–1:10', questions: [
+        '3.1 В следующем квартале разработка удвоит количество фич. Как это влияет на QA?',
+        '3.2 ChillBase выходит на PC или консоль — полностью новая платформа для тестирования. Как готовитесь?',
+        '3.3 Срочный хотфикс — нужно выпустить за 24 часа. Что проверяем, что пропускаем?',
+        '3.4 Лид QA уходит за неделю до релиза. Где находятся знания о том, как устроено тестирование?'
+      ]},
+      { name: 'Data & Tools', time: '1:10–1:25', questions: [
+        '4.1 Сколько тест-кейсов в TestRail? Какой процент актуален? Кто их поддерживает?',
+        '4.2 Что автоматически запускается при каждом коммите или релизе?',
+        '4.3 Есть ли дашборд с динамикой багов — по релизам, по модулям, по приоритетам?',
+        '4.4 Сколько тестовых сред? Как они настраиваются — ручная работа или автоматическая?',
+        '4.5 Как отчитывается QA перед Production о готовности?'
+      ]},
+      { name: 'AI Signals', time: '1:25–1:40', questions: [
+        '5.1 ChatGPT, Gemini, Claude — для чего конкретно используете? Пример с прошлой недели.',
+        '5.2 AI-компонента в TestRail — что именно там есть? Что привлекает?',
+        '5.3 Если AI мог бы писать тест-кейсы на основе существующих — это было бы полезно?',
+        '5.4 Что бы вы поручили AI-тестировщику, который работает 24/7? Регресс? Генерацию тест-кейсов?',
+        '5.5 Что в QA точно должен делать человек? Где AI-решение вас пугает?'
+      ]}
+    ]
+  },
+  '05': {
+    id: '05',
+    name: 'Back Office (Finance + Legal + HR + Bizdev)',
+    respondent: 'Погосян / Царева / Кольчиков / Кабанов',
+    count: 48,
+    aiLevel: 'med',
+    psychotype: 'ГРУППОВОЕ ИНТЕРВЬЮ (4 чел). Типично: Finance — Аналитик, Legal — Аналитик/Скептик, HR — Энтузиаст, Bizdev — Энтузиаст. Finance и Legal могут занять защитную позицию по AI (compliance-мышление). Задавай вопросы адресно по имени.',
+    redFlag: 'Не дай Finance/Legal заглушить энтузиазм HR и Bizdev. Если Finance комментирует HR-кейс — мягко верни: "да, важно, вернёмся. [Имя], договаривай про свой процесс".',
+    context: 'Finance: ChatGPT/Claude для анализа, Excel AI, Tableau AI. Боли: нет единого источника правды, много ручных процессов в Excel. Legal: ChatGPT только для переводов. Боли: задачи приходят во все каналы, нет legaltech. HR: ChatGPT/Gemini/Claude личные + Skailer. Боли: высокая доля рутины, нет аналитики. Bizdev: ChatGPT/Gemini для ресёрча.',
+    hypotheses: [
+      'Finance: P&L готовится вручную каждый раз заново из разных источников',
+      'Finance: нет автоматического alert при отклонении от плана',
+      'Legal: задачи приходят в личные сообщения и теряются',
+      'Legal: типовые договоры каждый раз пересматриваются с нуля',
+      'HR: скрининг резюме занимает непропорционально много времени',
+      'HR: онбординг новых сотрудников не стандартизирован',
+      'Bizdev: подготовка к переговорам — ручной ресёрч каждый раз'
+    ],
+    waves: [
+      { name: 'Rapport', time: '0:00–0:10', questions: [
+        'Back Office — это очень разные функции. Как вы взаимодействуете между собой? Где есть трение?'
+      ]},
+      { name: 'Карта процессов', time: '0:10–0:30', questions: [
+        '1.1 [Виктория] Конец месяца в Finance. Что происходит с первого по пятое число для закрытия?',
+        '1.2 [Артём] Откуда к вам приходят задачи? Перечислите все каналы.',
+        '1.3 [Арминэ] Процесс найма одного сотрудника от получения заявки до выхода на работу — шаг за шагом.',
+        '1.4 [Алексей] Как выглядит типичная сделка или партнёрство — от первого контакта до подписания?',
+        '1.5 Какие процессы требуют участия нескольких отделов Back Office одновременно?'
+      ]},
+      { name: 'Боли и фрикции', time: '0:30–0:50', questions: [
+        '2.1 [Finance] Где находится актуальная финансовая модель? Что если CFO и Product смотрят разные цифры?',
+        '2.2 [Finance] Сколько времени занимает подготовка месячного P&L-отчёта? Что делается вручную?',
+        '2.3 [Legal] Сколько задач в работе одновременно? Что чаще всего узкое место?',
+        '2.4 [Legal] Есть ли шаблоны для часто встречающихся договоров или каждый раз с нуля?',
+        '2.5 [HR] Назовите три задачи, которые делаете каждую неделю и можно было бы делегировать.',
+        '2.6 [HR] Какие HR-метрики нужны, но которых нет? Что приходится считать вручную?',
+        '2.7 [Bizdev] Загруженность бюрократией — что конкретно? Внутренние согласования или внешние требования партнёров?'
+      ]},
+      { name: 'Scaling Stress Test', time: '0:55–1:10', questions: [
+        '3.1 ChillBase нанимает 50 новых людей за 6 месяцев. Что это значит для каждого из вас?',
+        '3.2 Выход на рынок США или Европы — новые юрисдикции, налоги, партнёры. Что самое трудоёмкое?',
+        '3.3 [HR] HRD уходит в декрет на год. Что из работы невозможно делегировать без потери качества?',
+        '3.4 [Legal] Два крупных договора пришли одновременно — что приоритизируете?'
+      ]},
+      { name: 'Data & Tools', time: '1:10–1:25', questions: [
+        '4.1 Если завтра инвестор попросит актуальную финансовую модель — сколько времени до готовности?',
+        '4.2 Как отслеживается реестр всех лицензий — когда заканчиваются, сколько стоят?',
+        '4.3 Откуда берётся информация для отчёта по персоналу?',
+        '4.4 Как подписываются договоры с партнёрами — полностью цифровой процесс или есть бумажный этап?',
+        '4.5 Данные Finance, HR, Legal — они в одной системе или в разных?'
+      ]},
+      { name: 'AI Signals', time: '1:25–1:40', questions: [
+        '5.1 [Finance] ChatGPT и Claude для анализа данных — конкретный пример за последний месяц.',
+        '5.2 [Legal] Для каких юридических задач ChatGPT реально помогает? Где даёт плохой результат?',
+        '5.3 [HR] Skailer для скрининга резюме — насколько реально экономит время? Есть проблемы false positive?',
+        '5.4 [Группа] Каждый по одному ответу: какую одну задачу отдали бы AI прямо сейчас?',
+        '5.5 Что в вашей работе AI точно не должен делать — где нужен человек и его суждение?'
+      ]}
+    ]
+  },
+  '06': {
+    id: '06',
+    name: 'Community',
+    respondent: 'Фелипе Бернандес (Head of Community)',
+    count: 27,
+    aiLevel: 'med',
+    psychotype: 'Энтузиаст. Head of Community — люди-ориентированная роль. Будет много говорить, охотно делится. РИСК: много эмоций и историй из тикетов, мало цифр. Регулярно возвращай к объёмам: "сколько таких тикетов в день?", "сколько человек этим занимается?"',
+    redFlag: 'Иностранное имя — возможен языковой нюанс. Говори чётче, избегай идиом, давай переформулировать если видишь что не попал.',
+    context: '150+ Discord-серверов, тысячи тикетов. AI: ChatGPT для конденсации ответов опросов, AppFollow AI для App Store. В переговорах: Helpshift AI. Боли: ручная обработка опросов, боттлнек при запуске новых регионов, рост читерства.',
+    hypotheses: [
+      'Обработка опросов — 1 человек, несколько дней на тысячи ответов',
+      'Модерация на 150 серверах — неоднородное качество',
+      'Рефанды обрабатываются вручную без паттернов',
+      'Ивент-библиотека из 7 типов — запуск каждого ивента ручной',
+      'CCP-онбординг не масштабируется'
+    ],
+    waves: [
+      { name: 'Rapport', time: '0:00–0:10', questions: [
+        'Community — огромный объём работы с реальными игроками. Как бы вы описали главную ценность вашего отдела для бизнеса?'
+      ]},
+      { name: 'Карта процессов', time: '0:10–0:30', questions: [
+        '1.1 Опишите типичный день Community Manager — что он открывает первым делом?',
+        '1.2 150 серверов — как физически организовано? Один CM за сколько серверов отвечает?',
+        '1.3 Цель — 10 ивентов в день на каждый сервер. Как это устроено? Кто создаёт, запускает, мониторит?',
+        '1.4 Процесс от запуска опроса до финального инсайта. Кто инициирует? Кто анализирует тысячи ответов?',
+        '1.5 Тикет пришёл в Helpshift. Как он обрабатывается — кто читает, как принимается решение, кто отвечает?'
+      ]},
+      { name: 'Боли и фрикции', time: '0:30–0:50', questions: [
+        '2.1 27 человек на 150 серверов, тысячи тикетов. Где чаще всего понимаете, что ресурса не хватает?',
+        '2.2 Обработка открытых ответов — сколько ответов в типичном опросе? Сколько это занимает времени? Кто это делает?',
+        '2.3 Методы читеров меняются. Как узнаёте о новом методе? Что самое слабое место в этой цепочке?',
+        '2.4 Новый регион — нужны новые модераторы. Сколько времени занимает онбординг одного?',
+        '2.5 Сколько ответов в App Store в день? Сколько это времени на ручные ответы?',
+        '2.6 Content Creator Program — что в этом процессе самое трудоёмкое?'
+      ]},
+      { name: 'Scaling Stress Test', time: '0:55–1:10', questions: [
+        '3.1 ChillBase выходит в Латинскую Америку — 5 новых серверов, новый язык. Что первым даёт сбой?',
+        '3.2 Product просит проводить опросы в 3 раза чаще. Реалистично? Что нужно изменить?',
+        '3.3 Новый массовый метод читинга — нужно заблокировать 10,000 аккаунтов за 48 часов. Как сейчас?',
+        '3.4 CM, ведущий 20 ключевых серверов, заболевает на месяц. Что происходит с серверами?'
+      ]},
+      { name: 'Data & Tools', time: '1:10–1:25', questions: [
+        '4.1 Что смотрите в Redash? Какие дашборды используются ежедневно? Кто пишет SQL-запросы?',
+        '4.2 Что делают Discord Bots — только тикеты или что-то ещё?',
+        '4.3 Сколько тикетов в день через Helpshift? Какой % разрешается автоматически?',
+        '4.4 Сколько отзывов в App Store в день нужно обрабатывать? Какой % отвечается вручную?',
+        '4.5 Как вы знаете, что модерация на конкретном сервере работает хорошо или плохо?'
+      ]},
+      { name: 'AI Signals', time: '1:25–1:40', questions: [
+        '5.1 Как конкретно используете ChatGPT для конденсации ответов опросов? Копируете тысячи строк?',
+        '5.2 Helpshift AI в переговорах — что именно хотите от него?',
+        '5.3 AI-перевод опросов — где он ломается? Какие языки, типы ответов дают плохое качество?',
+        '5.4 Если бы был AI Community Manager, обученный на правилах ChillBase — что бы поручили первым?',
+        '5.5 Что в работе Community должен делать только живой человек?'
+      ]}
+    ]
+  },
+  '07': {
+    id: '07',
+    name: 'Marketing (Performance + Media)',
+    respondent: 'Ломатов / Виноградова / Савельев / др.',
+    count: 25,
+    aiLevel: 'high',
+    psychotype: 'ПИЛОТНОЕ ИНТЕРВЬЮ. Почти гарантированно Энтузиасты. Самый AI-зрелый отдел. ГЛАВНЫЙ РИСК: интервью превратится в демо их достижений. Активно копай в ограничения: "хорошо, а что НЕ получается?", "где качество проседает?", "что приходится переделывать руками?"',
+    redFlag: 'Разделяй два разных ответа: "работает" и "работает так, как вы хотели". Если несколько человек — следи чтобы Performance не заглушил Brand, у них разные боли.',
+    context: 'Performance: Claude Code + Nano Banana + Veo 3 — AI-pipeline производства креативов. MCP для анализа трафика. Боли: нет автоматизации управления кампаниями, низкое качество ТЗ для пайплайна. Media: Claude Code + MCP (стратегия, автоматизация). Боли: масштабирование x10 при ограниченных ресурсах, зависимость от 2D для рендеров, AI blacklist.',
+    hypotheses: [
+      'AI-pipeline работает, но ТЗ — боттлнек',
+      'Оптимизация кампаний — до сих пор ручная, нет AI для bid management',
+      'Контент-план — ручной процесс еженедельно',
+      'Инфлюенсер-поиск — ручной ресёрч без системы',
+      'AI blacklist — реальное ограничение на платформах'
+    ],
+    waves: [
+      { name: 'Rapport', time: '0:00–0:10', questions: [
+        'Маркетинг в игровой индустрии — особое место. Как описали бы, что делает ваш отдел, если очень просто?'
+      ]},
+      { name: 'AI Pipeline + Процессы', time: '0:10–0:30', questions: [
+        '1.1 Расскажите подробно, как работает AI-pipeline для производства креативов. От идеи до готового баннера/видео — каждый шаг. Где Claude Code, где Nano Banana, где Veo 3, что вручную.',
+        '1.2 [Media] Как создаётся контент-план на неделю/месяц? Кто, что, на каких платформах?',
+        '1.3 Как находите инфлюенсеров? Как оцениваете, как договариваетесь, как измеряете?',
+        '1.4 Как устроена оптимизация рекламных кампаний — кто смотрит на метрики, когда и что меняет?',
+        '1.5 Перед выходом на новый рынок — что исследуется? Кто делает, сколько времени?'
+      ]},
+      { name: 'Боли и фрикции', time: '0:30–0:50', questions: [
+        '2.1 Качество ТЗ — проблема для пайплайна. Что не так с ТЗ? Кто их пишет?',
+        '2.2 [Media only] Зависимость от арт-отдела — насколько реально тормозит? Сколько ждёте рендер персонажа?',
+        '2.3 AI blacklist на использование AI-контента — откуда это требование? Какие платформы, какие конкретно ограничения?',
+        '2.4 Если нужно производить в 10 раз больше контента — что главное ограничение: люди, время, ассеты, идеи?',
+        '2.5 Локализация маркетинговых материалов — как устроено? Через подрядчиков или внутри?',
+        '2.6 Как следите за трендами? Это стихийный процесс или есть система?'
+      ]},
+      { name: 'Scaling Stress Test', time: '0:55–1:10', questions: [
+        '3.1 ChillBase запускается одновременно в 3 новых регионах. Что требует полной переработки, что можно переиспользовать?',
+        '3.2 Крупный конкурент запустил похожую игру и агрессивно скупает трафик. Где ваш процесс ответа самый медленный?',
+        '3.3 Игра неожиданно пошла в вирал. Как реагируете в первые 48 часов? Где боттлнек в production контента?',
+        '3.4 Ключевой SMM-менеджер заболевает на неделю. Что происходит с публикациями?'
+      ]},
+      { name: 'Data & Tools', time: '1:10–1:25', questions: [
+        '4.1 Где живёт маркетинговая аналитика? Кто читает Tableau-дашборды ежедневно?',
+        '4.2 Что конкретно автоматизировали через Claude Code и MCP? Какие интеграции работают?',
+        '4.3 Как отслеживаете позиции в App Store? Что из ASO-оптимизации делается регулярно вручную?',
+        '4.4 Как отслеживаете, что делают конкуренты в маркетинге и рекламе?',
+        '4.5 Какие данные потребляет AI creative pipeline? Где ограничения качества вывода?'
+      ]},
+      { name: 'AI Signals (углублённо)', time: '1:25–1:45', questions: [
+        '5.1 Вы самый продвинутый AI-отдел. Что работает лучше всего? Что до сих пор не работает как хотелось бы?',
+        '5.2 Если бы было 2 недели только на AI-автоматизацию маркетинга — что бы сделали?',
+        '5.3 ComfyUI — что хотите там делать, чего нет в текущем стеке?',
+        '5.4 Весь отдел или только часть работает с AI? Как остальные относятся?',
+        '5.5 Есть ли способы использовать AI для производства контента, не нарушая требования платформ?'
+      ]}
+    ]
+  },
+  '08': {
+    id: '08',
+    name: 'Product (iAP / LiveOps / Meta / Analytics)',
+    respondent: 'Станкевич / Бутримов / Скударнов / Лозневой',
+    count: null,
+    aiLevel: 'high',
+    psychotype: 'Аналитики с реальным ML-опытом. Говори на их языке: ROI, метрики, accuracy, precision/recall, latency, стоимость инференса. Они оценивают тебя по глубине вопросов — если пойдёшь поверхностно, потеряешь кредит доверия за 5 минут.',
+    redFlag: 'Когда заговорят про Chill-AI — дай рассказать 5-7 минут. Потом аккуратно копай в ограничения: "а что не получилось?", "где модель ошибается?", "что решили не делать?"',
+    context: 'НАИБОЛЕЕ AI-ЗРЕЛЫЙ ОТДЕЛ. Chill-AI (Claude-based аналитика), ML LiveOps Combinator (остановлен из-за нехватки ресурсов), своя прогнозная модель доходности. Meta Product: ChatGPT Thinking, Gemini Pro, Claude Opus — все три активно. Боли: низкая скорость разработки, нехватка ресурса 2D, отсутствие автоматизации тестирования.',
+    hypotheses: [
+      'Chill-AI используется не всеми продактами — барьер в промптинге',
+      'Комбинатор LiveOps можно перезапустить с меньшими ресурсами через современные LLM',
+      'Прогнозная модель — точность известна, но доверие к ней нет всегда',
+      'Meta Product тратит много времени на оформление документов',
+      'Аналитика — боттлнек для продакт-решений'
+    ],
+    waves: [
+      { name: 'Rapport', time: '0:00–0:10', questions: [
+        'Продукт в open world — постоянный баланс между тем, что игроки хотят, и тем, что работает экономически. Как держите этот баланс?'
+      ]},
+      { name: 'AI-инструменты + процессы', time: '0:10–0:30', questions: [
+        '1.1 Как формируется LiveOps-календарь на следующий месяц? Кто, что делает, какие данные используются?',
+        '1.2 Как конкретно продакты используют Chill-AI? Пример вопроса, который кто-то задал на прошлой неделе.',
+        '1.3 Как используется прогнозная модель доходности? Кто смотрит, как часто, в каких решениях участвует?',
+        '1.4 Новая фича в roadmap — от идеи до запуска. Кто участвует на каждом шаге?',
+        '1.5 [Meta] Как превращается продуктовый vision в конкретный документ для разработки?'
+      ]},
+      { name: 'Боли и ограничения', time: '0:30–0:50', questions: [
+        '2.1 Низкая скорость разработки — где именно теряется время: формулировка задач, разработка, ревью, тестирование?',
+        '2.2 ML-комбинатор остановился из-за нехватки ресурсов. Что конкретно требовало ресурс — data science, бэкенд, продуктовое время?',
+        '2.3 Когда принимаете продуктовое решение без данных — потому что данные не готовы. Как часто? Что тормозит?',
+        '2.4 Разные сквады тянут экономику в разные стороны — расскажите подробнее. Где нет согласованности?',
+        '2.5 Нехватка ресурса 2D-команды — как это ограничивает продукт конкретно? Что не сделали из-за этого?',
+        '2.6 [Meta] Что значит "высокая неопределённость продукта"? Откуда она? Как работаете?'
+      ]},
+      { name: 'Scaling Stress Test', time: '0:55–1:10', questions: [
+        '3.1 DAU вырос в 3 раза за 3 месяца. Что в LiveOps-операциях ломается первым?',
+        '3.2 Product хочет запустить 5 крупных фич одновременно. Что главное ограничение?',
+        '3.3 Chill-AI используется в 10 раз больше — каждый продакт, каждый день. Инфраструктура держит?',
+        '3.4 Человек, лучше всех понимающий прогнозную модель и экономику игры, уходит. Что происходит?'
+      ]},
+      { name: 'Data Architecture', time: '1:10–1:25', questions: [
+        '4.1 На каких данных работает Chill-AI? Какие данные недоступны, но нужны?',
+        '4.2 Что предсказывает прогнозная модель? Точность? Как часто ошибается и почему?',
+        '4.3 Где хранятся данные о поведении пользователей, доходах, LiveOps-результатах? Всё в одном месте?',
+        '4.4 Где фиксируются продуктовые решения и их обоснование? База по тому, что пробовали и не сработало?',
+        '4.5 Что хотели бы знать о пользователях, но сейчас не знаете?'
+      ]},
+      { name: 'AI Strategy', time: '1:25–1:45', questions: [
+        '5.1 Chill-AI — что реально хорошо, что не устраивает? Где даёт ценность, где разочаровывает?',
+        '5.2 Если бы был месяц только на AI-проект для Product — что бы это было?',
+        '5.3 Можно ли перезапустить ML-комбинатор с меньшими ресурсами, применив современные LLM?',
+        '5.4 [Meta] ChatGPT Thinking, Gemini, Claude Opus — для разных задач. Конкретно: какую задачу даёте каждой модели?',
+        '5.5 Как видите AI в работе Product через год — эволюция текущих инструментов или что-то принципиально новое?'
+      ]}
+    ]
+  }
+};
+
+// ═══════════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════════
+let currentDept = '07';
+let currentWave = 0;
+let conversationHistory = [];
+let timerStart = null;
+let timerInterval = null;
+
+const deloitteDimensions = [
+  { key: 'strategy',    label: '1. Стратегия', source: 'Q4.7', weight: 1.5 },
+  { key: 'talent',      label: '2. Таланты/культура', source: 'Q5.5, Q5.6', weight: 1.5 },
+  { key: 'data',        label: '3. Данные', source: 'Q4.5', weight: 1.25 },
+  { key: 'tech',        label: '4. Технологии', source: 'Q4.1-4.4', weight: 1.0 },
+  { key: 'governance',  label: '5. Governance', source: 'Q4.6', weight: 1.0 },
+  { key: 'ecosystem',   label: '6. Экосистема', source: 'Q4.8', weight: 0.75 },
+  { key: 'value',       label: '7. Измерение', source: 'Q4.9', weight: 1.0 },
+];
+let deloitteScores = {};
+
+const ambassadorDimensions = [
+  { key: 'usage_freq',  label: 'Частота AI (Q5.1)', max: 5 },
+  { key: 'shares',      label: 'Делится опытом (Q5.6)', max: 5 },
+  { key: 'value',       label: 'Реализованная ценность (Q5.2)', max: 5 },
+  { key: 'innovation',  label: 'Инновационность (Q5.3)', max: 5 },
+  { key: 'pilot_ready', label: 'Готовность к пилоту (Q5.7)', max: 5 },
+  { key: 'teaches',     label: 'Готовность обучать (Q5.8)', max: 5 },
+];
+let ambassadorScores = {};
+
+// ═══════════════════════════════════════════════════
+// SYSTEM PROMPT BUILDER
+// ═══════════════════════════════════════════════════
+function buildSystemPrompt() {
+  const dept = DEPARTMENTS[currentDept];
+  const wave = dept.waves[currentWave];
+  const questions = wave.questions.join('\n- ');
+
+  return `Ты — AI-коуч для проведения интервью в рамках диагностики AI-зрелости компании ChillBase (геймдев, ~200 чел., open-world игра).
+
+ТВОЯ ЗАДАЧА: помогать интервьюеру в реальном времени. Анализируй что говорит собеседник и выдавай короткие, практические подсказки.
+
+═══ ТЕКУЩЕЕ ИНТЕРВЬЮ ═══
+Отдел: ${dept.name}
+Респондент: ${dept.respondent}
+Текущая волна: Волна ${currentWave} — ${wave.name} (${wave.time})
+Вопросы этой волны:
+- ${questions}
+
+═══ КОНТЕКСТ ОТДЕЛА ═══
+${dept.context}
+
+Психотип тактика: ${dept.psychotype}
+Красный флаг: ${dept.redFlag}
+
+Ключевые гипотезы для проверки:
+${dept.hypotheses.map((h, i) => `H${i+1}: ${h}`).join('\n')}
+
+═══ ИТОГОВЫЕ АРТЕФАКТЫ (что нужно заполнить) ═══
+1. Профиль AI-зрелости по Deloitte (7 измерений, балл 1-5):
+   - Стратегия ← Q4.7 (знает ли о AI-стратегии компании)
+   - Таланты/культура ← Q5.5, Q5.6 (уровень AI-грамотности, делится ли опытом)
+   - Данные ← Q4.5 (состояние датасетов)
+   - Технологии ← Q4.1-4.4 (инструменты, автоматизация)
+   - Governance ← Q4.6 (есть ли правила по AI)
+   - Экосистема ← Q4.8 (внешние AI-партнёры)
+   - Измерение ценности ← Q4.9 (как оценивают ROI инструментов)
+
+2. Скоринг амбассадора (балл 1-5 по 6 индикаторам):
+   - Частота AI ← Q5.1
+   - Делится опытом ← Q5.6
+   - Реализованная ценность ← Q5.2
+   - Инновационность ← Q5.3
+   - Готовность к пилоту ← Q5.7
+   - Готовность обучать ← Q5.8
+   Классификация: 23-30 = Champion, 17-22 = Advocate, 11-16 = Curious, 0-10 = Observer
+
+3. Инициативы для Impact-Feasibility матрицы (Quick Win / Strategic Bet / Low Hanging Fruit / Deprioritize)
+
+═══ ФОРМАТ ОТВЕТА ═══
+Отвечай СТРОГО по следующей структуре (используй эти заголовки):
+
+🎯 СИГНАЛ:
+[1-2 предложения: что это говорит о психотипе, уровне AI, готовности. Конкретно и практично.]
+
+💬 СЛЕДУЮЩИЙ ВОПРОС:
+[Точный вопрос для продолжения — либо следующий из гайда, либо уточняющий follow-up. Дай текст вопроса который можно произнести прямо сейчас.]
+
+📊 СКОРИНГ-ПОДСКАЗКА:
+[Если сказанное даёт данные для артефактов — укажи измерение и предварительный балл. Например: "Стратегия → 2/5 (не знает о AI-стратегии компании)". Если данных нет — напиши "пока недостаточно данных".]
+
+⚡ ФЛАГ:
+[Только если есть что-то важное: потенциальный амбассадор, красный флаг, Quick Win инициатива, смена тактики. Если ничего срочного — пропусти этот раздел.]
+
+ВАЖНО:
+- Будь конкретным, не общим
+- Вопросы давай готовые к произнесению
+- Психотип и тактику держи в голове постоянно
+- Если видишь признаки амбассадора — выдели
+- Если видишь Quick Win инициативу — назови её`;
+}
+
+// ═══════════════════════════════════════════════════
+// API CALL
+// ═══════════════════════════════════════════════════
+async function callClaude(userMessage) {
+  const key = document.getElementById('apiKey').value.trim();
+  if (!key) throw new Error('Нет API ключа');
+
+  const messages = [
+    ...conversationHistory,
+    { role: 'user', content: userMessage }
+  ];
+
+  const response = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: {
+      'content-type': 'application/json',
+      'x-api-key': key,
+      'anthropic-version': '2023-06-01',
+      'anthropic-dangerous-direct-browser-access': 'true'
+    },
+    body: JSON.stringify({
+      model: 'claude-haiku-4-5-20251001',
+      max_tokens: 600,
+      system: buildSystemPrompt(),
+      messages: messages
+    })
+  });
+
+  if (!response.ok) {
+    const err = await response.json().catch(() => ({}));
+    throw new Error(err.error?.message || `HTTP ${response.status}`);
+  }
+
+  const data = await response.json();
+  return data.content[0].text;
+}
+
+// ═══════════════════════════════════════════════════
+// CHAT UI
+// ═══════════════════════════════════════════════════
+function sendMessage() {
+  const ta = document.getElementById('userInput');
+  const text = ta.value.trim();
+  if (!text) return;
+
+  ta.value = '';
+  addUserMessage(text);
+  runAssistant(text);
+}
+
+function handleKey(e) {
+  if (e.key === 'Enter' && !e.shiftKey) {
+    e.preventDefault();
+    sendMessage();
+  }
+}
+
+function addUserMessage(text) {
+  const div = document.createElement('div');
+  div.className = 'msg msg-user';
+  div.textContent = text;
+  appendMessage(div);
+}
+
+function addAssistantMessage(text) {
+  const div = document.createElement('div');
+  div.className = 'msg msg-assistant';
+  div.innerHTML = formatAssistantResponse(text);
+  appendMessage(div);
+}
+
+function formatAssistantResponse(text) {
+  let html = text
+    .replace(/🎯 СИГНАЛ:/g, '<div class="signal-block"><span class="signal-tag tag-signal">🎯 Сигнал</span><div class="signal-text">')
+    .replace(/💬 СЛЕДУЮЩИЙ ВОПРОС:/g, '</div></div><div class="signal-block"><span class="signal-tag tag-q">💬 Следующий вопрос</span><div class="signal-text">')
+    .replace(/📊 СКОРИНГ-ПОДСКАЗКА:/g, '</div></div><div class="signal-block"><span class="signal-tag tag-score">📊 Скоринг</span><div class="signal-text">')
+    .replace(/⚡ ФЛАГ:/g, '</div></div><div class="signal-block"><span class="signal-tag tag-flag">⚡ Флаг</span><div class="signal-text">');
+
+  // Close last open divs
+  html += '</div></div>';
+
+  // Bold text
+  html = html.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+  // Newlines
+  html = html.replace(/\n/g, '<br>');
+
+  return html;
+}
+
+function addError(text) {
+  const div = document.createElement('div');
+  div.className = 'msg msg-error';
+  div.textContent = '⚠️ ' + text;
+  appendMessage(div);
+}
+
+function addTyping() {
+  const div = document.createElement('div');
+  div.className = 'typing';
+  div.id = 'typingIndicator';
+  div.textContent = 'Claude думает...';
+  appendMessage(div);
+  return div;
+}
+
+function appendMessage(el) {
+  const container = document.getElementById('chatMessages');
+  container.appendChild(el);
+  container.scrollTop = container.scrollHeight;
+}
+
+async function runAssistant(userText) {
+  const btn = document.getElementById('sendBtn');
+  btn.disabled = true;
+
+  const typing = addTyping();
+
+  try {
+    const response = await callClaude(userText);
+
+    conversationHistory.push({ role: 'user', content: userText });
+    conversationHistory.push({ role: 'assistant', content: response });
+
+    // Keep history manageable
+    if (conversationHistory.length > 20) {
+      conversationHistory = conversationHistory.slice(-16);
+    }
+
+    typing.remove();
+    addAssistantMessage(response);
+
+    // Try to auto-extract scores from response
+    autoExtractScores(response);
+
+  } catch (err) {
+    typing.remove();
+    addError(err.message);
+  } finally {
+    btn.disabled = false;
+    document.getElementById('userInput').focus();
+  }
+}
+
+function toggleScripts(btn) {
+  btn.classList.toggle('open');
+  document.getElementById('scriptsInner').classList.toggle('open');
+}
+
+function toggleScriptCard(header) {
+  header.classList.toggle('open');
+  header.nextElementSibling.classList.toggle('open');
+}
+
+function clearChat() {
+  document.getElementById('chatMessages').innerHTML = '<div class="msg msg-info" style="max-width:100%">Чат очищен. Начните новую тему.</div>';
+  conversationHistory = [];
+}
+
+// ═══════════════════════════════════════════════════
+// DEPARTMENT & WAVE UI
+// ═══════════════════════════════════════════════════
+function switchDept() {
+  currentDept = document.getElementById('deptSelect').value;
+  currentWave = 0;
+  conversationHistory = [];
+  deloitteScores = {};
+  ambassadorScores = {};
+  renderDeptInfo();
+  renderWaves();
+  renderScores();
+  updateWaveLabel();
+  clearChat();
+  loadInterviewResults(currentDept);
+}
+
+function renderDeptInfo() {
+  const dept = DEPARTMENTS[currentDept];
+  const aiClass = { high: 'ai-high', med: 'ai-med', 'low-med': 'ai-low', unknown: 'ai-unk', low: 'ai-low' }[dept.aiLevel] || 'ai-unk';
+  const aiLabel = { high: '🟢 HIGH AI', med: '🟡 MEDIUM AI', 'low-med': '🟡 LOW-MED AI', unknown: '❓ UNKNOWN AI', low: '🔴 LOW AI' }[dept.aiLevel] || '❓';
+
+  document.getElementById('deptInfo').innerHTML = `
+    <div class="dept-name">${dept.name}</div>
+    <div class="dept-meta">
+      👤 ${dept.respondent}<br>
+      👥 ${dept.count ? dept.count + ' чел.' : 'кол-во неизвестно'}
+    </div>
+    <span class="dept-ai-badge ${aiClass}">${aiLabel}</span>
+    <div style="margin-top:8px;font-size:11px;color:var(--muted);line-height:1.4;">${dept.psychotype}</div>
+    <div style="margin-top:6px;font-size:11px;color:var(--red);line-height:1.4;">⚠️ ${dept.redFlag}</div>
+  `;
+}
+
+function renderWaves() {
+  const dept = DEPARTMENTS[currentDept];
+  const container = document.getElementById('wavesContainer');
+  container.innerHTML = '';
+
+  dept.waves.forEach((wave, wIdx) => {
+    const block = document.createElement('div');
+    block.className = 'wave-block';
+
+    const header = document.createElement('div');
+    header.className = 'wave-header' + (wIdx === currentWave ? ' active' : '');
+    header.innerHTML = `<div class="wave-num">${wIdx}</div> Волна ${wIdx}: ${wave.name} <span style="margin-left:auto;font-size:10px;color:var(--muted);font-weight:400">${wave.time}</span>`;
+    header.onclick = () => toggleWave(wIdx, header, questionsDiv);
+
+    const questionsDiv = document.createElement('div');
+    questionsDiv.className = 'wave-questions' + (wIdx === currentWave ? ' open' : '');
+    questionsDiv.id = `wave-questions-${wIdx}`;
+
+    wave.questions.forEach((q, qIdx) => {
+      const qItem = document.createElement('div');
+      qItem.className = 'question-item';
+      qItem.id = `q-${wIdx}-${qIdx}`;
+      qItem.innerHTML = `<span class="q-num">${qIdx+1}.</span> ${q}`;
+      qItem.onclick = (e) => { e.stopPropagation(); useQuestion(q, wIdx, qIdx); };
+      questionsDiv.appendChild(qItem);
+    });
+
+    block.appendChild(header);
+    block.appendChild(questionsDiv);
+    container.appendChild(block);
+  });
+
+  renderTiming();
+}
+
+function toggleWave(wIdx, header, questionsDiv) {
+  const isOpen = questionsDiv.classList.contains('open');
+  // Close all
+  document.querySelectorAll('.wave-questions').forEach(d => d.classList.remove('open'));
+  document.querySelectorAll('.wave-header').forEach(h => h.classList.remove('active'));
+  if (!isOpen) {
+    questionsDiv.classList.add('open');
+    header.classList.add('active');
+    currentWave = wIdx;
+    updateWaveLabel();
+  }
+}
+
+function updateWaveLabel() {
+  const dept = DEPARTMENTS[currentDept];
+  const wave = dept.waves[currentWave];
+  document.getElementById('waveLabel').textContent = `Волна ${currentWave}`;
+  document.getElementById('waveIndicator').textContent = `Волна ${currentWave} — ${wave.name}`;
+}
+
+function useQuestion(q, wIdx, qIdx) {
+  // Mark as used
+  const el = document.getElementById(`q-${wIdx}-${qIdx}`);
+  if (el) el.classList.toggle('used');
+  // Put question in input
+  document.getElementById('userInput').value = `[Задан вопрос] ${q}`;
+  document.getElementById('userInput').focus();
+}
+
+// ═══════════════════════════════════════════════════
+// SCORES
+// ═══════════════════════════════════════════════════
+function renderScores() {
+  // Deloitte
+  const deloitteContainer = document.getElementById('deloitteScores');
+  deloitteContainer.innerHTML = '';
+
+  deloitteDimensions.forEach(dim => {
+    const val = deloitteScores[dim.key] || '';
+    const row = document.createElement('div');
+    row.className = 'score-row';
+    row.innerHTML = `
+      <span class="score-label" title="${dim.source}">${dim.label}</span>
+      <input class="score-input" type="number" min="1" max="5" step="0.5"
+        value="${val}" placeholder="—"
+        onchange="setDeloitte('${dim.key}', this.value)">
+      <div class="score-bar"><div class="score-fill" style="width:${val ? (val/5*100)+'%' : '0'}"></div></div>
+    `;
+    deloitteContainer.appendChild(row);
+  });
+
+  updateComposite();
+
+  // Ambassador
+  const ambContainer = document.getElementById('ambassadorScores');
+  ambContainer.innerHTML = '';
+
+  ambassadorDimensions.forEach(dim => {
+    const val = ambassadorScores[dim.key] || '';
+    const row = document.createElement('div');
+    row.className = 'score-row';
+    row.innerHTML = `
+      <span class="score-label">${dim.label}</span>
+      <input class="score-input" type="number" min="1" max="5" step="1"
+        value="${val}" placeholder="—"
+        onchange="setAmbassador('${dim.key}', this.value)">
+    `;
+    ambContainer.appendChild(row);
+  });
+
+  updateAmbassador();
+}
+
+function setDeloitte(key, val) {
+  if (val && val >= 1 && val <= 5) deloitteScores[key] = parseFloat(val);
+  else delete deloitteScores[key];
+  updateComposite();
+}
+
+function updateComposite() {
+  const totalWeight = deloitteDimensions.reduce((s, d) => s + d.weight, 0);
+  let weighted = 0;
+  let filled = 0;
+  deloitteDimensions.forEach(dim => {
+    if (deloitteScores[dim.key]) {
+      weighted += deloitteScores[dim.key] * dim.weight;
+      filled++;
+    }
+  });
+
+  const el = document.getElementById('compositeScore');
+  const badge = document.getElementById('maturityBadge');
+
+  if (filled === 0) {
+    el.textContent = '—';
+    badge.style.display = 'none';
+    return;
+  }
+
+  const composite = weighted / totalWeight;
+  el.textContent = composite.toFixed(1);
+  badge.style.display = 'inline-block';
+
+  const levels = [
+    [1.8, 'm1', 'L1 — Осведомлённость'],
+    [2.5, 'm2', 'L2 — Экспериментирование'],
+    [3.3, 'm3', 'L3 — Операционализация'],
+    [4.1, 'm4', 'L4 — Масштабирование'],
+    [5.0, 'm5', 'L5 — Трансформация'],
+  ];
+  for (const [max, cls, label] of levels) {
+    if (composite <= max) {
+      badge.className = `maturity-badge ${cls}`;
+      badge.textContent = label;
+      break;
+    }
+  }
+
+  // Update bars
+  document.querySelectorAll('.score-fill').forEach((fill, i) => {
+    const dim = deloitteDimensions[i];
+    if (dim && deloitteScores[dim.key]) {
+      fill.style.width = (deloitteScores[dim.key] / 5 * 100) + '%';
+    }
+  });
+}
+
+function setAmbassador(key, val) {
+  if (val && val >= 1 && val <= 5) ambassadorScores[key] = parseInt(val);
+  else delete ambassadorScores[key];
+  updateAmbassador();
+}
+
+function updateAmbassador() {
+  const total = Object.values(ambassadorScores).reduce((s, v) => s + v, 0);
+  const max = 30;
+  document.getElementById('ambassadorTotal').textContent = `${total}/${max}`;
+
+  const cls = document.getElementById('ambassadorClass');
+  if (total >= 23) { cls.textContent = '🏆 AI Champion'; cls.className = 'ambassador-class cls-champion'; }
+  else if (total >= 17) { cls.textContent = '⭐ AI Advocate'; cls.className = 'ambassador-class cls-advocate'; }
+  else if (total >= 11) { cls.textContent = '🌱 AI Curious'; cls.className = 'ambassador-class cls-curious'; }
+  else { cls.textContent = '👁 AI Observer'; cls.className = 'ambassador-class cls-observer'; }
+}
+
+function autoExtractScores(text) {
+  // Try to detect score hints in assistant response and nudge user
+  // This is heuristic — not auto-setting, just providing a hint
+  const scoreHints = text.match(/(\w[\w\/]+)\s*→\s*(\d(?:\.\d)?)\s*\/\s*5/g);
+  if (scoreHints && scoreHints.length > 0) {
+    // Could auto-fill but let user control — just highlight
+  }
+}
+
+// ═══════════════════════════════════════════════════
+// TIMING
+// ═══════════════════════════════════════════════════
+function renderTiming() {
+  const dept = DEPARTMENTS[currentDept];
+  const container = document.getElementById('timingBlock');
+  container.innerHTML = dept.waves.map(w => `
+    <div class="timing-row">
+      <span class="timing-label">Волна ${dept.waves.indexOf(w)}: ${w.name}</span>
+      <span class="timing-time">${w.time}</span>
+    </div>
+  `).join('');
+}
+
+function startTimer() {
+  if (timerInterval) {
+    clearInterval(timerInterval);
+    timerInterval = null;
+    document.querySelector('button[onclick="startTimer()"]').textContent = '⏱ Старт';
+    return;
+  }
+  timerStart = Date.now();
+  timerInterval = setInterval(() => {
+    const elapsed = Math.floor((Date.now() - timerStart) / 1000);
+    const m = Math.floor(elapsed / 60).toString().padStart(2, '0');
+    const s = (elapsed % 60).toString().padStart(2, '0');
+    document.querySelector('button[onclick="startTimer()"]').textContent = `⏹ ${m}:${s}`;
+  }, 1000);
+}
+
+// ═══════════════════════════════════════════════════
+// EXPORT
+// ═══════════════════════════════════════════════════
+function exportNotes() {
+  const dept = DEPARTMENTS[currentDept];
+  const notes = document.getElementById('notesArea').value;
+  const date = new Date().toLocaleDateString('ru');
+
+  let out = `# Артефакт интервью — ${dept.name}\n`;
+  out += `**Дата:** ${date}\n`;
+  out += `**Респондент:** ${dept.respondent}\n\n`;
+
+  out += `## Профиль AI-зрелости (Deloitte)\n\n`;
+  out += `| Измерение | Балл |\n|-----------|------|\n`;
+  deloitteDimensions.forEach(d => {
+    out += `| ${d.label} | ${deloitteScores[d.key] || '—'} |\n`;
+  });
+  const totalW = deloitteDimensions.reduce((s, d) => s + d.weight, 0);
+  const comp = deloitteDimensions.reduce((s, d) => s + (deloitteScores[d.key] || 0) * d.weight, 0) / totalW;
+  out += `| **Composite** | **${comp.toFixed(1)}** |\n\n`;
+
+  out += `## Скоринг амбассадора\n\n`;
+  out += `| Индикатор | Балл |\n|-----------|------|\n`;
+  ambassadorDimensions.forEach(d => {
+    out += `| ${d.label} | ${ambassadorScores[d.key] || '—'} |\n`;
+  });
+  const ambTotal = Object.values(ambassadorScores).reduce((s, v) => s + v, 0);
+  out += `| **Итого** | **${ambTotal}/30** |\n\n`;
+
+  out += `## Заметки и цитаты\n\n${notes}\n`;
+
+  const blob = new Blob([out], { type: 'text/markdown' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `artifact_${dept.id}_${dept.name.split(' ')[0]}_${date.replace(/\./g, '-')}.md`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+// ═══════════════════════════════════════════════════
+// KEY
+// ═══════════════════════════════════════════════════
+function checkKey() {
+  const key = document.getElementById('apiKey').value.trim();
+  const status = document.getElementById('keyStatus');
+  if (key.startsWith('sk-ant-')) {
+    status.textContent = '● ключ введён';
+    status.className = 'key-status ok';
+    localStorage.setItem('cb_api_key', key);
+  } else {
+    status.textContent = '● нет ключа';
+    status.className = 'key-status no';
+  }
+}
+
+// ═══════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════
+function init() {
+  // Load saved key
+  const savedKey = localStorage.getItem('cb_api_key');
+  if (savedKey) {
+    document.getElementById('apiKey').value = savedKey;
+    checkKey();
+  }
+
+  // Populate dept selector
+  const sel = document.getElementById('deptSelect');
+  Object.values(DEPARTMENTS).forEach(d => {
+    const opt = document.createElement('option');
+    opt.value = d.id;
+    opt.textContent = `${d.id}. ${d.name}`;
+    if (d.id === currentDept) opt.selected = true;
+    sel.appendChild(opt);
+  });
+
+  renderDeptInfo();
+  renderWaves();
+  renderScores();
+  updateWaveLabel();
+}
+
+init();
+
+// ═══════════════════════════════════════════════════
+// PRE-LOADED INTERVIEW RESULTS
+// ═══════════════════════════════════════════════════
+
+const INTERVIEW_RESULTS = {
+  '07': {
+    date: '27.04.2026',
+    participants: 'Ломатов Саша, Голованов Влад, Савельев Владимир',
+    deloitte: {
+      strategy:   2,
+      talent:     2.5,
+      data:       3,
+      tech:       3.5,
+      governance: 3,
+      ecosystem:  3,
+      value:      2.5
+    },
+    ambassador: {
+      usage_freq:  5,
+      shares:      3,
+      value:       4,
+      innovation:  4,
+      pilot_ready: 5,
+      teaches:     3
+    },
+    ambassadorName: 'Голованов Влад',
+    notes: `ДАТА: 27.04.2026
+УЧАСТНИКИ: Ломатов Саша (analytics/отчёты), Голованов Влад (creative AI pipeline), Савельев Владимир (закупка, кампании)
+Примечание: angeladevis478@gmail.com присутствовала, почти не говорила — не идентифицирована
+
+━━━ АМБАССАДОРЫ ━━━
+▸ Голованов Влад — 24/30 🏆 Champion
+  AI creative pipeline (Nano Banana, Runway, Eleven Labs, Claude Code)
+  Строит автогенерацию промптов, экспериментирует с 3D-генерацией
+
+▸ Ломатов Саша — ~24/30 🏆 Champion
+  Автоматизирует отчёты и медиапланирование через Claude Code
+  Работает с Tableau, строит AI-алерты
+
+━━━ КЛЮЧЕВЫЕ ЦИТАТЫ ━━━
+"Общего плана или стратегии по AI у нас пока нет, двигаемся каждый по своим"
+"Сорок тысяч креативов — нам нужен механизм внутренней цензуры, который не пропускает шлак"
+"AI content restrictions от Legal — Veo 3 запрещён, это является проблемой"
+"Время на сборку отчёта вручную — от получаса до часа в среднем"
+"Уровень работы с AI в целом довольно низкий, площадки для обмена нет ни на уровне отдела, ни компании"
+"Если сделали улучшение волос через AI, то в последующем переиспользовать проблемно — краткосрочная оптимизация создаёт долгосрочные проблемы"
+"[про автоматизацию перформанс-менеджмента] — ну это уже Black Mirror какой-то" (Савельев, про страхи)
+
+━━━ ПРОВЕРКА ГИПОТЕЗ ━━━
+H1 ✅ ТЗ — боттлнек: "time production увеличится в два раза", "душно выходит с точки зрения фидбеков"
+H2 ✅ Закупка ручная: "двадцать-пятьдесят кампаний, каждую смотреть вручную" (Савельев)
+H3 ✅ Отчёты ручные: 30-60 мин в неделю, медиапланирование в процессе автоматизации (Ломатов)
+H4 ✅ Инфлюенсер-ресёрч ручной: список из ~6 конкурентов, обновляется руками
+H5 ✅ AI blacklist реальное ограничение: Veo 3 запрещён, есть шаблон запроса к юристам
+H6 ⚠️ Локализация: Азия/Япония отдельно, worldwide — "те же подходы работают", глубоко не копали
+
+━━━ QUICK WINS ━━━
+1. Автоматизация отчётности — Саша уже начал, 30-60 мин/нед экономии
+2. Умные AI-алерты в Slack на базе Tableau данных
+3. Нарезка/адаптация видео под форматы (100k+ роликов в хранилище)
+4. Транскрипция звонков — прямой запрос от команды (3D-отдел уже использует)
+5. AI-фильтр "шлак/не шлак" для хранилища креативов (40k креативов)
+
+━━━ STRATEGIC BETS ━━━
+1. Полная автоматизация тестирования креативов (пример: MyGames)
+2. Улучшение системы ТЗ с учётом аудиторий + сегментация аудиторий через AI (Савельев)
+3. Автоматизация управления рекламными кампаниями (20-50 кампаний)
+
+━━━ РИСКИ И ПАТТЕРНЫ ━━━
+⚠️ Ловушка краткосрочной оптимизации: AI-улучшения контента (напр. волосы) создают технический долг — переиспользовать нельзя когда стандарт качества вырастет. Нужна стратегия архивирования.
+⚠️ Усталость от давления "используй AI везде": сопротивление — не скептицизм, а защита рабочих процессов. Не давить, предлагать конкретные инструменты.
+⚠️ Страх AI в HR/перформанс-менеджменте: автоматизация оценки людей воспринимается негативно — в рекомендациях не включать.
+
+━━━ НЕ СЕЙЧАС ━━━
+— 3D game content generation: "нигде на рынке не реализовано"
+— Автоматизация перформанс-менеджмента: команда против`
+  },
+  '03': {
+    date: '29.04.2026',
+    participants: 'Андрей Лысак (Head of Dev), Илья (Gameplay Dev Lead)',
+    deloitte: {
+      strategy:   2,
+      talent:     2.5,
+      data:       2,
+      tech:       3.5,
+      governance: 3,
+      ecosystem:  2,
+      value:      1.5
+    },
+    ambassador: {
+      usage_freq:  2,
+      shares:      2,
+      value:       2,
+      innovation:  3,
+      pilot_ready: 3,
+      teaches:     2
+    },
+    ambassadorName: 'Андрей Лысак',
+    notes: `ДАТА: 29.04.2026
+УЧАСТНИКИ: Андрей Лысак (Head of Dev / Production), Илья (Gameplay Dev Lead)
+Примечание: Саша (не присутствовал) — упомянут несколько раз как неформальный AI-чемпион
+
+━━━ АМБАССАДОРЫ ━━━
+▸ Саша (не присутствовал) — ориентировочно 26+/30 🏆 Champion
+  Делает презентации по AI на общих созвонах, вживую показывал как написать многомерный скрипт
+  Делится находками с командой регулярно, вызывает восхищение у коллег
+  → Пригласить на отдельное интервью или follow-up
+
+▸ Андрей Лысак — ~14/30 🔍 AI Curious
+  Использует Cursor + FactChecker, осознаёт пробелы ("боюсь, есть примеры, где не понимаю что не понимаю")
+  Хочет триггеры в голове для поиска возможностей автоматизации
+  Учится через разговоры с Сашей и YouTube
+
+▸ Илья — ~13/30 🔍 AI Curious
+  Не пишет код сам — Copilot не актуален. Использует ChatGPT + локальные модели ситуативно
+  Хорошо понимает риски и ограничения AI в разработке, мыслит системно
+
+━━━ КЛЮЧЕВЫЕ ЦИТАТЫ ━━━
+"бежишь, тебе тяжело, на плече велосипед, ты его несёшь, не едешь, потому что цепь слов" — про техдолг как постоянный контекст
+"я боюсь, что есть примеры, где я не понимаю, что я не понимаю" — Андрей про слепые зоны с AI
+"должны какие-то триггеры быть, которые должны у меня в голове цзынкать" — Андрей про потребность в AI-насмотренности
+"нейронка просто стих написала по поводу review. Мы покекали" — про неудачный опыт с code review AI
+"самое главное, чтобы у разработчиков не вырабатывалось слепое доверие к нейронке" — Илья, ключевой риск
+"обезьяний труд — всегда есть, каждый раз сидишь и думаешь, господи, зачем я этим занимаюсь" — Андрей
+
+━━━ GOVERNANCE — ВАЖНАЯ НАХОДКА ━━━
+Единственное правило: данные не выносить за периметр компании.
+Есть инфраструктура для развёртывания локальных моделей внутри компании:
+  → серверы под генерацию картинок/моделей, текстовые модели, кодинговые модели
+  → Copilot куплен для всей команды тех. директором
+  → разработчики могут деплоить любые модели в рамках контура
+Это ВЫСОКИЙ feasibility для любых AI-инициатив в разработке — инфраструктура уже есть.
+
+━━━ ПРОЦЕССЫ — КАРТА ━━━
+Vision doc → ревью/оценка → Prodoc (правки) → декомпозиция/переоценка → разработка (архитектура + ревью → код → тестирование/стабилизация) → LiveOps
+Приоритизация: баги от игроков (через комьюнити) + QA + краш-аналитика → техлиды + продюсеры расставляют приоритеты
+Онбординг: 2-3 дня настройка среды, 2-3 дня учебные задачи, со следующей недели боевые
+
+━━━ AI В РАЗРАБОТКЕ — НЮАНСЫ ━━━
+Code review попробовали — не взлетело: формат вывода не тот, нужна интеграция с GitLab, промпты не отработаны. Потенциал есть, но "с полпинка не завелось".
+Codebase agent — Илья видит его как навигатор/указатель (не генератор кода): "агент выдал гипотезу, разработчик пошёл посмотрел". Риск: если разработчик не знает ответа, он не сможет провалидировать вывод AI.
+Vibe coding история: один из разработчиков создал среднеразмерное приложение через LLM за пару дней (рефакторинг + документация + юнит-тесты). Для прода не подходит — "будет страдать качество кода", но как прототип — работает.
+
+━━━ QUICK WINS ━━━
+1. Code review automation с интеграцией GitLab — уже пробовали, нужны правильные промпты + формат вывода
+2. Codebase navigation agent — "указатель" по кодовой базе (не генератор), per-component scope
+3. Документация для новых фич и сервисов — шаблоны + AI-генерация по структуре
+4. Задачи в Flowfast — автосоздание/заполнение по полям для типовых bug-репортов
+
+━━━ STRATEGIC BETS ━━━
+1. Внутренняя AI-платформа на базе уже существующей инфраструктуры локальных моделей
+2. AI-assisted рефакторинг техдолга (с человеческим надзором) — "велосипед несём на плече"
+3. Генерация юнит-тестов для нового кода
+
+━━━ РИСКИ ━━━
+⚠️ Слепое доверие к AI: разработчики использующие Copilot 10 раз для навигации, начнут доверять и для сложных архитектурных решений — нужна культура валидации
+⚠️ Контекстное окно vs. кодовая база: кодовая база слишком большая для полной загрузки → agent должен работать per-component
+⚠️ Саша — единственный явный AI-чемпион: если он уйдёт, импульс потеряется. Нужно формализовать передачу знаний
+
+━━━ НЕ СЕЙЧАС ━━━
+— Полная замена разработчика: "модели ещё не на том уровне"
+— Автогенерация production-кода: качество не устроит, нужен постоянный надзор`
+  }
+};
+
+function loadInterviewResults(deptId) {
+  const result = INTERVIEW_RESULTS[deptId];
+  if (!result) return;
+
+  deloitteScores = { ...result.deloitte };
+  ambassadorScores = { ...result.ambassador };
+  document.getElementById('notesArea').value = result.notes;
+  renderScores();
+
+  // Show banner
+  const banner = document.createElement('div');
+  banner.style.cssText = 'background:#14532d;color:#6ee7b7;padding:6px 12px;font-size:11px;font-weight:600;text-align:center;flex-shrink:0;border-bottom:1px solid #166534;';
+  banner.textContent = `✓ Загружены результаты интервью от ${result.date} — ${result.participants}`;
+  document.querySelector('.main').before(banner);
+  setTimeout(() => banner.remove(), 5000);
+}
+
+// Load results for default dept on start
+loadInterviewResults(currentDept);
+</script>
+</body>
+</html>
