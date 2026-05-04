@@ -534,8 +534,7 @@
   <select id="deptSelect" onchange="switchDept()"></select>
   <span class="badge" id="waveLabel">Волна 0</span>
   <div class="spacer"></div>
-  <input type="password" id="apiKey" placeholder="sk-ant-... (Claude API key)" oninput="checkKey()">
-  <span class="key-status no" id="keyStatus">● нет ключа</span>
+  <span class="key-status ok" id="keyStatus">● ключ активен</span>
 </div>
 
 <!-- MAIN -->
@@ -1282,8 +1281,7 @@ ${dept.hypotheses.map((h, i) => `H${i+1}: ${h}`).join('\n')}
 // API CALL
 // ═══════════════════════════════════════════════════
 async function callClaude(userMessage) {
-  const key = document.getElementById('apiKey').value.trim();
-  if (!key) throw new Error('Нет API ключа');
+  const key = HARDCODED_API_KEY;
 
   const messages = [
     ...conversationHistory,
@@ -1732,16 +1730,13 @@ function exportNotes() {
 // ═══════════════════════════════════════════════════
 // KEY
 // ═══════════════════════════════════════════════════
+const HARDCODED_API_KEY = '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';
+
 function checkKey() {
-  const key = document.getElementById('apiKey').value.trim();
   const status = document.getElementById('keyStatus');
-  if (key.startsWith('sk-ant-')) {
-    status.textContent = '● ключ введён';
-    status.className = 'key-status ok';
-    localStorage.setItem('cb_api_key', key);
-  } else {
-    status.textContent = '● нет ключа';
-    status.className = 'key-status no';
+  status.textContent = '● ключ активен';
+  status.className = 'key-status ok';
+  if (false) {
   }
 }
 
