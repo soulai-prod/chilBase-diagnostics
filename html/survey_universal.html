@@ -256,6 +256,24 @@ h1,h2,h3,h4 { font-family:'Space Grotesk',sans-serif; line-height:1.2; }
 /* ─── BLOCKS ─── */
 .block { display:none; }
 .block.active { display:block; }
+
+@media (max-width: 640px) {
+  .header { padding: 1rem; flex-wrap: wrap; gap: .5rem; }
+  .header-tag { font-size: .75rem; padding: .2rem .6rem; }
+  .main { padding: 1.5rem 1rem 3rem; }
+  .block-title { font-size: 1.4rem; }
+  .progress-steps { gap: .3rem; }
+  .step-dot { width: 22px; height: 22px; font-size: .62rem; }
+  .likert-btn { width: 36px; height: 36px; font-size: .85rem; }
+  .opt-text { font-size: .88rem; }
+  .nav-row { flex-direction: column; gap: .75rem; }
+  .nav-row .btn { width: 100%; text-align: center; }
+  .goal-pills { flex-wrap: wrap; }
+  textarea { font-size: 16px; } /* prevents iOS zoom */
+  select { font-size: 16px; }
+  input[type=text], input[type=email] { font-size: 16px; }
+  .section-select-row { flex-direction: column; }
+}
 </style>
 </head>
 <body>
