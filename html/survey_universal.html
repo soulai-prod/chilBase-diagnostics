@@ -693,11 +693,61 @@ h1,h2,h3,h4 { font-family:'Space Grotesk',sans-serif; line-height:1.2; }
   </div>
 
   <!-- ══════════════════════════════════
-       БЛОК 5 — АМБАССАДОРСКИЙ ПОТЕНЦИАЛ
+       БЛОК 4.5 — ЧЕСТНЫЙ ОПЫТ С AI
   ══════════════════════════════════ -->
   <div class="block" id="block-5">
     <div class="block-header">
       <div class="block-label">Блок 5 · 4 вопроса</div>
+      <h1 class="block-title">Честный опыт с AI</h1>
+      <p class="block-sub">Нас интересует не только то, что работает — но и то, что не работает. Это самая важная часть для понимания реальной картины.</p>
+      <div class="goal-pills">
+        <span class="goal-pill g2">Профиль AI-зрелости</span>
+        <span class="goal-pill g1">Список инициатив</span>
+      </div>
+    </div>
+
+    <!-- Q5new.1 -->
+    <div class="question open-q">
+      <div class="q-label"><span class="q-num">1</span>Что из попробованного с AI у вас <strong>не сработало</strong>? <span class="q-optional">необязательно, но ценно</span></div>
+      <textarea id="q5n_1" placeholder="Например: пробовал(а) использовать ChatGPT для X, но результат не подошёл потому что... / Пробовал(а) автоматизировать Y, но..."></textarea>
+    </div>
+
+    <!-- Q5new.2 -->
+    <div class="question open-q">
+      <div class="q-label"><span class="q-num">2</span>Есть ли ситуации, где AI вам <strong>мешает или замедляет</strong> работу — а не помогает? <span class="q-optional">необязательно</span></div>
+      <textarea id="q5n_2" placeholder="Например: приходится перепроверять каждый результат, что занимает больше времени чем без AI / Коллеги присылают AI-тексты, которые нужно полностью переписывать..."></textarea>
+    </div>
+
+    <!-- Q5new.3 -->
+    <div class="question open-q">
+      <div class="q-label"><span class="q-num">3</span>Вспомните конкретный случай, когда применение AI <strong>не дало ожидаемого результата</strong> за последние несколько месяцев. Что произошло? <span class="q-optional">необязательно</span></div>
+      <textarea id="q5n_3" placeholder="Любой случай — рабочий или личный. Чем честнее, тем полезнее для анализа."></textarea>
+    </div>
+
+    <!-- Q5new.4 -->
+    <div class="question">
+      <div class="q-label"><span class="q-num">4</span>Как вы в целом относитесь к AI на рабочем месте прямо сейчас?</div>
+      <div class="options" data-type="radio" data-id="q5n_4">
+        <label class="opt"><input type="radio" name="q5n_4" value="enthusiast"><div class="opt-marker"></div><span class="opt-text">Использую активно — вижу реальную пользу</span></label>
+        <label class="opt"><input type="radio" name="q5n_4" value="curious"><div class="opt-marker"></div><span class="opt-text">Интересуюсь, пробую — но результаты нестабильные</span></label>
+        <label class="opt"><input type="radio" name="q5n_4" value="skeptic"><div class="opt-marker"></div><span class="opt-text">Скептически — пока не убедился(ась) в ценности</span></label>
+        <label class="opt"><input type="radio" name="q5n_4" value="concerned"><div class="opt-marker"></div><span class="opt-text">Настороженно — вижу риски или негативные стороны</span></label>
+        <label class="opt"><input type="radio" name="q5n_4" value="neutral"><div class="opt-marker"></div><span class="opt-text">Нейтрально — это просто инструмент, не более</span></label>
+      </div>
+    </div>
+
+    <div class="nav-row">
+      <button class="btn btn-secondary" onclick="prevBlock(5)">← Назад</button>
+      <button class="btn btn-primary" onclick="nextBlock(5)">Далее →</button>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════
+       БЛОК 6 — АМБАССАДОРСКИЙ ПОТЕНЦИАЛ
+  ══════════════════════════════════ -->
+  <div class="block" id="block-6">
+    <div class="block-header">
+      <div class="block-label">Блок 6 · 4 вопроса</div>
       <h1 class="block-title">Готовность к изменениям</h1>
       <p class="block-sub">Этот блок помогает понять, кто готов стать AI-амбассадором — первопроходцем, который поможет внедрить инструменты в своём отделе.</p>
       <div class="goal-pills">
@@ -755,44 +805,50 @@ h1,h2,h3,h4 { font-family:'Space Grotesk',sans-serif; line-height:1.2; }
     </div>
 
     <div class="nav-row">
-      <button class="btn btn-secondary" onclick="prevBlock(5)">← Назад</button>
-      <button class="btn btn-primary" onclick="nextBlock(5)">Далее →</button>
+      <button class="btn btn-secondary" onclick="prevBlock(6)">← Назад</button>
+      <button class="btn btn-primary" onclick="nextBlock(6)">Далее →</button>
     </div>
   </div>
 
   <!-- ══════════════════════════════════
-       БЛОК 6 — ОТКРЫТЫЕ ВОПРОСЫ
+       БЛОК 7 — ОТКРЫТЫЕ ВОПРОСЫ
   ══════════════════════════════════ -->
-  <div class="block" id="block-6">
+  <div class="block" id="block-7">
     <div class="block-header">
-      <div class="block-label">Блок 6 · 3 вопроса · финальный</div>
+      <div class="block-label">Блок 7 · 4 вопроса · финальный</div>
       <h1 class="block-title">Ваши мысли</h1>
       <p class="block-sub">Открытые вопросы — необязательные, но самые ценные. Именно здесь появляются неочевидные идеи.</p>
     </div>
 
-    <!-- Q6.1 -->
+    <!-- Q7.1 -->
     <div class="question open-q">
       <div class="q-label"><span class="q-num">1</span>Если бы вы могли устранить одну рутину в своей работе прямо сейчас — что бы это было?</div>
       <textarea id="q6_1" placeholder="Опишите задачу, которую ненавидите делать вручную..."></textarea>
     </div>
 
-    <!-- Q6.2 -->
+    <!-- Q7.2 -->
     <div class="question open-q">
-      <div class="q-label"><span class="q-num">2</span>Какую задачу вашего отдела AI мог бы помочь решить первым делом?</div>
-      <textarea id="q6_2" placeholder="Любая идея — даже нереалистичная на первый взгляд..."></textarea>
+      <div class="q-label"><span class="q-num">2</span>Что в вашей работе точно <strong>НЕ стоит</strong> автоматизировать или отдавать AI? Почему?</div>
+      <textarea id="q6_2" placeholder="Например: принятие определённых решений, живое общение с командой, оценка творческих работ..."></textarea>
     </div>
 
-    <!-- Q6.3 -->
+    <!-- Q7.3 -->
+    <div class="question open-q">
+      <div class="q-label"><span class="q-num">3</span>Что бы вы хотели сказать команде, которая будет внедрять AI в ChillBase? Что важно не упустить?</div>
+      <textarea id="q6_3" placeholder="Любые мысли, опасения, пожелания — это остаётся внутри команды и помогает сделать внедрение честным..."></textarea>
+    </div>
+
+    <!-- Q7.4 -->
     <div class="question open-q">
       <div class="q-label">
-        <span class="q-num">3</span>Ваше имя (если готовы участвовать в пилоте)
+        <span class="q-num">4</span>Ваше имя (если готовы участвовать в пилоте)
         <span class="q-optional">необязательно</span>
       </div>
-      <textarea id="q6_3" rows="1" style="min-height:48px; resize:none;" placeholder="Имя и отдел — только если хотите, чтобы с вами связались по поводу пилота..."></textarea>
+      <textarea id="q6_4" rows="1" style="min-height:48px; resize:none;" placeholder="Имя и отдел — только если хотите, чтобы с вами связались по поводу пилота..."></textarea>
     </div>
 
     <div class="nav-row">
-      <button class="btn btn-secondary" onclick="prevBlock(6)">← Назад</button>
+      <button class="btn btn-secondary" onclick="prevBlock(7)">← Назад</button>
       <button class="btn btn-submit" onclick="submitSurvey()">Отправить ответы</button>
     </div>
   </div>
@@ -813,13 +869,14 @@ h1,h2,h3,h4 { font-family:'Space Grotesk',sans-serif; line-height:1.2; }
 <script>
 // ─── BLOCKS CONFIG ───────────────────────────────────────
 const BLOCKS = [
-  { label: 'Восприятие', short: '0' },
-  { label: 'Профиль',    short: '1' },
-  { label: 'Рутина',     short: '2' },
-  { label: 'AI-грамотность', short: '3' },
-  { label: 'AI сейчас', short: '4' },
-  { label: 'Амбассадор', short: '5' },
-  { label: 'Открытые',  short: '6' },
+  { label: 'Восприятие',    short: '0' },
+  { label: 'Профиль',       short: '1' },
+  { label: 'Рутина',        short: '2' },
+  { label: 'AI-грамотность',short: '3' },
+  { label: 'AI сейчас',     short: '4' },
+  { label: 'Честный опыт',  short: '5' },
+  { label: 'Амбассадор',    short: '6' },
+  { label: 'Открытые',      short: '7' },
 ];
 let currentBlock = 0;
 const answers = {};
