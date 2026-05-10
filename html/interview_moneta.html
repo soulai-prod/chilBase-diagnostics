@@ -22,6 +22,8 @@
   --gold: #D4A017;
   --gold-pale: #FFF8E7;
   --gold-border: #FDEAA7;
+  --score-1: #E74C3C; --score-2: #F39C12; --score-3: #F1C40F;
+  --score-4: #2ECC71; --score-5: #1B9E5A;
 }
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text-dark); min-height: 100vh; }
@@ -80,6 +82,13 @@ body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--tex
 .context-block ul li { font-size: .82rem; padding: .2rem 0; padding-left: 1rem; position: relative; }
 .context-block ul li::before { content: '\2192'; position: absolute; left: 0; color: var(--ocean-mid); opacity: .5; font-size: .72rem; }
 
+/* HYPOTHESES */
+.hypo-grid { display: flex; flex-direction: column; gap: .7rem; }
+.hypo-card { display: grid; grid-template-columns: 32px 1fr 1fr; gap: .8rem; align-items: start; padding: .8rem 1rem; background: var(--gold-pale); border: 1px solid var(--gold-border); border-radius: 10px; }
+.hypo-num { width: 28px; height: 28px; border-radius: 50%; background: var(--gold); color: #1a1200; display: flex; align-items: center; justify-content: center; font-size: .75rem; font-weight: 700; flex-shrink: 0; }
+.hypo-text { font-size: .83rem; font-weight: 500; }
+.hypo-goal { font-size: .78rem; color: var(--text-mid); }
+
 /* WAVES */
 .wave-header { display: flex; align-items: center; gap: 1rem; padding: 1.1rem 1.5rem; cursor: pointer; user-select: none; }
 .wave-header:hover { background: var(--ocean-pale); }
@@ -104,11 +113,81 @@ body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--tex
 .psycho-note { background: #E8F5E9; border-left: 3px solid #27AE60; padding: .75rem 1rem; border-radius: 0 8px 8px 0; font-size: .82rem; margin-bottom: 1rem; }
 
 /* ARTIFACTS */
-.artifact-table { width: 100%; border-collapse: collapse; font-size: .8rem; }
+.artifact-section { background: #F8F9FA; border-radius: 12px; padding: 1.5rem; margin-bottom: 1.5rem; }
+.artifact-section.gold-art { background: #FFFDF5; border: 1px solid var(--gold-border); }
+.artifact-section-title {
+  font-family: 'Space Grotesk', sans-serif; font-size: .95rem; font-weight: 700;
+  color: var(--ocean-deep); margin-bottom: 1rem;
+  display: flex; align-items: center; gap: .5rem;
+}
+.artifact-section-title .art-num {
+  width: 24px; height: 24px; border-radius: 50%; background: var(--gold);
+  color: #1a1200; font-size: .72rem; font-weight: 700;
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.artifact-sub { font-family: 'Space Grotesk', sans-serif; font-size: .75rem; font-weight: 600; text-transform: uppercase; letter-spacing: .08em; color: #856404; margin-bottom: .6rem; margin-top: 1rem; }
+
+.artifact-table { width: 100%; border-collapse: collapse; font-size: .8rem; margin-bottom: 1rem; }
 .artifact-table th { background: #1a1200; color: #fff; padding: .5rem .7rem; text-align: left; font-size: .72rem; font-weight: 600; }
-.artifact-table td { padding: .5rem .7rem; border-bottom: 1px solid var(--border); background: var(--white); }
+.artifact-table td { padding: .5rem .7rem; border-bottom: 1px solid var(--border); background: var(--white); vertical-align: middle; }
+.artifact-table td:first-child { font-weight: 500; }
 .fill-field { width: 100%; min-height: 22px; border: none; border-bottom: 1px dashed var(--border); background: transparent; font-size: .8rem; font-family: 'Inter', sans-serif; outline: none; }
 .fill-field:focus { border-bottom-color: var(--gold); }
+
+/* MATURITY SCORE */
+.score-input { display: flex; gap: .3rem; align-items: center; }
+.score-btn {
+  width: 28px; height: 28px; border-radius: 50%; border: 2px solid #ddd;
+  background: transparent; font-size: .75rem; font-weight: 700; cursor: pointer;
+  display: flex; align-items: center; justify-content: center; transition: all .2s; color: #999;
+}
+.score-btn:hover { border-color: var(--gold); color: var(--gold); }
+.score-btn.s1.selected { background: var(--score-1); border-color: var(--score-1); color: #fff; }
+.score-btn.s2.selected { background: var(--score-2); border-color: var(--score-2); color: #fff; }
+.score-btn.s3.selected { background: var(--score-3); border-color: var(--score-3); color: #333; }
+.score-btn.s4.selected { background: var(--score-4); border-color: var(--score-4); color: #fff; }
+.score-btn.s5.selected { background: var(--score-5); border-color: var(--score-5); color: #fff; }
+.score-label { font-size: .72rem; color: var(--text-mid); min-width: 60px; margin-left: .3rem; }
+
+/* AMBASSADOR */
+.ambassador-card { background: var(--white); border: 1px solid var(--gold-border); border-radius: 10px; padding: 1rem 1.2rem; margin-bottom: .8rem; }
+.ambassador-name { font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: .9rem; color: var(--ocean-deep); margin-bottom: .8rem; display: flex; align-items: center; gap: .5rem; }
+.ambassador-grid { display: grid; grid-template-columns: 1fr 1fr; gap: .6rem; }
+.amb-row { display: flex; flex-direction: column; gap: .3rem; }
+.amb-label { font-size: .72rem; color: var(--text-mid); }
+.amb-score-total { margin-top: .8rem; padding-top: .8rem; border-top: 1px solid var(--gold-border); display: flex; align-items: center; gap: 1rem; }
+.amb-total-num { font-family: 'Space Grotesk', sans-serif; font-size: 1.4rem; font-weight: 700; color: var(--gold); }
+.amb-total-label { font-size: .78rem; color: var(--text-mid); }
+.champion-badge { padding: .2rem .7rem; border-radius: 20px; font-size: .72rem; font-weight: 700; }
+.champion { background: #e6f7ee; color: #1a7a4a; border: 1px solid #a8dfc0; }
+.advocate { background: #e8f4fd; color: #1B6B93; border: 1px solid #B3D9F5; }
+.curious { background: #FFF8E7; color: #856404; border: 1px solid #FDEAA7; }
+.observer { background: #f5f5f5; color: #777; border: 1px solid #ddd; }
+
+.amb-extra-table { width: 100%; border-collapse: collapse; font-size: .8rem; }
+.amb-extra-table th { background: var(--gold); color: #1a1200; padding: .5rem .7rem; text-align: left; font-size: .72rem; font-weight: 600; }
+.amb-extra-table td { padding: .5rem .7rem; border-bottom: 1px solid var(--border); background: var(--white); }
+
+/* IMPACT-FEASIBILITY */
+.matrix-table { width: 100%; border-collapse: collapse; font-size: .8rem; margin-bottom: 1rem; }
+.matrix-table th { background: var(--gold); color: #1a1200; padding: .5rem .7rem; text-align: left; font-size: .72rem; font-weight: 600; }
+.matrix-table td { padding: .55rem .7rem; border-bottom: 1px solid var(--border); background: var(--white); vertical-align: middle; }
+.quadrant-legend { display: grid; grid-template-columns: 1fr 1fr; gap: .6rem; margin-top: 1rem; }
+.q-legend-item { padding: .6rem .8rem; border-radius: 8px; font-size: .78rem; }
+.q-legend-item strong { display: block; font-family: 'Space Grotesk', sans-serif; font-size: .8rem; margin-bottom: .2rem; }
+.ql1 { background: #e6f7ee; color: #1a7a4a; } .ql2 { background: #e8f4fd; color: #1B6B93; }
+.ql3 { background: #FFF8E7; color: #856404; } .ql4 { background: #f5f5f5; color: #777; }
+.feasibility-mini { display: grid; grid-template-columns: 1fr 1fr; gap: .5rem; margin-top: .8rem; }
+.f-item { background: var(--white); border: 1px solid var(--border); border-radius: 8px; padding: .5rem .7rem; }
+.f-item-label { font-size: .72rem; color: var(--text-mid); margin-bottom: .3rem; }
+
+/* TIMING */
+.timing-list { display: flex; flex-direction: column; gap: .5rem; }
+.timing-item { display: flex; align-items: center; gap: 1rem; padding: .6rem 1rem; background: var(--gold-pale); border-radius: 8px; }
+.timing-time { font-family: 'Space Grotesk', sans-serif; font-size: .8rem; font-weight: 700; color: #856404; white-space: nowrap; min-width: 110px; }
+.timing-label { font-size: .83rem; }
+.timing-mark { margin-left: auto; }
+.timing-mark input[type=checkbox] { width: 16px; height: 16px; cursor: pointer; }
 
 .print-btn { position: fixed; bottom: 2rem; right: 2rem; background: var(--gold); color: #1a1200; border: none; border-radius: 50px; padding: .65rem 1.3rem; cursor: pointer; font-family: 'Inter', sans-serif; font-size: .82rem; font-weight: 600; box-shadow: 0 4px 20px rgba(212,160,23,.4); display: flex; align-items: center; gap: .5rem; transition: all .2s; z-index: 100; }
 .print-btn:hover { transform: translateY(-2px); }
@@ -120,7 +199,7 @@ body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--tex
   .section-body, .wave-body { display: block !important; }
 }
 
-/* ── MOBILE ─────────────────────────────── */
+/* MOBILE */
 .mobile-bar {
   display: none;
   align-items: center; gap: .75rem;
@@ -193,23 +272,36 @@ body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--tex
   <div class="sidebar-logo">
     <div class="brand">ChillBase · AI Audit</div>
     <div class="dept">Moneta</div>
-    <div class="meta">30 мин · Монетизация</div>
+    <div class="meta">35 мин · Монетизация</div>
   </div>
 
   <div class="nav-section">
-    <div class="nav-label">Навигация</div>
-    <a class="nav-item" href="#context"><span class="wave-num">📋</span>Контекст</a>
+    <div class="nav-label">Подготовка</div>
+    <a class="nav-item active" href="#context"><span class="wave-num">📋</span>Контекст</a>
+    <a class="nav-item" href="#hypotheses"><span class="wave-num">💡</span>Гипотезы</a>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-label">Интервью</div>
     <a class="nav-item" href="#wave0"><span class="wave-num">0</span>Раппорт</a>
     <a class="nav-item" href="#wave1"><span class="wave-num">1</span>Карта процессов</a>
     <a class="nav-item" href="#wave2"><span class="wave-num">2</span>Боли и разрывы</a>
     <a class="nav-item" href="#wave3"><span class="wave-num">3</span>AI Сигналы</a>
-    <a class="nav-item" href="#artifacts"><span class="wave-num">✓</span>Артефакты</a>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-label">Артефакты</div>
+    <a class="nav-item" href="#art1"><span class="wave-num">①</span>Карта процессов</a>
+    <a class="nav-item" href="#art2"><span class="wave-num">②</span>AI-зрелость</a>
+    <a class="nav-item" href="#art3"><span class="wave-num">③</span>Амбассадоры</a>
+    <a class="nav-item" href="#art4"><span class="wave-num">④</span>Инициативы</a>
+    <a class="nav-item" href="#timing"><span class="wave-num">⏱</span>Тайминг</a>
   </div>
 
   <div class="sidebar-timer">
     <div class="timer-label">Таймер</div>
     <div class="timer-display" id="timerDisplay">00:00</div>
-    <button class="timer-btn" onclick="toggleTimer()">▶ Старт</button>
+    <button class="timer-btn" id="timerBtn" onclick="toggleTimer()">▶ Старт</button>
   </div>
 </aside>
 
@@ -222,11 +314,11 @@ body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--tex
       <div class="subtitle">ChillBase · Продукт монетизации</div>
       <div class="meta-grid">
         <div class="meta-item"><div class="label">Формат</div><div class="value">1:1 / индивидуальное</div></div>
-        <div class="meta-item"><div class="label">Длительность</div><div class="value">30 минут</div></div>
+        <div class="meta-item"><div class="label">Длительность</div><div class="value">35 минут</div></div>
         <div class="meta-item"><div class="label">Продукт</div><div class="value">Moneta (Монетизация)</div></div>
       </div>
     </div>
-    <div class="duration-badge">⏱ 30 мин</div>
+    <div class="duration-badge">⏱ 35 мин</div>
   </div>
 
   <!-- CONTEXT -->
@@ -249,7 +341,7 @@ body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--tex
             </ul>
           </div>
           <div class="context-block gold">
-            <h4>Гипотезы для проверки</h4>
+            <h4>Известные сигналы</h4>
             <ul>
               <li>Решения о ценообразовании и офферах принимаются без ML-прогноза</li>
               <li>Нет A/B тестирования на масштабе или оно медленное</li>
@@ -258,11 +350,31 @@ body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--tex
             </ul>
           </div>
           <div class="context-block full">
-            <h4>Психотип — определи в первые 2–3 мин</h4>
+            <h4>Психотип — определи в первые 2-3 мин</h4>
             <div class="psycho-note">
               Монетизация — обычно Аналитики (метрики, LTV, ARPU) или Скептики (защищают "справедливую монетизацию"). <strong>Если скептик</strong> — начинай с конкретных процессов, не оценок. <strong>Если аналитик</strong> — говори числами: «сколько времени», «какой процент», «как часто». <strong>Красный флаг:</strong> «у нас хорошая монетизация, игроки довольны» — проби через инциденты и упущенную выручку.
             </div>
           </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- HYPOTHESES -->
+  <div class="section" id="hypotheses">
+    <div class="section-card">
+      <div class="section-header" onclick="toggleSection(this)">
+        <div class="section-icon">💡</div>
+        <div><div class="section-title">Гипотезы для проверки</div><div class="section-sub">5 предположений — подтвердить или опровергнуть за 35 мин</div></div>
+        <span class="section-toggle open">▼</span>
+      </div>
+      <div class="section-body">
+        <div class="hypo-grid">
+          <div class="hypo-card"><div class="hypo-num">H1</div><div class="hypo-text">Ценообразование и офферы строятся без predictive-модели — решения принимаются на исторических данных + интуиции</div><div class="hypo-goal">Проверить: Q1.1, Q2.3 — есть ли модель или хотя бы её зачатки</div></div>
+          <div class="hypo-card"><div class="hypo-num">H2</div><div class="hypo-text">A/B тестирование офферов либо отсутствует, либо цикл слишком длинный (недели вместо дней)</div><div class="hypo-goal">Проверить: Q1.4 — кто запускает, сколько времени, как интерпретируют</div></div>
+          <div class="hypo-card"><div class="hypo-num">H3</div><div class="hypo-text">Аналитика LiveOps приходит с задержкой 24-48ч+ — команда не может оперативно корректировать события</div><div class="hypo-goal">Проверить: Q1.3 — какие метрики, как быстро после запуска</div></div>
+          <div class="hypo-card"><div class="hypo-num">H4</div><div class="hypo-text">ML-комбинатор офферов остановлен — ресурсы или приоритеты не позволяют перезапустить</div><div class="hypo-goal">Проверить: Q3.1 — что именно остановило, можно ли перезапустить проще</div></div>
+          <div class="hypo-card"><div class="hypo-num">H5</div><div class="hypo-text">Персонализация монетизации по сегментам игроков минимальна — один оффер для всех или ручная сегментация</div><div class="hypo-goal">Проверить: Q2.2 — какие сегменты, есть ли динамическое предложение</div></div>
         </div>
       </div>
     </div>
@@ -274,7 +386,7 @@ body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--tex
       <div class="wave-header" onclick="toggleWave(this)">
         <span class="wave-badge wave-0">Волна 0</span>
         <div><div class="wave-title">Раппорт</div></div>
-        <span class="wave-time">⏱ 0:00 – 0:05</span>
+        <span class="wave-time">⏱ 0:00 – 0:03</span>
         <span class="section-toggle open" style="margin-left:1rem">▼</span>
       </div>
       <div class="wave-body">
@@ -282,6 +394,7 @@ body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--tex
           <div class="q-num">Открывающий вопрос</div>
           <div class="q-text">«Монетизация — это постоянное напряжение между тем, что хочет игрок, и тем, что нужно бизнесу. Где сейчас это напряжение выше всего — в механиках, в данных для решений, или в скорости реакции на рынок?»</div>
           <div class="q-note">Слушай: "механики" → проблема в дизайне и экономике. "Данные" → аналитический разрыв. "Скорость реакции" → LiveOps операционные ограничения. Это определит фокус волны 2.</div>
+          <div class="q-note probe" style="margin-top:.3rem">→ Проба: если ответ общий — «А если конкретнее: за последний месяц, что отняло больше всего времени или нервов?»</div>
         </div>
       </div>
     </div>
@@ -293,28 +406,32 @@ body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--tex
       <div class="wave-header" onclick="toggleWave(this)">
         <span class="wave-badge wave-1">Волна 1</span>
         <div><div class="wave-title">Карта процессов</div></div>
-        <span class="wave-time">⏱ 0:05 – 0:15</span>
+        <span class="wave-time">⏱ 0:03 – 0:13</span>
         <span class="section-toggle open" style="margin-left:1rem">▼</span>
       </div>
       <div class="wave-body">
         <div class="question-block">
           <div class="q-num">1.1 Монетизационный календарь</div>
           <div class="q-text">«Как планируется монетизационный календарь на следующий месяц? Откуда берутся данные для решений — прогнозные модели, исторические паттерны, интуиция команды?»</div>
-          <div class="q-note money">→ Если «исторические данные + интуиция» — значит нет predictive модели. Большой AI-кейс.</div>
+          <div class="q-note money">→ Если «исторические данные + интуиция» — значит нет predictive модели. Большой AI-кейс. (H1)</div>
+          <div class="q-note probe" style="margin-top:.3rem">→ Проба: «Сколько офферов/событий в типичном месяце? Кто финально утверждает календарь?»</div>
         </div>
         <div class="question-block">
           <div class="q-num">1.2 Путь нового оффера</div>
           <div class="q-text">«Возьмём последний новый оффер или пакет — от идеи до запуска. Кто участвует, сколько времени занимает каждый этап: дизайн механики, согласование цены, технический запуск, QA?»</div>
           <div class="q-note">Ищи: где ручная работа, где ожидание чужих ресурсов, где узкое место.</div>
+          <div class="q-note probe" style="margin-top:.3rem">→ Проба: «Какой этап можно было бы сократить в 2 раза, если бы были ресурсы/инструменты?»</div>
         </div>
         <div class="question-block">
           <div class="q-num">1.3 Измерение эффективности</div>
           <div class="q-text">«Как вы понимаете, что монетизационное событие сработало? Какие метрики смотрите, как быстро они появляются после запуска?»</div>
-          <div class="q-note">Если данные приходят с задержкой 24–48 ч+ — нет real-time реакции на перфоманс. Зафиксируй.</div>
+          <div class="q-note">Если данные приходят с задержкой 24-48 ч+ — нет real-time реакции на перфоманс. Зафиксируй. (H3)</div>
+          <div class="q-note probe" style="margin-top:.3rem">→ Проба: «Бывает, что результат уже виден, но данные ещё не пришли — и вы просто ждёте?»</div>
         </div>
         <div class="question-block">
           <div class="q-num">1.4 A/B тестирование</div>
           <div class="q-text">«Проводите A/B тесты по ценообразованию или офферам? Как устроен процесс — кто запускает, сколько времени занимает, кто интерпретирует результат?»</div>
+          <div class="q-note probe">→ Проба: «Сколько A/B тестов по монетизации запустили за последние 3 месяца? Какой процент офферов проходит через A/B?» (H2)</div>
         </div>
         <div class="interim-note">💰 Промежуточный вывод: зафиксируй — есть ли predictive модель, какова задержка данных, сколько времени от идеи до запуска оффера.</div>
       </div>
@@ -327,7 +444,7 @@ body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--tex
       <div class="wave-header" onclick="toggleWave(this)">
         <span class="wave-badge wave-2">Волна 2</span>
         <div><div class="wave-title">Боли и разрывы</div></div>
-        <span class="wave-time">⏱ 0:15 – 0:23</span>
+        <span class="wave-time">⏱ 0:13 – 0:25</span>
         <span class="section-toggle open" style="margin-left:1rem">▼</span>
       </div>
       <div class="wave-body">
@@ -340,17 +457,37 @@ body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--tex
         <div class="question-block">
           <div class="q-num">2.2 Упущенная выручка</div>
           <div class="q-text">«Где деньги остаются на столе — есть сегменты игроков или окна, в которые могли бы монетизироваться лучше, но не получается? Из-за чего?»</div>
-          <div class="q-note probe">→ Проба: «Это технические ограничения, отсутствие данных, или нехватка ресурса команды?»</div>
+          <div class="q-note probe">→ Проба: «Это технические ограничения, отсутствие данных, или нехватка ресурса команды?» (H5 — сегментация)</div>
         </div>
         <div class="question-block">
           <div class="q-num">2.3 Решения без данных</div>
           <div class="q-text">«Какие решения по монетизации вы принимаете интуитивно — потому что данных нет или они запаздывают? Приведите последний пример.»</div>
-          <div class="q-note money">→ Если таких много — это главный AI-кейс: predictive pricing, сегментация, LTV-прогноз.</div>
+          <div class="q-note money">→ Если таких много — это главный AI-кейс: predictive pricing, сегментация, LTV-прогноз. (H1)</div>
         </div>
         <div class="question-block">
           <div class="q-num">2.4 Баланс и overmonetization</div>
           <div class="q-text">«Как понимаете, что монетизационная механика справедливая для игрока? Есть ли внутренний сигнал или метрика, что вы перешли черту?»</div>
           <div class="q-note">Это выявляет governance-зрелость и наличие player-centric метрик. Важно для Deloitte-фреймворка.</div>
+        </div>
+
+        <!-- STRESS-TEST SCENARIOS -->
+        <div class="depth-note" style="margin-top:1.2rem">⚡ <strong>Стресс-тест сценарии:</strong> проверяем хрупкость системы при масштабировании.</div>
+        <div class="question-block">
+          <div class="q-num">2.5 Сценарий: x3 DAU</div>
+          <div class="q-text">«Предположим, DAU вырос в 3 раза за 3 месяца. Что в монетизации ломается первым — A/B тестирование не масштабируется, офферный пайплайн не успевает, аналитика захлёбывается?»</div>
+          <div class="q-note probe">→ Проба: «А ценообразование? Текущие цены работают при x3 аудитории, или нужна другая сегментация?»</div>
+        </div>
+        <div class="question-block">
+          <div class="q-num">2.6 Сценарий: ключевой человек уходит</div>
+          <div class="q-text">«Человек, который лучше всего понимает pricing-логику и экономику офферов, уходит завтра. Что происходит? Где знания — в голове, в документах, в системе?»</div>
+          <div class="q-note probe">→ Проба: «Сколько времени займёт нового человека выйти на тот же уровень решений?»</div>
+        </div>
+
+        <!-- GOVERNANCE QUESTION -->
+        <div class="question-block">
+          <div class="q-num">2.7 Governance: данные и pricing</div>
+          <div class="q-text">«Кто имеет доступ к финансовым данным по монетизации — выручке по офферам, LTV по сегментам, ценовой истории? Есть ли ограничения, кто может менять цены в продакшне?»</div>
+          <div class="q-note money">→ Data governance для pricing — критично для AI: если данные разрозненны или доступ ограничен, predictive модель не построить. Зафиксируй для Артефакта 2.</div>
         </div>
       </div>
     </div>
@@ -362,54 +499,321 @@ body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--tex
       <div class="wave-header" onclick="toggleWave(this)">
         <span class="wave-badge wave-3">Волна 3</span>
         <div><div class="wave-title">AI Сигналы</div></div>
-        <span class="wave-time">⏱ 0:23 – 0:29</span>
+        <span class="wave-time">⏱ 0:25 – 0:32</span>
         <span class="section-toggle open" style="margin-left:1rem">▼</span>
       </div>
       <div class="wave-body">
         <div class="question-block">
           <div class="q-num">3.1 Текущее использование AI</div>
           <div class="q-text">«Используете AI-инструменты в работе? Chill-AI, прогнозные модели, ChatGPT, что-то другое? Для чего конкретно?»</div>
-          <div class="q-note">Если упомянут ML-комбинатор — спроси: «Он сейчас работает? Что остановило развитие?»</div>
+          <div class="q-note">Если упомянут ML-комбинатор — спроси: «Он сейчас работает? Что остановило развитие?» (H4)</div>
+          <div class="q-note probe" style="margin-top:.3rem">→ Проба: «Как часто используете? Каждый день, раз в неделю, или по случаю?»</div>
         </div>
         <div class="question-block">
           <div class="q-num">3.2 Приоритет AI-автоматизации</div>
           <div class="q-text">«Из этого списка — что было бы ценнее всего автоматизировать: прогноз выручки по офферам, сегментация игроков для персональных предложений, real-time оптимизация цены, или что-то другое?»</div>
-          <div class="q-note money">→ Ответ напрямую ляжет в Impact-Feasibility Matrix (Артефакт 1). Запиши дословно.</div>
+          <div class="q-note money">→ Ответ напрямую ляжет в Impact-Feasibility Matrix (Артефакт 4). Запиши дословно.</div>
         </div>
         <div class="question-block">
           <div class="q-num">3.3 Готовность к пилоту</div>
           <div class="q-text">«Если бы sfer.ai запустила AI-пилот в монетизации — что должно быть в нём, чтобы вы сказали "да, нам это нужно"?»</div>
+          <div class="q-note probe">→ Проба: «Кто в команде был бы первым пользователем? Кого бы вы порекомендовали как "того, кто точно попробует"?» — для Артефакта 3 (амбассадоры).</div>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- ARTIFACTS -->
-  <div class="section" id="artifacts">
+  <!-- ARTIFACT 1 — Process Map -->
+  <div class="section" id="art1">
     <div class="section-card">
       <div class="section-header" onclick="toggleSection(this)">
-        <div class="section-icon">✍️</div>
-        <div><div class="section-title">Фиксация по итогам</div><div class="section-sub">Заполни сразу после интервью</div></div>
+        <div class="section-icon">①</div>
+        <div><div class="section-title">Артефакт 1 — Карта процессов монетизации</div><div class="section-sub">Заполнять во время интервью</div></div>
         <span class="section-toggle open">▼</span>
       </div>
       <div class="section-body">
-        <table class="artifact-table">
-          <thead><tr><th>Параметр</th><th>Запись</th></tr></thead>
-          <tbody>
-            <tr><td>Имя / роль</td><td><input class="fill-field" placeholder=""></td></tr>
-            <tr><td>Психотип</td><td><input class="fill-field" placeholder="Аналитик / Скептик / Энтузиаст / Исполнитель"></td></tr>
-            <tr><td>Главное напряжение (из открывающего вопроса)</td><td><input class="fill-field" placeholder="Механики / Данные / Скорость реакции"></td></tr>
-            <tr><td>Есть ли predictive модель?</td><td><input class="fill-field" placeholder="Да / Нет / Частично"></td></tr>
-            <tr><td>Задержка данных после запуска оффера</td><td><input class="fill-field" placeholder="часов / дней"></td></tr>
-            <tr><td>Инцидент — когда не сработало</td><td><input class="fill-field" placeholder=""></td></tr>
-            <tr><td>Где деньги остаются на столе</td><td><input class="fill-field" placeholder=""></td></tr>
-            <tr><td>AI-инструменты которые используют</td><td><input class="fill-field" placeholder=""></td></tr>
-            <tr><td>Приоритет AI-автоматизации (дословно)</td><td><input class="fill-field" placeholder=""></td></tr>
-            <tr><td>Готовность к пилоту (1–5)</td><td><input class="fill-field" placeholder=""></td></tr>
-            <tr><td>Потенциальный AI-амбассадор?</td><td><input class="fill-field" placeholder="Да / Нет / Возможно"></td></tr>
-            <tr><td>Ключевые цитаты</td><td><input class="fill-field" placeholder=""></td></tr>
-          </tbody>
-        </table>
+        <div class="artifact-section gold-art">
+          <div class="artifact-sub">Монетизационный календарь</div>
+          <table class="artifact-table">
+            <thead><tr><th>Параметр</th><th>Значение</th></tr></thead>
+            <tbody>
+              <tr><td>Горизонт планирования</td><td><input class="fill-field" placeholder="неделя / месяц / квартал"></td></tr>
+              <tr><td>Кол-во офферов/событий в месяц</td><td><input class="fill-field" placeholder="___"></td></tr>
+              <tr><td>Источник данных для решений</td><td><input class="fill-field" placeholder="модель / история / интуиция"></td></tr>
+              <tr><td>Кто утверждает финально</td><td><input class="fill-field" placeholder="___"></td></tr>
+            </tbody>
+          </table>
+
+          <div class="artifact-sub">Оффер-пайплайн (от идеи до запуска)</div>
+          <table class="artifact-table">
+            <thead><tr><th>Этап</th><th>Кто</th><th>Время</th><th>Узкое место?</th></tr></thead>
+            <tbody>
+              <tr><td><input class="fill-field" placeholder="Идея / дизайн механики"></td><td><input class="fill-field"></td><td><input class="fill-field"></td><td><input class="fill-field"></td></tr>
+              <tr><td><input class="fill-field" placeholder="Согласование цены"></td><td><input class="fill-field"></td><td><input class="fill-field"></td><td><input class="fill-field"></td></tr>
+              <tr><td><input class="fill-field" placeholder="Техническая реализация"></td><td><input class="fill-field"></td><td><input class="fill-field"></td><td><input class="fill-field"></td></tr>
+              <tr><td><input class="fill-field" placeholder="QA / тестирование"></td><td><input class="fill-field"></td><td><input class="fill-field"></td><td><input class="fill-field"></td></tr>
+              <tr><td><input class="fill-field" placeholder="Запуск + мониторинг"></td><td><input class="fill-field"></td><td><input class="fill-field"></td><td><input class="fill-field"></td></tr>
+            </tbody>
+          </table>
+
+          <div class="artifact-sub">Ключевые метрики и задержки</div>
+          <table class="artifact-table">
+            <thead><tr><th>Метрика</th><th>Задержка данных</th><th>Кто смотрит</th></tr></thead>
+            <tbody>
+              <tr><td><input class="fill-field" placeholder="ARPU / ARPPU"></td><td><input class="fill-field"></td><td><input class="fill-field"></td></tr>
+              <tr><td><input class="fill-field" placeholder="Conversion rate"></td><td><input class="fill-field"></td><td><input class="fill-field"></td></tr>
+              <tr><td><input class="fill-field" placeholder="LTV по сегментам"></td><td><input class="fill-field"></td><td><input class="fill-field"></td></tr>
+              <tr><td><input class="fill-field" placeholder="Revenue per event"></td><td><input class="fill-field"></td><td><input class="fill-field"></td></tr>
+            </tbody>
+          </table>
+
+          <div class="artifact-sub">Сигнальные цитаты</div>
+          <textarea style="width:100%;min-height:70px;border:1px dashed var(--gold-border);border-radius:8px;padding:.8rem;font-family:'Inter',sans-serif;font-size:.83rem;background:var(--white);resize:vertical;" placeholder="Записывай дословно — лучшие цитаты для отчёта..."></textarea>
+          <div class="artifact-sub">Single Points of Failure</div>
+          <textarea style="width:100%;min-height:50px;border:1px dashed var(--gold-border);border-radius:8px;padding:.8rem;font-family:'Inter',sans-serif;font-size:.83rem;background:var(--white);resize:vertical;" placeholder="Люди или процессы, уход которых парализует монетизацию..."></textarea>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ARTIFACT 2 — AI Maturity -->
+  <div class="section" id="art2">
+    <div class="section-card">
+      <div class="section-header" onclick="toggleSection(this)">
+        <div class="section-icon">②</div>
+        <div>
+          <div class="section-title">Артефакт 2 — AI-зрелость монетизации</div>
+          <div class="section-sub">Deloitte AI Maturity · 4 измерения · Балл ставит интервьюер</div>
+        </div>
+        <span class="section-toggle open">▼</span>
+      </div>
+      <div class="section-body">
+        <div class="artifact-section gold-art">
+          <p style="font-size:.82rem; color:var(--text-mid); margin-bottom:1.2rem; line-height:1.55">Баллы 1-5 выставляешь ты по итогам разговора — не спрашиваешь респондентов напрямую. Кликни цифру чтобы выбрать балл.</p>
+
+          <table class="artifact-table">
+            <thead>
+              <tr><th style="width:30%">Измерение</th><th style="width:20%">Балл</th><th>Что услышал / увидел</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>1. Стратегия</strong><br><span style="font-size:.72rem;color:#888">Есть ли AI-стратегия в монетизации, или используют ad-hoc</span></td>
+                <td><div class="score-input" id="s1">
+                  <button class="score-btn s1" onclick="setScore('s1',1,this)">1</button>
+                  <button class="score-btn s2" onclick="setScore('s1',2,this)">2</button>
+                  <button class="score-btn s3" onclick="setScore('s1',3,this)">3</button>
+                  <button class="score-btn s4" onclick="setScore('s1',4,this)">4</button>
+                  <button class="score-btn s5" onclick="setScore('s1',5,this)">5</button>
+                </div></td>
+                <td><input class="fill-field" placeholder="← Q3.2, Q2.3 — как принимают решения"></td>
+              </tr>
+              <tr>
+                <td><strong>2. Данные</strong><br><span style="font-size:.72rem;color:#888">Доступность, качество, задержка pricing/LTV данных</span></td>
+                <td><div class="score-input" id="s2">
+                  <button class="score-btn s1" onclick="setScore('s2',1,this)">1</button>
+                  <button class="score-btn s2" onclick="setScore('s2',2,this)">2</button>
+                  <button class="score-btn s3" onclick="setScore('s2',3,this)">3</button>
+                  <button class="score-btn s4" onclick="setScore('s2',4,this)">4</button>
+                  <button class="score-btn s5" onclick="setScore('s2',5,this)">5</button>
+                </div></td>
+                <td><input class="fill-field" placeholder="← Q1.3, Q2.7 — задержка, доступ, governance"></td>
+              </tr>
+              <tr>
+                <td><strong>3. Технологии</strong><br><span style="font-size:.72rem;color:#888">ML-модели, A/B платформа, автоматизация</span></td>
+                <td><div class="score-input" id="s3">
+                  <button class="score-btn s1" onclick="setScore('s3',1,this)">1</button>
+                  <button class="score-btn s2" onclick="setScore('s3',2,this)">2</button>
+                  <button class="score-btn s3" onclick="setScore('s3',3,this)">3</button>
+                  <button class="score-btn s4" onclick="setScore('s3',4,this)">4</button>
+                  <button class="score-btn s5" onclick="setScore('s3',5,this)">5</button>
+                </div></td>
+                <td><input class="fill-field" placeholder="← Q1.4, Q3.1 — A/B тесты, ML-комбинатор, Chill-AI"></td>
+              </tr>
+              <tr>
+                <td><strong>4. Измерение</strong><br><span style="font-size:.72rem;color:#888">Как измеряют эффект монетизационных решений</span></td>
+                <td><div class="score-input" id="s4">
+                  <button class="score-btn s1" onclick="setScore('s4',1,this)">1</button>
+                  <button class="score-btn s2" onclick="setScore('s4',2,this)">2</button>
+                  <button class="score-btn s3" onclick="setScore('s4',3,this)">3</button>
+                  <button class="score-btn s4" onclick="setScore('s4',4,this)">4</button>
+                  <button class="score-btn s5" onclick="setScore('s4',5,this)">5</button>
+                </div></td>
+                <td><input class="fill-field" placeholder="← Q1.3, Q2.4 — метрики, overmonetization"></td>
+              </tr>
+              <tr style="background:var(--gold-pale)">
+                <td><strong>Composite</strong></td>
+                <td><div id="composite" style="font-family:'Space Grotesk',sans-serif;font-size:1.2rem;font-weight:700;color:var(--gold);">—</div></td>
+                <td><div id="maturity-level" style="font-size:.82rem;color:var(--text-mid)">Выберите баллы выше</div></td>
+              </tr>
+            </tbody>
+          </table>
+          <div style="font-size:.75rem; color:var(--text-mid); line-height:1.6">
+            <strong>Уровни:</strong> 1.0-1.8 = Осведомлённость · 1.9-2.5 = Экспериментирование · 2.6-3.3 = Операционализация · 3.4-4.1 = Масштабирование · 4.2-5.0 = Трансформация
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ARTIFACT 3 — Ambassador Scoring -->
+  <div class="section" id="art3">
+    <div class="section-card">
+      <div class="section-header" onclick="toggleSection(this)">
+        <div class="section-icon">③</div>
+        <div>
+          <div class="section-title">Артефакт 3 — Оценка амбассадоров</div>
+          <div class="section-sub">Заполняется на респондента + имена из Q3.3</div>
+        </div>
+        <span class="section-toggle open">▼</span>
+      </div>
+      <div class="section-body">
+        <div class="artifact-section gold-art">
+
+          <!-- Ambassador 1: Respondent -->
+          <div class="ambassador-card">
+            <div class="ambassador-name"><input class="fill-field" style="font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:.9rem;max-width:200px" placeholder="Имя респондента"> <span style="font-size:.75rem;font-weight:400;color:var(--text-mid)">(Moneta)</span></div>
+            <div class="ambassador-grid">
+              <div class="amb-row"><div class="amb-label">Частота использования AI (Q3.1)</div><div class="score-input" id="a1"><button class="score-btn s1" onclick="setAmbScore('a1',1,this)">1</button><button class="score-btn s2" onclick="setAmbScore('a1',2,this)">2</button><button class="score-btn s3" onclick="setAmbScore('a1',3,this)">3</button><button class="score-btn s4" onclick="setAmbScore('a1',4,this)">4</button><button class="score-btn s5" onclick="setAmbScore('a1',5,this)">5</button></div></div>
+              <div class="amb-row"><div class="amb-label">Делится опытом с командой</div><div class="score-input" id="a2"><button class="score-btn s1" onclick="setAmbScore('a2',1,this)">1</button><button class="score-btn s2" onclick="setAmbScore('a2',2,this)">2</button><button class="score-btn s3" onclick="setAmbScore('a2',3,this)">3</button><button class="score-btn s4" onclick="setAmbScore('a2',4,this)">4</button><button class="score-btn s5" onclick="setAmbScore('a2',5,this)">5</button></div></div>
+              <div class="amb-row"><div class="amb-label">Реализованная ценность от AI (Q3.2)</div><div class="score-input" id="a3"><button class="score-btn s1" onclick="setAmbScore('a3',1,this)">1</button><button class="score-btn s2" onclick="setAmbScore('a3',2,this)">2</button><button class="score-btn s3" onclick="setAmbScore('a3',3,this)">3</button><button class="score-btn s4" onclick="setAmbScore('a3',4,this)">4</button><button class="score-btn s5" onclick="setAmbScore('a3',5,this)">5</button></div></div>
+              <div class="amb-row"><div class="amb-label">Проактивность / инновационность</div><div class="score-input" id="a4"><button class="score-btn s1" onclick="setAmbScore('a4',1,this)">1</button><button class="score-btn s2" onclick="setAmbScore('a4',2,this)">2</button><button class="score-btn s3" onclick="setAmbScore('a4',3,this)">3</button><button class="score-btn s4" onclick="setAmbScore('a4',4,this)">4</button><button class="score-btn s5" onclick="setAmbScore('a4',5,this)">5</button></div></div>
+              <div class="amb-row"><div class="amb-label">Готовность к пилоту (Q3.3)</div><div class="score-input" id="a5"><button class="score-btn s1" onclick="setAmbScore('a5',1,this)">1</button><button class="score-btn s2" onclick="setAmbScore('a5',2,this)">2</button><button class="score-btn s3" onclick="setAmbScore('a5',3,this)">3</button><button class="score-btn s4" onclick="setAmbScore('a5',4,this)">4</button><button class="score-btn s5" onclick="setAmbScore('a5',5,this)">5</button></div></div>
+              <div class="amb-row"><div class="amb-label">Готовность обучать других</div><div class="score-input" id="a6"><button class="score-btn s1" onclick="setAmbScore('a6',1,this)">1</button><button class="score-btn s2" onclick="setAmbScore('a6',2,this)">2</button><button class="score-btn s3" onclick="setAmbScore('a6',3,this)">3</button><button class="score-btn s4" onclick="setAmbScore('a6',4,this)">4</button><button class="score-btn s5" onclick="setAmbScore('a6',5,this)">5</button></div></div>
+            </div>
+            <div class="amb-score-total">
+              <div><div class="amb-total-num" id="amb-total-1">—</div><div class="amb-total-label">из 30 баллов</div></div>
+              <div id="amb-category-1" class="champion-badge observer">—</div>
+              <div style="margin-left:auto">
+                <div style="font-size:.75rem;color:var(--text-mid);margin-bottom:.3rem">Психотип</div>
+                <input class="fill-field" placeholder="Аналитик / Скептик / Энтузиаст / Исполнитель" style="max-width:250px">
+              </div>
+            </div>
+          </div>
+
+          <div class="artifact-sub">Другие имена из команды (из Q3.3)</div>
+          <table class="amb-extra-table">
+            <thead><tr><th>Имя</th><th>Что сказали</th><th>Предварительная категория</th></tr></thead>
+            <tbody>
+              <tr><td><input class="fill-field"></td><td><input class="fill-field"></td><td><input class="fill-field"></td></tr>
+              <tr><td><input class="fill-field"></td><td><input class="fill-field"></td><td><input class="fill-field"></td></tr>
+            </tbody>
+          </table>
+
+          <div style="margin-top:.8rem; font-size:.75rem; color:var(--text-mid); line-height:1.6">
+            <strong>Классификация:</strong> 23-30 = AI Champion · 17-22 = AI Advocate · 11-16 = AI Curious · 0-10 = AI Observer
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ARTIFACT 4 — Impact x Feasibility -->
+  <div class="section" id="art4">
+    <div class="section-card">
+      <div class="section-header" onclick="toggleSection(this)">
+        <div class="section-icon">④</div>
+        <div>
+          <div class="section-title">Артефакт 4 — Инициативы Impact x Feasibility</div>
+          <div class="section-sub">McKinsey Impact-Feasibility Matrix · монетизация</div>
+        </div>
+        <span class="section-toggle open">▼</span>
+      </div>
+      <div class="section-body">
+        <div class="artifact-section gold-art">
+          <table class="matrix-table">
+            <thead>
+              <tr><th>Инициатива</th><th>Категория</th><th>Боль (1-5)</th><th>Ценность (1-5)</th><th>Feasibility (1-5)</th><th>Квадрант</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Predictive pricing модель (прогноз выручки по офферам)</td>
+                <td style="font-size:.75rem">ML / Прогнозирование</td>
+                <td><input class="fill-field" style="width:40px" placeholder="—"></td>
+                <td><input class="fill-field" style="width:40px" placeholder="—"></td>
+                <td><input class="fill-field" style="width:40px" placeholder="—"></td>
+                <td><select style="font-size:.75rem;border:1px solid #ddd;border-radius:4px;padding:.2rem .4rem;background:#fff" onchange="colorQuadrant(this)"><option value="">—</option><option value="q1">Q1: Quick Win</option><option value="q2">Q2: Strategic Bet</option><option value="q3">Q3: Low Fruit</option><option value="q4">Q4: Depri</option></select></td>
+              </tr>
+              <tr>
+                <td>AI-сегментация для персональных офферов</td>
+                <td style="font-size:.75rem">ML / Сегментация</td>
+                <td><input class="fill-field" style="width:40px" placeholder="—"></td>
+                <td><input class="fill-field" style="width:40px" placeholder="—"></td>
+                <td><input class="fill-field" style="width:40px" placeholder="—"></td>
+                <td><select style="font-size:.75rem;border:1px solid #ddd;border-radius:4px;padding:.2rem .4rem;background:#fff" onchange="colorQuadrant(this)"><option value="">—</option><option value="q1">Q1: Quick Win</option><option value="q2">Q2: Strategic Bet</option><option value="q3">Q3: Low Fruit</option><option value="q4">Q4: Depri</option></select></td>
+              </tr>
+              <tr>
+                <td>Перезапуск ML-комбинатора офферов</td>
+                <td style="font-size:.75rem">Автоматизация</td>
+                <td><input class="fill-field" style="width:40px" placeholder="—"></td>
+                <td><input class="fill-field" style="width:40px" placeholder="—"></td>
+                <td><input class="fill-field" style="width:40px" placeholder="—"></td>
+                <td><select style="font-size:.75rem;border:1px solid #ddd;border-radius:4px;padding:.2rem .4rem;background:#fff" onchange="colorQuadrant(this)"><option value="">—</option><option value="q1">Q1: Quick Win</option><option value="q2">Q2: Strategic Bet</option><option value="q3">Q3: Low Fruit</option><option value="q4">Q4: Depri</option></select></td>
+              </tr>
+              <tr>
+                <td>Real-time оптимизация цены</td>
+                <td style="font-size:.75rem">Динамическое pricing</td>
+                <td><input class="fill-field" style="width:40px" placeholder="—"></td>
+                <td><input class="fill-field" style="width:40px" placeholder="—"></td>
+                <td><input class="fill-field" style="width:40px" placeholder="—"></td>
+                <td><select style="font-size:.75rem;border:1px solid #ddd;border-radius:4px;padding:.2rem .4rem;background:#fff" onchange="colorQuadrant(this)"><option value="">—</option><option value="q1">Q1: Quick Win</option><option value="q2">Q2: Strategic Bet</option><option value="q3">Q3: Low Fruit</option><option value="q4">Q4: Depri</option></select></td>
+              </tr>
+              <tr>
+                <td>LTV-прогноз по когортам для планирования</td>
+                <td style="font-size:.75rem">Аналитика</td>
+                <td><input class="fill-field" style="width:40px" placeholder="—"></td>
+                <td><input class="fill-field" style="width:40px" placeholder="—"></td>
+                <td><input class="fill-field" style="width:40px" placeholder="—"></td>
+                <td><select style="font-size:.75rem;border:1px solid #ddd;border-radius:4px;padding:.2rem .4rem;background:#fff" onchange="colorQuadrant(this)"><option value="">—</option><option value="q1">Q1: Quick Win</option><option value="q2">Q2: Strategic Bet</option><option value="q3">Q3: Low Fruit</option><option value="q4">Q4: Depri</option></select></td>
+              </tr>
+              <tr>
+                <td><input class="fill-field" placeholder="+ из разговора"></td>
+                <td><input class="fill-field" placeholder="категория"></td>
+                <td><input class="fill-field" style="width:40px" placeholder="—"></td>
+                <td><input class="fill-field" style="width:40px" placeholder="—"></td>
+                <td><input class="fill-field" style="width:40px" placeholder="—"></td>
+                <td><select style="font-size:.75rem;border:1px solid #ddd;border-radius:4px;padding:.2rem .4rem;background:#fff" onchange="colorQuadrant(this)"><option value="">—</option><option value="q1">Q1: Quick Win</option><option value="q2">Q2: Strategic Bet</option><option value="q3">Q3: Low Fruit</option><option value="q4">Q4: Depri</option></select></td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="quadrant-legend">
+            <div class="q-legend-item ql1"><strong>Q1: Quick Win</strong>Impact >= 3.5 + Feasibility >= 3.5 → Запускать первыми</div>
+            <div class="q-legend-item ql2"><strong>Q2: Strategic Bet</strong>Impact >= 3.5 + F < 3.5 → Инвестировать в prerequisites</div>
+            <div class="q-legend-item ql3"><strong>Q3: Low Hanging Fruit</strong>Impact < 3.5 + F >= 3.5 → Быстрые пилоты, build momentum</div>
+            <div class="q-legend-item ql4"><strong>Q4: Deprioritize</strong>Оба < 3.5 → Не сейчас, пересмотр через 6-12 мес.</div>
+          </div>
+
+          <div class="artifact-sub">Общая Feasibility монетизации</div>
+          <div class="feasibility-mini">
+            <div class="f-item"><div class="f-item-label">Данные готовы (Q1.3, Q2.7)</div><input class="fill-field" placeholder="1-5"></div>
+            <div class="f-item"><div class="f-item-label">Стандартизация процессов (В1)</div><input class="fill-field" placeholder="1-5"></div>
+            <div class="f-item"><div class="f-item-label">Документация знаний (Q2.6)</div><input class="fill-field" placeholder="1-5"></div>
+            <div class="f-item"><div class="f-item-label">Навыки команды (Q3.1)</div><input class="fill-field" placeholder="1-5"></div>
+          </div>
+
+          <div class="artifact-sub">Открытые вопросы для follow-up</div>
+          <textarea style="width:100%;min-height:60px;border:1px dashed var(--gold-border);border-radius:8px;padding:.8rem;font-family:'Inter',sans-serif;font-size:.83rem;background:var(--white);resize:vertical;" placeholder="Что нужно уточнить дополнительно..."></textarea>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TIMING -->
+  <div class="section" id="timing">
+    <div class="section-card">
+      <div class="section-header" onclick="toggleSection(this)">
+        <div class="section-icon">⏱</div>
+        <div><div class="section-title">Тайминг сессии</div><div class="section-sub">Отмечай по ходу интервью</div></div>
+        <span class="section-toggle open">▼</span>
+      </div>
+      <div class="section-body">
+        <div class="timing-list">
+          <div class="timing-item"><div class="timing-time">0:00 – 0:03</div><div class="timing-label">Волна 0: Раппорт</div><div class="timing-mark"><input type="checkbox"></div></div>
+          <div class="timing-item"><div class="timing-time">0:03 – 0:13</div><div class="timing-label">Волна 1: Карта процессов (4 вопроса)</div><div class="timing-mark"><input type="checkbox"></div></div>
+          <div class="timing-item"><div class="timing-time">0:13 – 0:25</div><div class="timing-label">Волна 2: Боли + стресс-тест + governance (7 вопросов)</div><div class="timing-mark"><input type="checkbox"></div></div>
+          <div class="timing-item"><div class="timing-time">0:25 – 0:32</div><div class="timing-label">Волна 3: AI Сигналы (3 вопроса)</div><div class="timing-mark"><input type="checkbox"></div></div>
+          <div class="timing-item"><div class="timing-time">0:32 – 0:35</div><div class="timing-label">Буфер: дозаполнение артефактов</div><div class="timing-mark"><input type="checkbox"></div></div>
+        </div>
       </div>
     </div>
   </div>
@@ -426,7 +830,7 @@ function toggleSidebar() {
   sidebar.classList.toggle('open');
   overlay.classList.toggle('show');
 }
-// Заполнить мобильный заголовок
+// Fill mobile header
 document.addEventListener('DOMContentLoaded', function() {
   const deptEl = document.querySelector('.sidebar-logo .dept');
   const mobileLabel = document.getElementById('mobileDeptLabel');
@@ -435,8 +839,17 @@ document.addEventListener('DOMContentLoaded', function() {
 
 let timerInterval = null, seconds = 0, running = false;
 function toggleTimer() {
-  if (running) { clearInterval(timerInterval); running = false; document.querySelector('.timer-btn').textContent = '▶ Старт'; }
-  else { timerInterval = setInterval(() => { seconds++; const m = String(Math.floor(seconds/60)).padStart(2,'0'), s = String(seconds%60).padStart(2,'0'); document.getElementById('timerDisplay').textContent = m+':'+s; }, 1000); running = true; document.querySelector('.timer-btn').textContent = '⏸ Пауза'; }
+  const btn = document.getElementById('timerBtn');
+  if (running) { clearInterval(timerInterval); running = false; btn.textContent = '▶ Старт'; }
+  else {
+    timerInterval = setInterval(() => {
+      seconds++;
+      const m = String(Math.floor(seconds/60)).padStart(2,'0'), s = String(seconds%60).padStart(2,'0');
+      document.getElementById('timerDisplay').textContent = m+':'+s;
+    }, 1000);
+    running = true;
+    btn.textContent = '⏸ Пауза';
+  }
 }
 function toggleSection(header) {
   const body = header.nextElementSibling, toggle = header.querySelector('.section-toggle');
@@ -446,7 +859,76 @@ function toggleWave(header) {
   const body = header.nextElementSibling, toggle = header.querySelector('.section-toggle');
   body.classList.toggle('hidden'); toggle.classList.toggle('open');
 }
+function setActive(el) {
+  document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+  el.classList.add('active');
+}
+// Scroll-based nav highlight
+const allSections = document.querySelectorAll('.section');
+window.addEventListener('scroll', () => {
+  let current = '';
+  allSections.forEach(s => { if (window.scrollY >= s.offsetTop - 80) current = s.id; });
+  document.querySelectorAll('.nav-item').forEach(n => {
+    n.classList.remove('active');
+    if (n.getAttribute('href') === '#' + current) n.classList.add('active');
+  });
+});
 document.querySelectorAll('a[href^="#"]').forEach(a => a.addEventListener('click', e => { e.preventDefault(); document.querySelector(a.getAttribute('href'))?.scrollIntoView({behavior:'smooth'}); }));
+
+// Maturity scores (4 dimensions for Moneta)
+const matScores = {};
+function setScore(id, val, btn) {
+  const row = document.getElementById(id);
+  row.querySelectorAll('.score-btn').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  matScores[id] = val;
+  updateComposite();
+}
+function updateComposite() {
+  const keys = ['s1','s2','s3','s4'];
+  const vals = keys.map(k => matScores[k] || null);
+  if (vals.some(v => v === null)) return;
+  const avg = (vals.reduce((a,b) => a+b, 0) / vals.length).toFixed(2);
+  document.getElementById('composite').textContent = avg;
+  const matLevels = [[1.9,'Осведомлённость'],[2.6,'Экспериментирование'],[3.4,'Операционализация'],[4.2,'Масштабирование'],[99,'Трансформация']];
+  const level = matLevels.find(l => parseFloat(avg) < l[0]);
+  document.getElementById('maturity-level').textContent = level ? level[1] : 'Трансформация';
+}
+
+// Ambassador scores
+const ambScores = {};
+const ambCats = [[11,'AI Observer','observer'],[17,'AI Curious','curious'],[23,'AI Advocate','advocate'],[31,'AI Champion','champion']];
+function setAmbScore(id, val, btn) {
+  const row = document.getElementById(id);
+  row.querySelectorAll('.score-btn').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  ambScores[id] = val;
+  updateAmbTotals();
+}
+function updateAmbTotals() {
+  const keysA = ['a1','a2','a3','a4','a5','a6'];
+  const valsA = keysA.map(k => ambScores[k] || 0);
+  if (valsA.some(v => v > 0)) {
+    const total = valsA.reduce((a,b) => a+b, 0);
+    document.getElementById('amb-total-1').textContent = total;
+    const cat = ambCats.slice().reverse().find(c => total >= c[0]) || ambCats[0];
+    const el = document.getElementById('amb-category-1');
+    el.textContent = cat[1];
+    el.className = 'champion-badge ' + cat[2];
+  }
+}
+
+// Quadrant coloring
+function colorQuadrant(sel) {
+  const cls = {'q1':'quadrant-q1','q2':'quadrant-q2','q3':'quadrant-q3','q4':'quadrant-q4'};
+  sel.className = '';
+  if (cls[sel.value]) sel.classList.add(cls[sel.value]);
+  sel.style.fontSize = '.75rem';
+  sel.style.border = '1px solid #ddd';
+  sel.style.borderRadius = '4px';
+  sel.style.padding = '.2rem .4rem';
+  sel.style.background = '#fff';
+}
 </script>
 </body>
 </html>
