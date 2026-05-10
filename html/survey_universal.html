@@ -1545,6 +1545,9 @@ function prevBlock(from) {
 document.addEventListener('click', function(e) {
   const opt = e.target.closest('.opt');
   if (!opt) return;
+  // Prevent label from toggling checkbox/radio before our handler
+  if (e.target.tagName === 'INPUT') return;
+  e.preventDefault();
   const wrap = opt.closest('[data-type]');
   if (!wrap) return;
   const type = wrap.dataset.type;
@@ -1554,7 +1557,7 @@ document.addEventListener('click', function(e) {
   if (!input) return;
 
   if (type === 'radio') {
-    wrap.querySelectorAll('.opt').forEach(o => o.classList.remove('selected'));
+    wrap.querySelectorAll('.opt').forEach(o => { o.classList.remove('selected'); o.querySelector('input').checked = false; });
     opt.classList.add('selected');
     input.checked = true;
     answers[id] = input.value;
